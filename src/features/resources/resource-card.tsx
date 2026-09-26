@@ -19,7 +19,8 @@ import {
   Users,
   Video,
   Monitor,
-  Edit2
+  Edit2,
+  Download
 } from 'lucide-react';
 import { archiveResourceAction } from './actions';
 import { EditResourceDialog } from './edit-resource-dialog';
@@ -71,6 +72,10 @@ export function ResourceCard({ resource, projectId, currentUserId, isManager, ta
 
   const Icon = CATEGORY_ICONS[resource.category] || FileText;
   const canEdit = isManager || resource.addedBy.id === currentUserId;
+  const isFile =
+    resource.url.startsWith('/api/uploads/') ||
+    resource.url.startsWith('/uploads/') ||
+    /\.(pdf|docx?|xlsx?|pptx?|png|jpe?g|webp|svg|zip)$/i.test(resource.url);
 
   const handleCopy = async () => {
     try {
@@ -104,6 +109,11 @@ export function ResourceCard({ resource, projectId, currentUserId, isManager, ta
               <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-sm bg-surface-secondary text-text-secondary border border-border tracking-wide uppercase">
                 {resource.category.replace('_', ' ')}
               </span>
+              {isFile && (
+                <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-sm bg-blue-50 text-blue-700 border border-blue-200 tracking-wide uppercase">
+                  File
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -123,10 +133,11 @@ export function ResourceCard({ resource, projectId, currentUserId, isManager, ta
             href={resource.url}
             target="_blank"
             rel="noopener noreferrer"
+            download={isFile ? true : undefined}
             className="inline-flex items-center justify-center size-7 rounded-md text-text-muted hover:bg-surface-secondary hover:text-primary transition-colors"
-            title="Open Link"
+            title={isFile ? "Download / View File" : "Open Link"}
           >
-            <ExternalLink className="size-3.5" />
+            {isFile ? <Download className="size-3.5" /> : <ExternalLink className="size-3.5" />}
           </a>
           {canEdit && (
             <>

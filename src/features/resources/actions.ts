@@ -4,11 +4,20 @@ import { db } from '@/server/db/client';
 import { requireActiveUser, canManageProject } from '@/server/auth/authorization';
 import { ResourceCategory, SystemRole } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
+import fs from 'fs';
+import path from 'path';
+
+const ALLOWED_EXTS = [
+  '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx',
+  '.png', '.jpg', '.jpeg', '.webp', '.svg', '.gif',
+  '.txt', '.csv', '.zip', '.json'
+];
+
+const MAX_FILE_SIZE = 30 * 1024 * 1024; // 30 MB
 
 export async function createResourceAction(projectId: string, formData: FormData) {
   try {
     const currentUser = await requireActiveUser();
-    // Members can add resources, so we just verify they are a member (this is implied if they can view the project in page level, but we should double check)
     const member = await db.projectMember.findFirst({
       where: { projectId, userId: currentUser.id, removedAt: null },
     });
@@ -17,22 +26,70 @@ export async function createResourceAction(projectId: string, formData: FormData
       return { error: 'You are not a member of this project.' };
     }
 
-    const title = formData.get('title') as string;
-    const url = formData.get('url') as string;
+    const titleInput = formData.get('title') as string | null;
+    const mode = (formData.get('mode') as string) || 'url';
+    let url = (formData.get('url') as string) || '';
+    const file = formData.get('file') as File | null;
     const category = formData.get('category') as ResourceCategory;
     const description = formData.get('description') as string | null;
     const tagsInput = formData.get('tags') as string | null;
     const relatedTaskId = formData.get('relatedTaskId') as string | null;
 
-    if (!title || !url || !category) {
-      return { error: 'Title, URL, and category are required.' };
+    let finalTitle = titleInput?.trim() || '';
+
+    // Handle File Upload Mode
+    if (mode === 'file' || (file && file.size > 0 && typeof file.name === 'string')) {
+      if (!file || file.size === 0) {
+        return { error: 'Please choose a document or image file to upload.' };
+      }
+
+      if (file.size > MAX_FILE_SIZE) {
+        return { error: 'File size exceeds 30MB limit. Please compress or choose a smaller file.' };
+      }
+
+      const ext = path.extname(file.name).toLowerCase();
+      if (!ALLOWED_EXTS.includes(ext)) {
+        return {
+          error: `Unsupported file format (${ext}). Supported formats: PDF, Word (DOC/DOCX), Excel, PPT, PNG, JPG, WEBP, SVG, CSV, TXT, ZIP.`,
+        };
+      }
+
+      // Auto-extract title if empty
+      if (!finalTitle) {
+        finalTitle = path.basename(file.name, ext).replace(/[-_]/g, ' ').trim() || 'Uploaded Document';
+      }
+
+      // Ensure upload directory exists
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'resources');
+      await fs.promises.mkdir(uploadDir, { recursive: true });
+
+      const rawBase = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 40);
+      const uniqueName = `${Date.now()}_${rawBase || 'resource'}${ext}`;
+      const filePath = path.join(uploadDir, uniqueName);
+
+      const bytes = await file.arrayBuffer();
+      await fs.promises.writeFile(filePath, Buffer.from(bytes));
+
+      url = `/api/uploads/resources/${uniqueName}`;
+    } else {
+      // URL Mode
+      if (!url) {
+        return { error: 'Destination URL is required for web links.' };
+      }
+
+      try {
+        new URL(url);
+      } catch {
+        return { error: 'Invalid URL. Please enter a valid URL starting with http:// or https://' };
+      }
+
+      if (!finalTitle) {
+        return { error: 'Resource Title is required.' };
+      }
     }
 
-    // Basic URL validation
-    try {
-      new URL(url);
-    } catch {
-      return { error: 'Invalid URL provided.' };
+    if (!category) {
+      return { error: 'Category is required.' };
     }
 
     const tags = tagsInput
@@ -43,10 +100,10 @@ export async function createResourceAction(projectId: string, formData: FormData
       const resource = await tx.projectResource.create({
         data: {
           projectId,
-          title,
+          title: finalTitle,
           url,
           category,
-          description,
+          description: description?.trim() || null,
           tags,
           relatedTaskId: relatedTaskId || null,
           addedById: currentUser.id,
@@ -60,7 +117,7 @@ export async function createResourceAction(projectId: string, formData: FormData
           action: 'CREATED_RESOURCE',
           entityType: 'RESOURCE',
           entityId: resource.id,
-          metadata: { title, url, category },
+          metadata: { title: finalTitle, url, category, mode },
         },
       });
     });
@@ -141,21 +198,44 @@ export async function updateResourceAction(resourceId: string, projectId: string
       return { error: 'Only Project Leads, Admins, or the creator can edit this resource.' };
     }
 
-    const title = formData.get('title') as string;
-    const url = formData.get('url') as string;
+    const title = (formData.get('title') as string)?.trim();
+    let url = (formData.get('url') as string)?.trim() || resource.url;
+    const file = formData.get('file') as File | null;
     const category = formData.get('category') as ResourceCategory;
     const description = formData.get('description') as string | null;
     const tagsInput = formData.get('tags') as string | null;
     const relatedTaskId = formData.get('relatedTaskId') as string | null;
 
-    if (!title || !url || !category) {
-      return { error: 'Title, URL, and category are required.' };
+    if (!title) {
+      return { error: 'Title is required.' };
     }
 
-    try {
-      new URL(url);
-    } catch {
-      return { error: 'Invalid URL provided.' };
+    // If new file uploaded during edit
+    if (file && file.size > 0 && typeof file.name === 'string') {
+      if (file.size > MAX_FILE_SIZE) {
+        return { error: 'File size exceeds 30MB limit.' };
+      }
+      const ext = path.extname(file.name).toLowerCase();
+      if (!ALLOWED_EXTS.includes(ext)) {
+        return { error: `Unsupported file type (${ext}).` };
+      }
+
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'resources');
+      await fs.promises.mkdir(uploadDir, { recursive: true });
+
+      const rawBase = path.basename(file.name, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 40);
+      const uniqueName = `${Date.now()}_${rawBase || 'resource'}${ext}`;
+      const filePath = path.join(uploadDir, uniqueName);
+
+      const bytes = await file.arrayBuffer();
+      await fs.promises.writeFile(filePath, Buffer.from(bytes));
+      url = `/api/uploads/resources/${uniqueName}`;
+    } else if (url && !url.startsWith('/api/uploads/') && !url.startsWith('/uploads/')) {
+      try {
+        new URL(url);
+      } catch {
+        return { error: 'Invalid URL provided.' };
+      }
     }
 
     const tags = tagsInput
@@ -169,7 +249,7 @@ export async function updateResourceAction(resourceId: string, projectId: string
           title,
           url,
           category,
-          description,
+          description: description?.trim() || null,
           tags,
           relatedTaskId: relatedTaskId || null,
         },

@@ -23,6 +23,7 @@ import {
   X,
   LayoutGrid,
   List as ListIcon,
+  Download,
 } from 'lucide-react';
 import { ResourceCategory } from '@prisma/client';
 import { archiveResourceAction } from './actions';
@@ -239,7 +240,9 @@ export function WorkspaceResourceHub({
         let matchesHost = false;
         try {
           matchesHost = new URL(r.url).hostname.toLowerCase().includes(q);
-        } catch {}
+        } catch {
+          matchesHost = r.url.toLowerCase().includes(q);
+        }
 
         if (!matchesTitle && !matchesDesc && !matchesTags && !matchesProject && !matchesAddedBy && !matchesHost) {
           return false;
@@ -281,11 +284,31 @@ export function WorkspaceResourceHub({
     setSortBy('NEWEST');
   };
 
-  const getHostname = (urlStr: string) => {
+  const getResourceBadge = (urlStr: string) => {
+    const isUpload = urlStr.startsWith('/api/uploads/') || urlStr.startsWith('/uploads/');
+    const ext = (urlStr.split('?')[0] || '').split('.').pop()?.toLowerCase();
+    if (isUpload || ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'webp', 'svg', 'zip'].includes(ext || '')) {
+      if (ext === 'pdf') {
+        return { label: 'PDF Document', isFile: true, color: 'text-red-700 bg-red-50 border-red-200' };
+      }
+      if (['doc', 'docx'].includes(ext || '')) {
+        return { label: 'Word Document', isFile: true, color: 'text-blue-700 bg-blue-50 border-blue-200' };
+      }
+      if (['xls', 'xlsx', 'csv'].includes(ext || '')) {
+        return { label: 'Spreadsheet', isFile: true, color: 'text-emerald-700 bg-emerald-50 border-emerald-200' };
+      }
+      if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext || '')) {
+        return { label: 'Image Asset', isFile: true, color: 'text-purple-700 bg-purple-50 border-purple-200' };
+      }
+      if (['zip', 'rar', 'tar', 'gz'].includes(ext || '')) {
+        return { label: 'Archive File', isFile: true, color: 'text-amber-700 bg-amber-50 border-amber-200' };
+      }
+      return { label: `${(ext || 'FILE').toUpperCase()} File`, isFile: true, color: 'text-slate-700 bg-slate-100 border-slate-200' };
+    }
     try {
-      return new URL(urlStr).hostname.replace(/^www\./, '');
+      return { label: new URL(urlStr).hostname.replace(/^www\./, ''), isFile: false, color: 'text-[#667085] bg-[#F2F4F7] border-[#E4E7EC]' };
     } catch {
-      return 'link';
+      return { label: 'Web Link', isFile: false, color: 'text-[#667085] bg-[#F2F4F7] border-[#E4E7EC]' };
     }
   };
 
@@ -618,7 +641,7 @@ export function WorkspaceResourceHub({
                 {filteredResources.map((res) => {
                   const meta = CATEGORY_META[res.category] || CATEGORY_META.OTHER;
                   const Icon = meta.icon;
-                  const hostname = getHostname(res.url);
+                  const badge = getResourceBadge(res.url);
                   const canArchive = isAdmin || res.addedBy.id === currentUserId;
 
                   return (
@@ -634,10 +657,14 @@ export function WorkspaceResourceHub({
                               className="font-semibold text-[13px] text-[#101828] hover:text-[#5B5FEF] hover:underline flex items-center gap-1.5"
                             >
                               {res.title}
-                              <ExternalLink className="size-3 text-[#98A2B3]" />
+                              {badge.isFile ? (
+                                <Download className="size-3 text-[#5B5FEF]" />
+                              ) : (
+                                <ExternalLink className="size-3 text-[#98A2B3]" />
+                              )}
                             </a>
-                            <span className="text-[10px] font-mono text-[#667085] bg-[#F2F4F7] px-1.5 py-0.2 rounded border border-[#E4E7EC]">
-                              {hostname}
+                            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${badge.color}`}>
+                              {badge.label}
                             </span>
                           </div>
 
@@ -717,15 +744,20 @@ export function WorkspaceResourceHub({
                             )}
                           </button>
 
-                          {/* Open External Link */}
+                          {/* Open External Link or Download File */}
                           <a
                             href={res.url}
                             target="_blank"
                             rel="noopener noreferrer"
+                            download={badge.isFile ? true : undefined}
                             className="inline-flex items-center justify-center size-7 rounded-[4px] border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#5B5FEF] hover:bg-[#EFF6FF] hover:border-[#BFDBFE] transition-colors"
-                            title="Open external link"
+                            title={badge.isFile ? "Download / View file" : "Open link"}
                           >
-                            <ExternalLink className="size-3.5" />
+                            {badge.isFile ? (
+                              <Download className="size-3.5" />
+                            ) : (
+                              <ExternalLink className="size-3.5" />
+                            )}
                           </a>
 
                           {/* Archive Action */}
@@ -754,7 +786,7 @@ export function WorkspaceResourceHub({
           {filteredResources.map((res) => {
             const meta = CATEGORY_META[res.category] || CATEGORY_META.OTHER;
             const Icon = meta.icon;
-            const hostname = getHostname(res.url);
+            const badge = getResourceBadge(res.url);
             const canArchive = isAdmin || res.addedBy.id === currentUserId;
 
             return (
@@ -770,8 +802,8 @@ export function WorkspaceResourceHub({
                       <Icon className="size-3" />
                       {meta.label}
                     </span>
-                    <span className="text-[10px] font-mono text-[#667085] bg-[#F2F4F7] px-1.5 py-0.5 rounded">
-                      {hostname}
+                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${badge.color}`}>
+                      {badge.label}
                     </span>
                   </div>
 
@@ -780,10 +812,11 @@ export function WorkspaceResourceHub({
                       href={res.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-[14px] text-[#101828] hover:text-[#5B5FEF] hover:underline line-clamp-1"
+                      className="font-semibold text-[14px] text-[#101828] hover:text-[#5B5FEF] hover:underline line-clamp-1 flex items-center gap-1.5"
                       title={res.title}
                     >
                       {res.title}
+                      {badge.isFile && <Download className="size-3 text-[#5B5FEF] shrink-0" />}
                     </a>
                     {res.description && (
                       <p className="mt-1 text-[12px] text-[#475467] line-clamp-2">
@@ -836,10 +869,11 @@ export function WorkspaceResourceHub({
                       href={res.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      download={badge.isFile ? true : undefined}
                       className="p-1.5 rounded border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#5B5FEF] hover:bg-[#EFF6FF]"
-                      title="Open external link"
+                      title={badge.isFile ? "Download / View file" : "Open link"}
                     >
-                      <ExternalLink className="size-3.5" />
+                      {badge.isFile ? <Download className="size-3.5" /> : <ExternalLink className="size-3.5" />}
                     </a>
                     {canArchive && (
                       <button
