@@ -73,8 +73,8 @@ export default async function LoginPage() {
       </div>
 
       {/* Right Login Form Side */}
-      <div className="flex flex-1 flex-col justify-center bg-white px-8 py-12 lg:px-20 xl:px-24">
-        <div className="w-full max-w-[380px] mx-auto space-y-8">
+      <div className="flex flex-1 flex-col justify-center bg-white px-4 sm:px-8 py-8 sm:py-12 lg:px-20 xl:px-24">
+        <div className="w-full max-w-[380px] mx-auto space-y-6 sm:space-y-8">
           <div className="text-center flex flex-col items-center">
             {/* Minimal Brand Mark */}
             <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#0B1020] to-[#1E293B] border border-[#E4E7EC] flex items-center justify-center mb-4">

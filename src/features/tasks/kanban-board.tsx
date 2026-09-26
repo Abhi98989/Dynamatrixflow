@@ -29,11 +29,11 @@ export function KanbanBoard({ tasks, projectId }: { tasks: KanbanTask[]; project
   const getInitials = (name: string) => name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
 
   return (
-    <div className="flex gap-3 overflow-x-auto pb-4 [&::-webkit-scrollbar]:hidden">
+    <div className="flex gap-3 overflow-x-auto pb-4 touch-pan-x snap-x snap-mandatory [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {COLUMNS.map(col => {
         const colTasks = tasks.filter(t => t.status === col.key);
         return (
-          <div key={col.key} className="min-w-[260px] w-[260px] shrink-0 flex flex-col">
+          <div key={col.key} className="snap-start min-w-[250px] w-[82vw] sm:w-[260px] shrink-0 flex flex-col">
             {/* Column header */}
             <div className="flex items-center gap-2 px-2 py-2 mb-2">
               <span className={`w-2 h-2 rounded-full ${col.dot}`} />

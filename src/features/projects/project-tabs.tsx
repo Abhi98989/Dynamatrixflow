@@ -20,7 +20,7 @@ export function ProjectTabs({ projectId, counts }: { projectId: string; counts: 
   const base = `/projects/${projectId}`;
 
   return (
-    <div className="flex items-center gap-0.5 border-b border-[#E4E7EC] overflow-x-auto [&::-webkit-scrollbar]:hidden">
+    <div className="flex items-center gap-0.5 border-b border-[#E4E7EC] overflow-x-auto touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {tabs.map(t => {
         const href = `${base}${t.key}`;
         const isActive = t.key === ""

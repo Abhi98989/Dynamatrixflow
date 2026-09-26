@@ -69,7 +69,7 @@ export function ProjectList({ projects }: { projects: ProjectItem[] }) {
   return (
     <div className="flex flex-col gap-6">
       {/* Header */}
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4">
         <div>
           <span className="text-[10px] font-semibold text-[#667085] tracking-widest uppercase">
             WORKSPACE / ENGINEERING
@@ -110,7 +110,7 @@ export function ProjectList({ projects }: { projects: ProjectItem[] }) {
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 flex-1">
-          <div className="relative flex-1 min-w-[200px] max-w-xs">
+          <div className="relative flex-1 min-w-[140px] max-w-xs">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#98A2B3]" />
             <input
               type="text"
@@ -194,7 +194,7 @@ export function ProjectList({ projects }: { projects: ProjectItem[] }) {
       {filteredProjects.length > 0 && view === "table" && (
         <div className="bg-white rounded-lg border border-[#E4E7EC] overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left">
+            <table className="w-full text-left min-w-[720px]">
               <thead className="bg-[#F9FAFB] border-b border-[#E4E7EC]">
                 <tr>
                   <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Project</th>

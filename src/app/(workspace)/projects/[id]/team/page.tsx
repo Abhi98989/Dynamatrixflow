@@ -83,64 +83,66 @@ export default async function TeamPage({ params }: Props) {
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-[#E4E7EC] overflow-hidden">
-          <table className="w-full text-left">
-            <thead className="bg-[#F9FAFB] border-b border-[#E4E7EC]">
-              <tr>
-                <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Member</th>
-                <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Position</th>
-                <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Project Role</th>
-                <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase text-center">To Do</th>
-                <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase text-center">Active</th>
-                <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase text-center">Done</th>
-                <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Joined</th>
-                {isManager && <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase w-10"></th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#F2F4F7]">
-              {project.members.map(m => {
-                const isLead = m.user.id === project.projectLeadId;
-                return (
-                  <tr key={m.id} className="hover:bg-[#F9FAFC] transition-colors h-11">
-                    <td className="py-2 px-4">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[#101828] text-white flex items-center justify-center text-[9px] font-bold shrink-0">
-                          {getInitials(m.user.name)}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[13px] font-semibold text-[#101828]">{m.user.name}</span>
-                            {isLead && <span className="px-1.5 py-0.5 rounded bg-[#5B5FEF]/10 text-[#5B5FEF] text-[9px] font-bold">LEAD</span>}
-                          </div>
-                          <span className="text-[11px] font-mono text-[#98A2B3]">{m.user.employeeId}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-2 px-4 text-[13px] text-[#475467]">{m.user.position || "—"}</td>
-                    <td className="py-2 px-4 text-[12px] text-[#475467]">{formatEnum(m.projectRole)}</td>
-                    <td className="py-2 px-4 text-center">
-                      <span className="text-[12px] font-semibold text-[#667085] tabular-nums">{statusMap[m.user.id]?.todo || 0}</span>
-                    </td>
-                    <td className="py-2 px-4 text-center">
-                      <span className="text-[12px] font-semibold text-[#2563EB] tabular-nums">{statusMap[m.user.id]?.inProgress || 0}</span>
-                    </td>
-                    <td className="py-2 px-4 text-center">
-                      <span className="text-[12px] font-semibold text-[#15803D] tabular-nums">{statusMap[m.user.id]?.completed || 0}</span>
-                    </td>
-                    <td className="py-2 px-4 text-[12px] text-[#98A2B3]">
-                      {new Date(m.joinedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                    </td>
-                    {isManager && (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left min-w-[680px]">
+              <thead className="bg-[#F9FAFB] border-b border-[#E4E7EC]">
+                <tr>
+                  <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Member</th>
+                  <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Position</th>
+                  <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Project Role</th>
+                  <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase text-center">To Do</th>
+                  <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase text-center">Active</th>
+                  <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase text-center">Done</th>
+                  <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Joined</th>
+                  {isManager && <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase w-10"></th>}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#F2F4F7]">
+                {project.members.map(m => {
+                  const isLead = m.user.id === project.projectLeadId;
+                  return (
+                    <tr key={m.id} className="hover:bg-[#F9FAFC] transition-colors h-11">
                       <td className="py-2 px-4">
-                        {!isLead && (
-                          <RemoveMemberButton memberId={m.id} projectId={projectId} memberName={m.user.name} />
-                        )}
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-[#101828] text-white flex items-center justify-center text-[9px] font-bold shrink-0">
+                            {getInitials(m.user.name)}
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[13px] font-semibold text-[#101828]">{m.user.name}</span>
+                              {isLead && <span className="px-1.5 py-0.5 rounded bg-[#5B5FEF]/10 text-[#5B5FEF] text-[9px] font-bold">LEAD</span>}
+                            </div>
+                            <span className="text-[11px] font-mono text-[#98A2B3]">{m.user.employeeId}</span>
+                          </div>
+                        </div>
                       </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      <td className="py-2 px-4 text-[13px] text-[#475467]">{m.user.position || "—"}</td>
+                      <td className="py-2 px-4 text-[12px] text-[#475467]">{formatEnum(m.projectRole)}</td>
+                      <td className="py-2 px-4 text-center">
+                        <span className="text-[12px] font-semibold text-[#667085] tabular-nums">{statusMap[m.user.id]?.todo || 0}</span>
+                      </td>
+                      <td className="py-2 px-4 text-center">
+                        <span className="text-[12px] font-semibold text-[#2563EB] tabular-nums">{statusMap[m.user.id]?.inProgress || 0}</span>
+                      </td>
+                      <td className="py-2 px-4 text-center">
+                        <span className="text-[12px] font-semibold text-[#15803D] tabular-nums">{statusMap[m.user.id]?.completed || 0}</span>
+                      </td>
+                      <td className="py-2 px-4 text-[12px] text-[#98A2B3]">
+                        {new Date(m.joinedAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      </td>
+                      {isManager && (
+                        <td className="py-2 px-4">
+                          {!isLead && (
+                            <RemoveMemberButton memberId={m.id} projectId={projectId} memberName={m.user.name} />
+                          )}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

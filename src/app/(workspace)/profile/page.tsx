@@ -98,7 +98,7 @@ export default async function ProfilePage() {
         </div>
 
         {/* Workload Stats */}
-        <div className="flex items-center gap-4 sm:gap-6 border-t md:border-t-0 md:border-l border-[#EEF1F5] pt-4 md:pt-0 md:pl-6 shrink-0">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-4 sm:gap-6 border-t md:border-t-0 md:border-l border-[#EEF1F5] pt-4 md:pt-0 md:pl-6 shrink-0">
           <div>
             <div className="flex items-center gap-1 text-[11px] text-[#667085]">
               <FolderKanban className="size-3 text-[#5B5FEF]" />

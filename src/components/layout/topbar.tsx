@@ -9,6 +9,8 @@ import { SidebarContent } from "./sidebar";
 import { logoutAction } from "@/server/auth/actions";
 import Image from "next/image";
 
+import Link from "next/link";
+
 interface TopbarProps {
   user?: {
     id?: string;
@@ -26,12 +28,12 @@ export function Topbar({ user }: TopbarProps) {
 
   return (
     <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 shadow-sm">
-      <div className="h-full w-full px-6 flex items-center justify-between">
-        <div className="flex items-center gap-6 flex-1">
+      <div className="h-full w-full px-3 sm:px-6 flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-6 flex-1 min-w-0">
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <div className="flex items-center gap-3 lg:hidden">
+            <div className="flex items-center gap-2 sm:gap-3 lg:hidden shrink-0">
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="shrink-0">
+                <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9">
                   <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
@@ -40,10 +42,10 @@ export function Topbar({ user }: TopbarProps) {
                 alt="Dynamatrix Icon" 
                 width={24} 
                 height={24} 
-                className="rounded-md"
+                className="rounded-md shrink-0"
               />
             </div>
-            <SheetContent className="w-64 p-0 border-r-0">
+            <SheetContent className="w-64 max-w-[85vw] p-0 border-r-0">
               <SheetTitle className="sr-only">Navigation</SheetTitle>
               <SheetDescription className="sr-only">Sidebar</SheetDescription>
               <SidebarContent onNavigate={() => setMenuOpen(false)} />
@@ -52,23 +54,23 @@ export function Topbar({ user }: TopbarProps) {
 
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200 text-slate-400 cursor-pointer w-full max-w-md hover:bg-slate-100 transition-colors">
             <Search className="w-4 h-4" />
-            <span className="text-sm flex-1">Search projects, tasks, doc links...</span>
+            <span className="text-sm flex-1 truncate">Search projects, tasks, doc links...</span>
             <kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-[10px] text-slate-500 leading-none">⌘K</kbd>
           </div>
         </div>
         
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <div className="hidden lg:flex items-center gap-2 px-3 py-1 rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             <span className="text-[11px] font-medium">System: Normal (99.98% up)</span>
           </div>
           
-          <div className="relative cursor-pointer group">
-            <Bell className="w-5 h-5 text-slate-600 group-hover:text-slate-900 transition-colors" />
-            <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white"></span>
-          </div>
+          <Link href="/notifications" className="relative p-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+            <Bell className="w-5 h-5" />
+            <span className="absolute 1 top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+          </Link>
           
-          <div className="h-6 w-px bg-slate-200"></div>
+          <div className="h-5 w-px bg-slate-200"></div>
           
           <Popover>
             <PopoverTrigger asChild>

@@ -426,7 +426,7 @@ export function WorkspaceResourceHub({
       </div>
 
       {/* 3. Category Filter Tabs (§13 Specification) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-[#E4E7EC]">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-[#E4E7EC] touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           type="button"
           onClick={() => setSelectedCategory('ALL')}

@@ -82,8 +82,8 @@ export function WorkspaceSettingsView({ currentUser }: WorkspaceSettingsViewProp
 
       {/* 2. Settings Grid (Nav + Content) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Navigation Sidebar */}
-        <div className="space-y-1">
+        {/* Navigation Sidebar / Mobile Tab Strip */}
+        <div className="flex flex-row overflow-x-auto pb-1 lg:pb-0 lg:flex-col gap-1 lg:gap-1.5 touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden shrink-0 border-b lg:border-b-0 border-[#E4E7EC]">
           {[
             { id: 'general', label: 'General Workspace', icon: Settings2 },
             { id: 'notifications', label: 'Notification Rules', icon: Bell },
@@ -99,14 +99,14 @@ export function WorkspaceSettingsView({ currentUser }: WorkspaceSettingsViewProp
                 key={item.id}
                 type="button"
                 onClick={() => setActiveTab(item.id as SettingsTab)}
-                className={`w-full px-3 py-2 flex items-center gap-2.5 rounded-[6px] text-[13px] font-medium transition-colors text-left ${
+                className={`px-3 py-2 flex items-center gap-2 rounded-[6px] text-[12px] sm:text-[13px] font-medium transition-colors text-left whitespace-nowrap lg:whitespace-normal shrink-0 lg:shrink ${
                   isActive
                     ? 'bg-[#EEF2FF] text-[#5B5FEF] font-semibold'
                     : 'text-[#475467] hover:bg-[#F9FAFC] hover:text-[#101828]'
                 }`}
               >
-                <Icon className={`size-4 ${isActive ? 'text-[#5B5FEF]' : 'text-[#667085]'}`} />
-                {item.label}
+                <Icon className={`size-4 shrink-0 ${isActive ? 'text-[#5B5FEF]' : 'text-[#667085]'}`} />
+                <span>{item.label}</span>
               </button>
             );
           })}

@@ -129,7 +129,7 @@ export function TaskList({
     <div className="space-y-4">
       {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        <div className="relative flex-1 max-w-md">
+        <div className="relative flex-1 min-w-[140px] max-w-md">
           <Search className="absolute left-3 top-2.5 size-4 text-text-muted" />
           <Input
             placeholder="Search tasks by title, code, or assignee..."
@@ -139,7 +139,7 @@ export function TaskList({
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-1.5 text-xs text-text-muted">
             <Filter className="size-3.5" />
             <span>Filters:</span>
@@ -179,7 +179,7 @@ export function TaskList({
       <Card className="overflow-hidden border-border">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[700px]">
               <thead className="border-b bg-surface-secondary/50 text-xs uppercase font-semibold text-text-secondary">
                 <tr>
                   <th scope="col" className="px-5 py-3.5">Task</th>

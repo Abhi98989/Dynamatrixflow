@@ -84,8 +84,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 max-w-7xl mx-auto">
-        <div className="bg-white rounded-lg p-5 border border-[#E4E7EC] flex flex-col justify-between h-32">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8 max-w-7xl mx-auto">
+        <div className="bg-white rounded-lg p-4 sm:p-5 border border-[#E4E7EC] flex flex-col justify-between h-28 sm:h-32">
           <span className="text-[13px] font-medium text-[#667085]">Active Projects</span>
           <div className="mt-auto">
             <div className="text-3xl font-semibold text-[#101828] tracking-tight">{activeProjectsCount}</div>
@@ -95,31 +95,31 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-5 border border-[#E4E7EC] flex flex-col justify-between h-32">
+        <div className="bg-white rounded-lg p-4 sm:p-5 border border-[#E4E7EC] flex flex-col justify-between h-28 sm:h-32">
           <span className="text-[13px] font-medium text-[#667085]">Overdue Tasks</span>
           <div className="mt-auto">
-            <div className="text-3xl font-semibold text-[#DC2626] tracking-tight">{overdueCount}</div>
-            <div className="text-[13px] text-[#667085] mt-1 flex items-center gap-2">
+            <div className="text-2xl sm:text-3xl font-semibold text-[#DC2626] tracking-tight">{overdueCount}</div>
+            <div className="text-[12px] sm:text-[13px] text-[#667085] mt-1 flex items-center gap-2">
               <span className="text-[#DC2626] font-medium">Action required</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-5 border border-[#E4E7EC] flex flex-col justify-between h-32">
+        <div className="bg-white rounded-lg p-4 sm:p-5 border border-[#E4E7EC] flex flex-col justify-between h-28 sm:h-32">
           <span className="text-[13px] font-medium text-[#667085]">Blocked Work</span>
           <div className="mt-auto">
-            <div className="text-3xl font-semibold text-[#B45309] tracking-tight">{blockedCount}</div>
-            <div className="text-[13px] text-[#667085] mt-1 flex items-center gap-2">
+            <div className="text-2xl sm:text-3xl font-semibold text-[#B45309] tracking-tight">{blockedCount}</div>
+            <div className="text-[12px] sm:text-[13px] text-[#667085] mt-1 flex items-center gap-2">
               <span className="text-[#B45309] font-medium">Stalled items</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-5 border border-[#E4E7EC] flex flex-col justify-between h-32">
+        <div className="bg-white rounded-lg p-4 sm:p-5 border border-[#E4E7EC] flex flex-col justify-between h-28 sm:h-32">
           <span className="text-[13px] font-medium text-[#667085]">Pending Review</span>
           <div className="mt-auto">
-            <div className="text-3xl font-semibold text-[#101828] tracking-tight">{needsReviewCount}</div>
-            <div className="text-[13px] text-[#667085] mt-1 flex items-center gap-2">
+            <div className="text-2xl sm:text-3xl font-semibold text-[#101828] tracking-tight">{needsReviewCount}</div>
+            <div className="text-[12px] sm:text-[13px] text-[#667085] mt-1 flex items-center gap-2">
               <span className="text-[#475467] font-medium">Queued</span>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default async function DashboardPage() {
               <h2 className="font-semibold text-[#101828] text-[15px]">Active Workstreams</h2>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm min-w-[540px]">
                 <thead className="text-[12px] text-[#667085] font-medium border-b border-[#EEF1F5]">
                   <tr>
                     <th className="py-3 px-5 font-medium">Project</th>

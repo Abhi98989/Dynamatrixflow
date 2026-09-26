@@ -587,7 +587,7 @@ export function UpcomingSchedule({
         </div>
 
         {/* Time Horizon Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 border-t border-[#EEF1F5]">
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 border-t border-[#EEF1F5] touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <span className="text-[11px] font-semibold uppercase tracking-wider text-[#98A2B3] shrink-0 mr-1">
             Horizon:
           </span>
