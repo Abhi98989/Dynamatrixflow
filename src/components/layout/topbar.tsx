@@ -30,27 +30,33 @@ export function Topbar({ user }: TopbarProps) {
     <header className="sticky top-0 z-30 h-16 bg-white border-b border-slate-200 shadow-sm">
       <div className="h-full w-full px-3 sm:px-6 flex items-center justify-between">
         <div className="flex items-center gap-2 sm:gap-6 flex-1 min-w-0">
-          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-            <div className="flex items-center gap-2 sm:gap-3 lg:hidden shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 lg:hidden shrink-0">
+            <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9">
+                <Button variant="ghost" size="icon" className="shrink-0 h-9 w-9 text-slate-700 hover:text-slate-900">
                   <Menu className="w-5 h-5" />
                 </Button>
               </SheetTrigger>
+              <SheetContent className="w-64 max-w-[85vw] p-0 border-r-0">
+                <SheetTitle className="sr-only">Navigation</SheetTitle>
+                <SheetDescription className="sr-only">Sidebar</SheetDescription>
+                <SidebarContent onNavigate={() => setMenuOpen(false)} />
+              </SheetContent>
+            </Sheet>
+            <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
               <Image 
-                src="/logo-icon.png" 
-                alt="Dynamatrix Icon" 
-                width={24} 
-                height={24} 
-                className="rounded-md shrink-0"
+                src="/app-icon.png" 
+                alt="Dynamatrix Flow" 
+                width={28} 
+                height={28} 
+                className="w-7 h-7 rounded-lg shrink-0 object-contain shadow-xs"
+                priority
               />
-            </div>
-            <SheetContent className="w-64 max-w-[85vw] p-0 border-r-0">
-              <SheetTitle className="sr-only">Navigation</SheetTitle>
-              <SheetDescription className="sr-only">Sidebar</SheetDescription>
-              <SidebarContent onNavigate={() => setMenuOpen(false)} />
-            </SheetContent>
-          </Sheet>
+              <span className="font-bold text-sm text-slate-900 tracking-tight">
+                Dynamatrix
+              </span>
+            </Link>
+          </div>
 
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200 text-slate-400 cursor-pointer w-full max-w-md hover:bg-slate-100 transition-colors">
             <Search className="w-4 h-4" />
