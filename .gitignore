@@ -9,4 +9,8 @@ coverage/
 .pnpm-store/
 test-results/
 playwright-report/
-.DS_Store
+# Markdown documentation (only track root README.md)
+*.md
+**/*.md
+!/README.md
+.agent/
