@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { db } from "@/server/db/client";
 import {
+  requireActiveUser,
   requireAdmin,
   requireProjectManage,
 } from "@/server/auth/authorization";
@@ -13,11 +14,13 @@ import {
   ProjectMemberRole,
   NotificationType,
   AccountStatus,
+  SystemRole,
 } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 const createProjectSchema = z.object({
   name: z.string().min(2, "Project name must be at least 2 characters").trim(),
+  projectCode: z.string().optional(),
   prefix: z.string().max(5).optional(),
   clientName: z.string().optional(),
   description: z.string().optional(),
@@ -39,10 +42,28 @@ export async function createProjectAction(
   _prevState: CreateProjectResult | undefined,
   formData: FormData,
 ): Promise<CreateProjectResult> {
-  const admin = await requireAdmin();
+  let user;
+  try {
+    user = await requireActiveUser();
+  } catch (err: unknown) {
+    return {
+      error:
+        err instanceof Error ? err.message : "Authentication required to create a project.",
+    };
+  }
+
+  if (
+    user.systemRole !== SystemRole.ADMIN &&
+    user.systemRole !== SystemRole.PROJECT_LEAD
+  ) {
+    return {
+      error: "Only Administrators and Project Leads are authorized to create projects.",
+    };
+  }
 
   const raw = {
     name: formData.get("name"),
+    projectCode: formData.get("projectCode") || "",
     prefix: formData.get("prefix") || "",
     clientName: formData.get("clientName") || "",
     description: formData.get("description") || "",
@@ -62,6 +83,7 @@ export async function createProjectAction(
 
   const {
     name,
+    projectCode: rawCustomCode,
     prefix,
     clientName,
     description,
@@ -84,7 +106,25 @@ export async function createProjectAction(
     };
   }
 
-  const projectCode = await generateNextProjectCode(prefix);
+  let finalProjectCode = rawCustomCode?.trim().toUpperCase();
+  if (finalProjectCode) {
+    if (!/^[A-Z0-9-]+$/.test(finalProjectCode)) {
+      return {
+        error: "Project code can only contain letters, numbers, and hyphens (e.g. PROJ-001).",
+      };
+    }
+    const existing = await db.project.findUnique({
+      where: { projectCode: finalProjectCode },
+      select: { id: true },
+    });
+    if (existing) {
+      return {
+        error: `Project code "${finalProjectCode}" is already in use. Please enter a different code or leave blank to auto-generate.`,
+      };
+    }
+  } else {
+    finalProjectCode = await generateNextProjectCode(prefix);
+  }
 
   const startParsed = startDate ? new Date(startDate) : null;
   const deadlineParsed = deadline ? new Date(deadline) : null;
@@ -93,71 +133,98 @@ export async function createProjectAction(
     return { error: "Project deadline cannot be earlier than start date." };
   }
 
-  const project = await db.$transaction(async (tx) => {
-    const newProject = await tx.project.create({
-      data: {
-        projectCode,
-        name,
-        description: description || null,
-        clientName: clientName || null,
-        status,
-        priority,
-        startDate: startParsed,
-        deadline: deadlineParsed,
-        projectLeadId: lead.id,
-        createdById: admin.id,
-      },
-    });
-
-    // Automatically add Project Lead as project member
-    await tx.projectMember.create({
-      data: {
-        projectId: newProject.id,
-        userId: lead.id,
-        projectRole: ProjectMemberRole.PROJECT_LEAD,
-        addedById: admin.id,
-      },
-    });
-
-    // Notify Project Lead
-    await tx.notification.create({
-      data: {
-        userId: lead.id,
-        type: NotificationType.PROJECT_ASSIGNED,
-        title: "Project Lead Assignment",
-        message: `You have been assigned as Project Lead for "${newProject.name}" [${newProject.projectCode}].`,
-        projectId: newProject.id,
-        entityType: "Project",
-        entityId: newProject.id,
-      },
-    });
-
-    // Audit Log
-    await tx.activityLog.create({
-      data: {
-        actorId: admin.id,
-        action: "PROJECT_CREATED",
-        entityType: "Project",
-        entityId: newProject.id,
-        metadata: {
-          projectCode: newProject.projectCode,
-          name: newProject.name,
+  try {
+    const project = await db.$transaction(async (tx) => {
+      const newProject = await tx.project.create({
+        data: {
+          projectCode: finalProjectCode,
+          name,
+          description: description || null,
+          clientName: clientName || null,
+          status,
+          priority,
+          startDate: startParsed,
+          deadline: deadlineParsed,
           projectLeadId: lead.id,
-          priority: newProject.priority,
+          createdById: user.id,
         },
-      },
+      });
+
+      // Automatically add Project Lead as project member
+      await tx.projectMember.create({
+        data: {
+          projectId: newProject.id,
+          userId: lead.id,
+          projectRole: ProjectMemberRole.PROJECT_LEAD,
+          addedById: user.id,
+        },
+      });
+
+      // If the creator is not the lead, also add creator as member
+      if (user.id !== lead.id) {
+        await tx.projectMember.create({
+          data: {
+            projectId: newProject.id,
+            userId: user.id,
+            projectRole:
+              user.systemRole === SystemRole.ADMIN
+                ? ProjectMemberRole.PROJECT_LEAD
+                : ProjectMemberRole.DEVELOPER,
+            addedById: user.id,
+          },
+        });
+      }
+
+      // Notify Project Lead if lead is different from creator
+      if (lead.id !== user.id) {
+        await tx.notification.create({
+          data: {
+            userId: lead.id,
+            type: NotificationType.PROJECT_ASSIGNED,
+            title: "Project Lead Assignment",
+            message: `You have been assigned as Project Lead for "${newProject.name}" [${newProject.projectCode}].`,
+            projectId: newProject.id,
+            entityType: "Project",
+            entityId: newProject.id,
+          },
+        });
+      }
+
+      // Audit Log
+      await tx.activityLog.create({
+        data: {
+          actorId: user.id,
+          action: "PROJECT_CREATED",
+          entityType: "Project",
+          entityId: newProject.id,
+          metadata: {
+            projectCode: newProject.projectCode,
+            name: newProject.name,
+            projectLeadId: lead.id,
+            priority: newProject.priority,
+          },
+        },
+      });
+
+      return newProject;
     });
 
-    return newProject;
-  });
+    revalidatePath("/projects");
 
-  revalidatePath("/projects");
-
-  return {
-    success: true,
-    projectId: project.id,
-    projectCode: project.projectCode,
-  };
+    return {
+      success: true,
+      projectId: project.id,
+      projectCode: project.projectCode,
+    };
+  } catch (err: unknown) {
+    console.error("Failed to create project:", err);
+    return {
+      error:
+        err instanceof Error
+          ? err.message
+          : "An unexpected error occurred while creating the project.",
+    };
+  }
 }
 
 export async function updateProjectAction(

@@ -20,7 +20,13 @@ export interface ProjectItem {
   members?: { user?: { id?: string; name: string | null } | null }[];
 }
 
-export function ProjectList({ projects }: { projects: ProjectItem[] }) {
+export function ProjectList({
+  projects,
+  canCreate = true,
+}: {
+  projects: ProjectItem[];
+  canCreate?: boolean;
+}) {
   const [view, setView] = useState<"table" | "grid">("table");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
@@ -80,12 +86,14 @@ export function ProjectList({ projects }: { projects: ProjectItem[] }) {
           <button className="inline-flex items-center gap-1.5 px-3 h-8 border border-[#E4E7EC] rounded-md text-[13px] font-medium text-[#475467] hover:bg-[#F9FAFC] transition-colors">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
-          <Link
-            href="/projects/new"
-            className="inline-flex items-center gap-1.5 px-3 h-8 bg-[#5B5FEF] rounded-md text-[13px] font-semibold text-white hover:bg-[#4C50D8] transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" /> New Project
-          </Link>
+          {canCreate && (
+            <Link
+              href="/projects/new"
+              className="inline-flex items-center gap-1.5 px-3 h-8 bg-[#5B5FEF] rounded-md text-[13px] font-semibold text-white hover:bg-[#4C50D8] transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" /> New Project
+            </Link>
+          )}
         </div>
       </div>
 

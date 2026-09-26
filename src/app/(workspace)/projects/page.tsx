@@ -48,10 +48,14 @@ export default async function ProjectsPage() {
     };
   });
 
+  const canCreate =
+    currentUser.systemRole === SystemRole.ADMIN ||
+    currentUser.systemRole === SystemRole.PROJECT_LEAD;
+
   return (
     <div className="w-full">
       <div className="max-w-[1600px] mx-auto flex flex-col gap-6">
-        <ProjectList projects={enrichedProjects} />
+        <ProjectList projects={enrichedProjects} canCreate={canCreate} />
       </div>
     </div>
   );
