@@ -32,10 +32,20 @@ export async function authenticateUser(
 
   const user = await db.user.findFirst({
     where: {
-      employeeId: {
-        equals: employeeId,
-        mode: "insensitive",
-      },
+      OR: [
+        {
+          employeeId: {
+            equals: employeeId,
+            mode: "insensitive",
+          },
+        },
+        {
+          email: {
+            equals: employeeId,
+            mode: "insensitive",
+          },
+        },
+      ],
     },
   });
 

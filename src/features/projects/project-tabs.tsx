@@ -15,13 +15,24 @@ const tabs = [
   { key: "/settings", label: "Settings", icon: Settings },
 ];
 
-export function ProjectTabs({ projectId, counts }: { projectId: string; counts: Record<string, number> }) {
+export function ProjectTabs({
+  projectId,
+  counts,
+  isGuest = false,
+}: {
+  projectId: string;
+  counts: Record<string, number>;
+  isGuest?: boolean;
+}) {
   const pathname = usePathname();
   const base = `/projects/${projectId}`;
+  const visibleTabs = isGuest
+    ? tabs.filter((t) => t.key !== "/settings" && t.key !== "/activity")
+    : tabs;
 
   return (
     <div className="flex items-center gap-0.5 border-b border-[#E4E7EC] overflow-x-auto touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {tabs.map(t => {
+      {visibleTabs.map(t => {
         const href = `${base}${t.key}`;
         const isActive = t.key === ""
           ? pathname === base || pathname === `${base}/`

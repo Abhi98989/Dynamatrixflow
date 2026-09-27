@@ -40,7 +40,7 @@ export default async function WorkspaceLayout({
 
   return (
     <div className="min-h-dvh">
-      <Sidebar />
+      <Sidebar user={user} />
       <div className="lg:pl-64">
         <Topbar user={user} />
         <main

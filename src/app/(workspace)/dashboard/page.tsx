@@ -4,11 +4,98 @@ import { requireActiveUser } from "@/server/auth/authorization";
 import { SystemRole, TaskStatus, ProjectStatus, Prisma } from "@prisma/client";
 import { Download, Plus } from "lucide-react";
 import Link from "next/link";
+import { GuestMonitorView, type GuestProjectData } from "@/features/guests/guest-monitor-view";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
 export default async function DashboardPage() {
   const currentUser = await requireActiveUser();
+
+  if (currentUser.systemRole === SystemRole.GUEST) {
+    const guestProjects = await db.project.findMany({
+      where: {
+        status: { not: ProjectStatus.ARCHIVED },
+        members: { some: { userId: currentUser.id, removedAt: null } },
+      },
+      include: {
+        projectLead: { select: { name: true, position: true } },
+        tasks: {
+          where: { archivedAt: null },
+          select: {
+            id: true,
+            taskCode: true,
+            title: true,
+            description: true,
+            status: true,
+            priority: true,
+            progress: true,
+            dueDate: true,
+            completedAt: true,
+            assignee: { select: { name: true, position: true } },
+          },
+          orderBy: { dueDate: "asc" },
+        },
+        milestones: {
+          where: { archivedAt: null },
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            status: true,
+            deadline: true,
+            progressOverride: true,
+          },
+          orderBy: { sortOrder: "asc" },
+        },
+        resources: {
+          where: { archivedAt: null },
+          select: {
+            id: true,
+            title: true,
+            url: true,
+            category: true,
+            createdAt: true,
+          },
+          orderBy: { createdAt: "desc" },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const serializedProjects: GuestProjectData[] = guestProjects.map((p) => ({
+      id: p.id,
+      name: p.name,
+      projectCode: p.projectCode,
+      description: p.description,
+      status: p.status,
+      priority: p.priority,
+      startDate: p.startDate ? p.startDate.toISOString() : null,
+      deadline: p.deadline ? p.deadline.toISOString() : null,
+      projectLead: p.projectLead,
+      tasks: p.tasks.map((t) => ({
+        ...t,
+        dueDate: t.dueDate ? t.dueDate.toISOString() : null,
+        completedAt: t.completedAt ? t.completedAt.toISOString() : null,
+      })),
+      milestones: p.milestones.map((m) => ({
+        ...m,
+        deadline: m.deadline ? m.deadline.toISOString() : null,
+      })),
+      resources: p.resources.map((r) => ({
+        ...r,
+        createdAt: r.createdAt.toISOString(),
+      })),
+    }));
+
+    return (
+      <GuestMonitorView
+        guestName={currentUser.name || "Guest Observer"}
+        guestId={currentUser.employeeId}
+        projects={serializedProjects}
+      />
+    );
+  }
+
   const isAdmin = currentUser.systemRole === SystemRole.ADMIN;
 
   let projectsQuery: Prisma.ProjectWhereInput = { status: { not: ProjectStatus.ARCHIVED } };

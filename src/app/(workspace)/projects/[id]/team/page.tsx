@@ -3,6 +3,9 @@ import { requireActiveUser, canViewProject, canManageProject } from "@/server/au
 import { notFound } from "next/navigation";
 import { AddMemberForm } from "@/features/projects/add-member-form";
 import { RemoveMemberButton } from "@/features/projects/remove-member-button";
+import { GenerateGuestDialog } from "@/features/guests/generate-guest-dialog";
+import { RevokeGuestButton } from "@/features/guests/revoke-guest-button";
+import { ShieldCheck, Users } from "lucide-react";
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -19,11 +22,13 @@ export default async function TeamPage({ params }: Props) {
     where: { id: projectId },
     select: {
       id: true,
+      name: true,
+      projectCode: true,
       projectLeadId: true,
       members: {
         where: { removedAt: null },
         include: {
-          user: { select: { id: true, name: true, employeeId: true, position: true, systemRole: true } },
+          user: { select: { id: true, name: true, email: true, employeeId: true, position: true, systemRole: true } },
         },
         orderBy: { joinedAt: "asc" },
       },
@@ -31,14 +36,16 @@ export default async function TeamPage({ params }: Props) {
   });
   if (!project) notFound();
 
+  const teamMembers = project.members.filter(m => m.user.systemRole !== "GUEST");
+  const guestMembers = project.members.filter(m => m.user.systemRole === "GUEST");
+
   // Get task counts per member
-  // Get per-member task status breakdown
   const tasksByStatus = await db.task.groupBy({
     by: ["assigneeId", "status"],
     where: { projectId, archivedAt: null, assigneeId: { not: null } },
     _count: true,
   });
-  // Build: { userId: { TODO: n, IN_PROGRESS: n, COMPLETED: n, total: n } }
+
   const statusMap: Record<string, { todo: number; inProgress: number; completed: number; total: number }> = {};
   for (const row of tasksByStatus) {
     const uid = row.assigneeId!;
@@ -49,12 +56,13 @@ export default async function TeamPage({ params }: Props) {
     else if (row.status === "COMPLETED") statusMap[uid].completed += row._count;
   }
 
-  // Get available users (not already members)
+  // Get available users (not already members and not guests)
   const memberIds = project.members.map(m => m.user.id);
   const availableUsers = isManager
     ? await db.user.findMany({
         where: {
           accountStatus: "ACTIVE",
+          systemRole: { not: "GUEST" },
           id: { notIn: memberIds },
         },
         select: { id: true, name: true, employeeId: true, position: true },
@@ -66,20 +74,31 @@ export default async function TeamPage({ params }: Props) {
   const formatEnum = (val: string) => val.split("_").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      {/* Team Header & Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-[16px] font-semibold text-[#101828]">Team</h2>
-          <p className="text-[12px] text-[#667085] mt-0.5">{project.members.length} members assigned to this project</p>
+          <h2 className="text-[16px] font-semibold text-[#101828]">Project Team</h2>
+          <p className="text-[12px] text-[#667085] mt-0.5">{teamMembers.length} team members assigned</p>
         </div>
-        {isManager && availableUsers.length > 0 && (
-          <AddMemberForm projectId={projectId} availableUsers={availableUsers} />
+        {isManager && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <GenerateGuestDialog
+              projectId={projectId}
+              projectName={project.name}
+              projectCode={project.projectCode}
+            />
+            {availableUsers.length > 0 && (
+              <AddMemberForm projectId={projectId} availableUsers={availableUsers} />
+            )}
+          </div>
         )}
       </div>
 
-      {project.members.length === 0 ? (
+      {/* Internal Team Table */}
+      {teamMembers.length === 0 ? (
         <div className="bg-white rounded-lg border border-[#E4E7EC] py-16 text-center">
-          <p className="text-[13px] text-[#667085]">No team members assigned yet.</p>
+          <p className="text-[13px] text-[#667085]">No internal team members assigned yet.</p>
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-[#E4E7EC] overflow-hidden">
@@ -98,7 +117,7 @@ export default async function TeamPage({ params }: Props) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F2F4F7]">
-                {project.members.map(m => {
+                {teamMembers.map(m => {
                   const isLead = m.user.id === project.projectLeadId;
                   return (
                     <tr key={m.id} className="hover:bg-[#F9FAFC] transition-colors h-11">
@@ -145,6 +164,104 @@ export default async function TeamPage({ params }: Props) {
           </div>
         </div>
       )}
+
+      {/* Guest Observers Section */}
+      <div className="pt-2">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-md bg-emerald-50 text-emerald-600 border border-emerald-100">
+              <ShieldCheck className="w-4 h-4" />
+            </span>
+            <div>
+              <h3 className="text-[15px] font-semibold text-[#101828]">Guest Observers</h3>
+              <p className="text-[12px] text-[#667085]">
+                External stakeholders with read-only visibility into milestones and progress %
+              </p>
+            </div>
+          </div>
+          {isManager && guestMembers.length > 0 && (
+            <GenerateGuestDialog
+              projectId={projectId}
+              projectName={project.name}
+              projectCode={project.projectCode}
+            />
+          )}
+        </div>
+
+        {guestMembers.length === 0 ? (
+          <div className="bg-white rounded-lg border border-[#E4E7EC] p-6 text-center">
+            <ShieldCheck className="w-8 h-8 text-[#98A2B3] mx-auto mb-2 opacity-60" />
+            <p className="text-[13px] font-medium text-[#101828]">No Guest Observers Assigned</p>
+            <p className="text-[12px] text-[#667085] mt-1 max-w-md mx-auto">
+              You can generate guest credentials to give external stakeholders real-time visibility into project delivery roadmaps.
+            </p>
+            {isManager && (
+              <div className="mt-3">
+                <GenerateGuestDialog
+                  projectId={projectId}
+                  projectName={project.name}
+                  projectCode={project.projectCode}
+                />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg border border-[#E4E7EC] overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left min-w-[600px]">
+                <thead className="bg-[#F9FAFB] border-b border-[#E4E7EC]">
+                  <tr>
+                    <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Guest Observer</th>
+                    <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Guest ID</th>
+                    <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Email</th>
+                    <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Permissions</th>
+                    <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase">Access Granted</th>
+                    {isManager && <th className="py-2.5 px-4 text-[11px] font-bold text-[#667085] tracking-wider uppercase text-right">Action</th>}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#F2F4F7]">
+                  {guestMembers.map((m) => (
+                    <tr key={m.id} className="hover:bg-[#F9FAFC] transition-colors h-11">
+                      <td className="py-2 px-4">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-emerald-700 text-white flex items-center justify-center text-[9px] font-bold shrink-0">
+                            {getInitials(m.user.name)}
+                          </div>
+                          <span className="text-[13px] font-semibold text-[#101828]">{m.user.name}</span>
+                        </div>
+                      </td>
+                      <td className="py-2 px-4">
+                        <span className="font-mono text-xs font-bold text-[#101828] bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                          {m.user.employeeId}
+                        </span>
+                      </td>
+                      <td className="py-2 px-4 text-xs text-[#475467] font-medium">{m.user.email || "—"}</td>
+                      <td className="py-2 px-4">
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="w-1 h-1 rounded-full bg-emerald-600" />
+                          Read-Only Monitor
+                        </span>
+                      </td>
+                      <td className="py-2 px-4 text-[12px] text-[#98A2B3]">
+                        {new Date(m.joinedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                      </td>
+                      {isManager && (
+                        <td className="py-2 px-4 text-right">
+                          <RevokeGuestButton
+                            guestUserId={m.user.id}
+                            projectId={projectId}
+                            guestName={m.user.name}
+                          />
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

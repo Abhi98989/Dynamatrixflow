@@ -11,6 +11,7 @@ enum SystemRole {
   ADMIN
   PROJECT_LEAD
   EMPLOYEE
+  GUEST
 }
 
 enum AccountStatus {
@@ -71,6 +72,7 @@ enum ProjectMemberRole {
   QA
   RESEARCHER
   OTHER
+  VIEWER
 }
 
 enum NotificationType {

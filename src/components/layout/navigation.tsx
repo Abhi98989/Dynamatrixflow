@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 type NavItem = { label: string, href: string, icon: LucideIcon, badge?: number };
-const navGroups: { label: string, items: NavItem[] }[] = [
+const defaultNavGroups: { label: string, items: NavItem[] }[] = [
   {
     label: "MAIN",
     items: [
@@ -45,8 +45,38 @@ const navGroups: { label: string, items: NavItem[] }[] = [
   },
 ];
 
-export function Navigation({ onNavigate }: { onNavigate?: () => void }) {
+const guestNavGroups: { label: string, items: NavItem[] }[] = [
+  {
+    label: "MONITOR",
+    items: [
+      { label: "Guest Monitor", href: "/dashboard", icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: "WORKSPACE",
+    items: [
+      { label: "Projects", href: "/projects", icon: FolderKanban },
+      { label: "Resources & Files", href: "/resources", icon: Library },
+    ],
+  },
+  {
+    label: "ACCOUNT",
+    items: [
+      { label: "Profile", href: "/profile", icon: UserCircle },
+    ],
+  },
+];
+
+export function Navigation({
+  onNavigate,
+  systemRole,
+}: {
+  onNavigate?: () => void;
+  systemRole?: string;
+}) {
   const pathname = usePathname();
+  const navGroups = systemRole === "GUEST" ? guestNavGroups : defaultNavGroups;
+
 
   return (
     <nav aria-label="Main navigation" className="flex flex-col gap-5 pb-6">

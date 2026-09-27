@@ -40,7 +40,7 @@ export function Topbar({ user }: TopbarProps) {
               <SheetContent className="w-64 max-w-[85vw] p-0 border-r-0">
                 <SheetTitle className="sr-only">Navigation</SheetTitle>
                 <SheetDescription className="sr-only">Sidebar</SheetDescription>
-                <SidebarContent onNavigate={() => setMenuOpen(false)} />
+                <SidebarContent onNavigate={() => setMenuOpen(false)} user={user} />
               </SheetContent>
             </Sheet>
             <Link href="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">

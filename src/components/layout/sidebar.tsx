@@ -1,7 +1,13 @@
 import { Navigation } from "./navigation";
 import Image from "next/image";
 
-export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+export function SidebarContent({
+  onNavigate,
+  user,
+}: {
+  onNavigate?: () => void;
+  user?: { systemRole?: string };
+}) {
   return (
     <div className="flex flex-col justify-between h-full bg-[#0B1020] text-white select-none">
       <div className="flex flex-col h-full overflow-hidden">
@@ -18,7 +24,7 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         
         {/* Navigation - hidden scrollbar */}
         <div className="flex-1 overflow-y-auto py-5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <Navigation onNavigate={onNavigate} />
+          <Navigation onNavigate={onNavigate} systemRole={user?.systemRole} />
         </div>
       </div>
 
@@ -35,10 +41,10 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ user }: { user?: { systemRole?: string } }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-50 hidden w-64 lg:block border-r border-[#1E293B]">
-      <SidebarContent />
+      <SidebarContent user={user} />
     </aside>
   );
 }

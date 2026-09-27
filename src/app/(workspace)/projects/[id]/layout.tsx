@@ -104,7 +104,11 @@ export default async function ProjectLayout({ children, params }: LayoutProps) {
         </div>
 
         {/* Tabs */}
-        <ProjectTabs projectId={project.id} counts={{ tasks: project._count.tasks, milestones: project._count.milestones, members: project._count.members, resources: project._count.resources }} />
+        <ProjectTabs
+          projectId={project.id}
+          counts={{ tasks: project._count.tasks, milestones: project._count.milestones, members: project._count.members, resources: project._count.resources }}
+          isGuest={currentUser.systemRole === "GUEST"}
+        />
 
         {/* Content */}
         <div>{children}</div>
