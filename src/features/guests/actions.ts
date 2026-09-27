@@ -81,7 +81,7 @@ export async function createGuestAction(
 
   if (existingUser) {
     // If user already exists as an employee or has another role
-    if (existingUser.systemRole !== SystemRole.GUEST) {
+    if ((existingUser.systemRole as string) !== "GUEST") {
       return {
         error: `User with email ${email} already exists as an organization ${existingUser.systemRole.toLowerCase()}. Cannot register as Guest.`,
       };
@@ -99,7 +99,7 @@ export async function createGuestAction(
       data: {
         projectId,
         userId: existingUser.id,
-        projectRole: ProjectMemberRole.VIEWER,
+        projectRole: "VIEWER" as any,
         addedById: currentUser.id,
       },
     });
@@ -149,7 +149,7 @@ export async function createGuestAction(
         email,
         employeeId: guestId,
         passwordHash,
-        systemRole: SystemRole.GUEST,
+        systemRole: "GUEST" as any,
         accountStatus: AccountStatus.ACTIVE,
         position: "Guest Observer",
         mustChangePassword: false,
@@ -160,7 +160,7 @@ export async function createGuestAction(
       data: {
         projectId,
         userId: user.id,
-        projectRole: ProjectMemberRole.VIEWER,
+        projectRole: "VIEWER" as any,
         addedById: currentUser.id,
       },
     });
@@ -220,7 +220,7 @@ export async function revokeGuestAction(formData: FormData) {
     select: { id: true, systemRole: true, name: true, employeeId: true },
   });
 
-  if (!guestUser || guestUser.systemRole !== SystemRole.GUEST) {
+  if (!guestUser || (guestUser.systemRole as string) !== "GUEST") {
     return { error: "Target user is not a guest." };
   }
 

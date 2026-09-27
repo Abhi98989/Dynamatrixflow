@@ -107,7 +107,7 @@ export default async function ProjectLayout({ children, params }: LayoutProps) {
         <ProjectTabs
           projectId={project.id}
           counts={{ tasks: project._count.tasks, milestones: project._count.milestones, members: project._count.members, resources: project._count.resources }}
-          isGuest={currentUser.systemRole === "GUEST"}
+          isGuest={(currentUser.systemRole as string) === "GUEST"}
         />
 
         {/* Content */}

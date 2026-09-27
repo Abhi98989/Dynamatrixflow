@@ -11,7 +11,8 @@ export const metadata: Metadata = { title: "Dashboard" };
 export default async function DashboardPage() {
   const currentUser = await requireActiveUser();
 
-  if (currentUser.systemRole === SystemRole.GUEST) {
+  const isGuest = (currentUser.systemRole as string) === "GUEST";
+  if (isGuest) {
     const guestProjects = await db.project.findMany({
       where: {
         status: { not: ProjectStatus.ARCHIVED },

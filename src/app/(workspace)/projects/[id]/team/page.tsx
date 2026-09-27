@@ -36,8 +36,8 @@ export default async function TeamPage({ params }: Props) {
   });
   if (!project) notFound();
 
-  const teamMembers = project.members.filter(m => m.user.systemRole !== "GUEST");
-  const guestMembers = project.members.filter(m => m.user.systemRole === "GUEST");
+  const teamMembers = project.members.filter(m => (m.user.systemRole as string) !== "GUEST");
+  const guestMembers = project.members.filter(m => (m.user.systemRole as string) === "GUEST");
 
   // Get task counts per member
   const tasksByStatus = await db.task.groupBy({
@@ -62,7 +62,7 @@ export default async function TeamPage({ params }: Props) {
     ? await db.user.findMany({
         where: {
           accountStatus: "ACTIVE",
-          systemRole: { not: "GUEST" },
+          systemRole: { not: "GUEST" as any },
           id: { notIn: memberIds },
         },
         select: { id: true, name: true, employeeId: true, position: true },
