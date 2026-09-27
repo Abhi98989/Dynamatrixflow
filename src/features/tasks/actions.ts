@@ -7,6 +7,7 @@ import {
   requireProjectManage,
   canUpdateTask,
   isAllowedStatusTransition,
+  canViewProject,
 } from '@/server/auth/authorization';
 import { generateNextTaskCode } from './code-generator';
 import {
@@ -559,4 +560,36 @@ export async function deleteSubtaskAction(
 
   revalidatePath(`/projects/${subtask.task.projectId}/tasks/${subtask.taskId}`);
   return { success: true };
+}
+
+export async function getTaskDetailsAction(taskId: string) {
+  const user = await requireActiveUser();
+  const task = await db.task.findUnique({
+    where: { id: taskId, archivedAt: null },
+    include: {
+      project: { select: { id: true, name: true, projectCode: true, projectLeadId: true } },
+      assignee: { select: { id: true, name: true, employeeId: true, position: true } },
+      subtasks: { orderBy: { sortOrder: 'asc' } },
+      comments: {
+        where: { deletedAt: null },
+        include: { user: { select: { id: true, name: true, employeeId: true, position: true } } },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
+  });
+
+  if (!task) return null;
+
+  const hasAccess = await canViewProject(user.id, task.projectId);
+  if (!hasAccess) return null;
+
+  const isLeadOrAdmin = user.systemRole === SystemRole.ADMIN || task.project.projectLeadId === user.id;
+  const canEdit = isLeadOrAdmin || task.assigneeId === user.id;
+
+  return {
+    task,
+    currentUserId: user.id,
+    isLeadOrAdmin,
+    canEdit,
+  };
 }

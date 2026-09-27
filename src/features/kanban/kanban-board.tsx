@@ -14,7 +14,9 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { updateTaskStatusAction } from '@/features/tasks/actions';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { updateTaskStatusAction, createTaskAction } from '@/features/tasks/actions';
+import { TaskDrawer } from '@/features/tasks/task-drawer';
 import { TaskStatus, Priority } from '@prisma/client';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -36,6 +38,7 @@ import {
   Loader2,
   Clock,
   Layers,
+  Plus,
 } from 'lucide-react';
 
 export interface KanbanTaskItem {
@@ -95,6 +98,9 @@ export function KanbanBoard({
   isLeadOrAdmin,
   members,
 }: KanbanBoardProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [drawerTaskId, setDrawerTaskId] = useState<string | null>(searchParams?.get('task') || null);
   const [tasks, setTasks] = useState<KanbanTaskItem[]>(initialTasks);
   const [activeTask, setActiveTask] = useState<KanbanTaskItem | null>(null);
   const [search, setSearch] = useState('');
@@ -309,6 +315,9 @@ export function KanbanBoard({
                 tasks={columnTasks}
                 currentUserId={currentUserId}
                 projectId={projectId}
+                isLeadOrAdmin={isLeadOrAdmin}
+                onSelectTask={(id) => setDrawerTaskId(id)}
+                onTaskCreated={() => router.refresh()}
               />
             );
           })}
@@ -328,6 +337,13 @@ export function KanbanBoard({
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Slide-Over Task Drawer */}
+      <TaskDrawer
+        taskId={drawerTaskId}
+        onClose={() => setDrawerTaskId(null)}
+        onTaskUpdated={() => router.refresh()}
+      />
 
       {/* Blocker Reason Modal */}
       <Dialog open={blockerModalOpen} onOpenChange={setBlockerModalOpen}>
@@ -375,16 +391,95 @@ export function KanbanBoard({
   );
 }
 
+function KanbanQuickAdd({
+  columnId,
+  projectId,
+  onTaskCreated,
+}: {
+  columnId: TaskStatus;
+  projectId: string;
+  onTaskCreated: () => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [title, setTitle] = useState('');
+  const [isPending, startTransition] = useTransition();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set('projectId', projectId);
+      formData.set('title', title.trim());
+      formData.set('status', columnId);
+      const res = await createTaskAction(undefined, formData);
+      if (res.success) {
+        setTitle('');
+        setIsOpen(false);
+        onTaskCreated();
+      }
+    });
+  };
+
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="w-full py-1.5 px-2.5 rounded-lg border border-dashed border-border/80 text-text-muted hover:text-text-primary hover:border-primary/60 text-[11px] font-medium flex items-center justify-center gap-1.5 transition-colors bg-surface/40 hover:bg-surface mt-1"
+      >
+        <Plus className="size-3" />
+        Add Task
+      </button>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="p-2.5 rounded-lg border border-border bg-surface shadow-xs space-y-2 mt-1">
+      <input
+        autoFocus
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Enter task title..."
+        className="w-full text-xs p-1.5 rounded border border-border focus:outline-none focus:border-primary bg-surface-secondary/40 text-text-primary"
+      />
+      <div className="flex items-center justify-end gap-1.5">
+        <button
+          type="button"
+          onClick={() => { setIsOpen(false); setTitle(''); }}
+          className="px-2 py-0.5 text-[11px] text-text-muted hover:text-text-primary font-medium"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={!title.trim() || isPending}
+          className="px-2.5 py-1 text-[11px] bg-primary text-white rounded font-medium hover:bg-primary/90 disabled:opacity-50"
+        >
+          {isPending ? 'Adding...' : 'Add'}
+        </button>
+      </div>
+    </form>
+  );
+}
+
 function KanbanColumn({
   column,
   tasks,
   currentUserId,
   projectId,
+  isLeadOrAdmin,
+  onSelectTask,
+  onTaskCreated,
 }: {
   column: { id: TaskStatus; label: string; headerColor: string };
   tasks: KanbanTaskItem[];
   currentUserId: string;
   projectId: string;
+  isLeadOrAdmin: boolean;
+  onSelectTask: (id: string) => void;
+  onTaskCreated: () => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
@@ -408,20 +503,31 @@ function KanbanColumn({
       </div>
 
       {/* Cards List */}
-      <div className="p-2 space-y-2 flex-1">
-        {tasks.map((task) => (
-          <DraggableKanbanCard
-            key={task.id}
-            task={task}
-            currentUserId={currentUserId}
-            projectId={projectId}
-          />
-        ))}
+      <div className="p-2 space-y-2 flex-1 flex flex-col justify-between">
+        <div className="space-y-2">
+          {tasks.map((task) => (
+            <DraggableKanbanCard
+              key={task.id}
+              task={task}
+              currentUserId={currentUserId}
+              projectId={projectId}
+              onSelectTask={onSelectTask}
+            />
+          ))}
 
-        {tasks.length === 0 && (
-          <div className="py-8 text-center text-[11px] text-text-muted italic">
-            No deliverables
-          </div>
+          {tasks.length === 0 && (
+            <div className="py-8 text-center text-[11px] text-text-muted italic">
+              No deliverables
+            </div>
+          )}
+        </div>
+
+        {isLeadOrAdmin && (
+          <KanbanQuickAdd
+            columnId={column.id}
+            projectId={projectId}
+            onTaskCreated={onTaskCreated}
+          />
         )}
       </div>
     </div>
@@ -432,10 +538,12 @@ function DraggableKanbanCard({
   task,
   currentUserId,
   projectId,
+  onSelectTask,
 }: {
   task: KanbanTaskItem;
   currentUserId: string;
   projectId: string;
+  onSelectTask: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: task.id,
@@ -451,6 +559,7 @@ function DraggableKanbanCard({
         currentUserId={currentUserId}
         projectId={projectId}
         dragHandleProps={{ ...attributes, ...listeners }}
+        onSelectTask={onSelectTask}
       />
     </div>
   );
@@ -462,12 +571,14 @@ function KanbanCardItem({
   projectId,
   dragHandleProps,
   isOverlay = false,
+  onSelectTask,
 }: {
   task: KanbanTaskItem;
   currentUserId: string;
   projectId: string;
   dragHandleProps?: Record<string, unknown>;
   isOverlay?: boolean;
+  onSelectTask?: (id: string) => void;
 }) {
   const isAssignee = task.assignee?.id === currentUserId;
   const isOverdue =
@@ -517,12 +628,13 @@ function KanbanCardItem({
       </div>
 
       {/* Task Title */}
-      <Link
-        href={`/projects/${projectId}/tasks/${task.id}`}
-        className="font-medium text-text-primary hover:text-primary transition-colors text-xs line-clamp-2 block leading-snug"
+      <button
+        type="button"
+        onClick={() => onSelectTask ? onSelectTask(task.id) : undefined}
+        className="font-medium text-text-primary hover:text-primary transition-colors text-xs line-clamp-2 block leading-snug text-left cursor-pointer w-full"
       >
         {task.title}
-      </Link>
+      </button>
 
       {/* Blocker reason if present */}
       {task.status === TaskStatus.BLOCKED && task.blockerReason && (

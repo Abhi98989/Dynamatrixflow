@@ -32,6 +32,7 @@ export function ProjectList({
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [priorityFilter, setPriorityFilter] = useState("ALL");
   const [leadFilter, setLeadFilter] = useState("ALL");
+  const [sortBy, setSortBy] = useState<"NEWEST" | "DEADLINE" | "ALPHABETICAL" | "PROGRESS">("NEWEST");
   const [now, setNow] = useState(0);
 
   useEffect(() => {
@@ -42,18 +43,40 @@ export function ProjectList({
   }, []);
 
   const filteredProjects = useMemo(() => {
-    return projects.filter(p => {
-      const q = search.toLowerCase();
+    const result = projects.filter(p => {
+      const q = search.toLowerCase().trim();
       const matchSearch =
+        !q ||
         p.name.toLowerCase().includes(q) ||
         p.projectCode.toLowerCase().includes(q) ||
         (p.clientName || "").toLowerCase().includes(q);
-      const matchStatus = statusFilter === "ALL" || p.status === statusFilter;
+      const matchStatus =
+        statusFilter === "ALL" ||
+        (statusFilter === "ACTIVE_OR_PROGRESS"
+          ? p.status === "ACTIVE" || p.status === "IN_PROGRESS"
+          : p.status === statusFilter);
       const matchPriority = priorityFilter === "ALL" || p.priority === priorityFilter;
       const matchLead = leadFilter === "ALL" || p.projectLead?.name === leadFilter;
       return matchSearch && matchStatus && matchPriority && matchLead;
     });
-  }, [projects, search, statusFilter, priorityFilter, leadFilter]);
+
+    result.sort((a, b) => {
+      if (sortBy === "ALPHABETICAL") {
+        return a.name.localeCompare(b.name);
+      }
+      if (sortBy === "PROGRESS") {
+        return (b.progress || 0) - (a.progress || 0);
+      }
+      if (sortBy === "DEADLINE") {
+        if (!a.deadline) return 1;
+        if (!b.deadline) return -1;
+        return new Date(a.deadline).getTime() - new Date(b.deadline).getTime();
+      }
+      return 0;
+    });
+
+    return result;
+  }, [projects, search, statusFilter, priorityFilter, leadFilter, sortBy]);
 
   const activeCount = projects.filter(p => p.status === "IN_PROGRESS" || p.status === "PLANNING" || p.status === "ACTIVE").length;
   const blockedCount = projects.filter(p => p.status === "BLOCKED" || p.status === "ON_HOLD").length;
@@ -115,6 +138,38 @@ export function ProjectList({
         ))}
       </div>
 
+      {/* Quick Filter Status Chips */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+        {[
+          { id: "ALL", label: "All Projects", count: projects.length },
+          { id: "ACTIVE_OR_PROGRESS", label: "Active", count: activeCount },
+          { id: "PLANNING", label: "Planning", count: projects.filter(p => p.status === "PLANNING").length },
+          { id: "IN_REVIEW", label: "In Review", count: reviewCount },
+          { id: "BLOCKED", label: "Blocked", count: projects.filter(p => p.status === "BLOCKED").length },
+          { id: "COMPLETED", label: "Completed", count: completedCount },
+        ].map((chip) => {
+          const isActive = statusFilter === chip.id;
+          return (
+            <button
+              key={chip.id}
+              onClick={() => setStatusFilter(chip.id)}
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
+                isActive
+                  ? "bg-[#5B5FEF] text-white shadow-xs"
+                  : "bg-white text-[#475467] border border-[#E4E7EC] hover:bg-[#F9FAFC] hover:text-[#101828]"
+              }`}
+            >
+              <span>{chip.label}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                isActive ? "bg-white/20 text-white" : "bg-slate-100 text-slate-600"
+              }`}>
+                {chip.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Toolbar */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2 flex-1">
@@ -162,6 +217,16 @@ export function ProjectList({
             {leads.map((l) => (
               <option key={l} value={l}>{l}</option>
             ))}
+          </select>
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value as any)}
+            className="h-8 px-2.5 bg-white border border-[#E4E7EC] rounded-md text-[13px] text-[#475467] focus:outline-none"
+          >
+            <option value="NEWEST">Sort: Default</option>
+            <option value="DEADLINE">Deadline: Soonest</option>
+            <option value="ALPHABETICAL">Alphabetical (A-Z)</option>
+            <option value="PROGRESS">Progress: Highest</option>
           </select>
         </div>
         <div className="flex items-center gap-0.5 border border-[#E4E7EC] rounded-md p-0.5 bg-[#F9FAFC] shrink-0">

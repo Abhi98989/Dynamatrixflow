@@ -10,6 +10,8 @@ import { logoutAction } from "@/server/auth/actions";
 import Image from "next/image";
 
 import Link from "next/link";
+import { CommandPalette } from "./command-palette";
+import { NotificationPopover } from "./notification-popover";
 
 interface TopbarProps {
   user?: {
@@ -23,6 +25,7 @@ interface TopbarProps {
 
 export function Topbar({ user }: TopbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [commandOpen, setCommandOpen] = useState(false);
   const displayName = user?.name || "Abhishek";
   const displayRole = user?.position || "Company Leader / VP Engineering";
 
@@ -58,11 +61,24 @@ export function Topbar({ user }: TopbarProps) {
             </Link>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200 text-slate-400 cursor-pointer w-full max-w-md hover:bg-slate-100 transition-colors">
+          <div
+            onClick={() => setCommandOpen(true)}
+            className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-slate-50 border border-slate-200 text-slate-400 cursor-pointer w-full max-w-md hover:bg-slate-100 transition-colors"
+          >
             <Search className="w-4 h-4" />
             <span className="text-sm flex-1 truncate">Search projects, tasks, doc links...</span>
             <kbd className="px-1.5 py-0.5 rounded bg-white border border-slate-200 font-mono text-[10px] text-slate-500 leading-none">⌘K</kbd>
           </div>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCommandOpen(true)}
+            className="sm:hidden h-9 w-9 text-slate-600 hover:text-slate-900"
+            title="Search"
+          >
+            <Search className="w-4 h-4" />
+          </Button>
         </div>
         
         <div className="flex items-center gap-2 sm:gap-4 shrink-0">
@@ -71,10 +87,7 @@ export function Topbar({ user }: TopbarProps) {
             <span className="text-[11px] font-medium">System: Normal (99.98% up)</span>
           </div>
           
-          <Link href="/notifications" className="relative p-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
-            <Bell className="w-5 h-5" />
-            <span className="absolute 1 top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white"></span>
-          </Link>
+          <NotificationPopover />
           
           <div className="h-5 w-px bg-slate-200"></div>
           
@@ -107,6 +120,12 @@ export function Topbar({ user }: TopbarProps) {
           </Popover>
         </div>
       </div>
+
+      <CommandPalette
+        open={commandOpen}
+        onOpenChange={setCommandOpen}
+        userRole={user?.systemRole}
+      />
     </header>
   );
 }

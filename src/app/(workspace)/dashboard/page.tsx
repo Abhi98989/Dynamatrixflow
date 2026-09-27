@@ -2,7 +2,16 @@ import { Metadata } from "next";
 import { db } from "@/server/db/client";
 import { requireActiveUser } from "@/server/auth/authorization";
 import { SystemRole, TaskStatus, ProjectStatus, Prisma } from "@prisma/client";
-import { Download, Plus } from "lucide-react";
+import {
+  Download,
+  Plus,
+  Activity,
+  FolderPlus,
+  CheckSquare,
+  Users,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 import Link from "next/link";
 import { GuestMonitorView, type GuestProjectData } from "@/features/guests/guest-monitor-view";
 
@@ -146,6 +155,41 @@ export default async function DashboardPage() {
     orderBy: { dueDate: 'asc' }, take: 4,
   });
 
+  // Health computation
+  const allProjectsForHealth = await db.project.findMany({
+    where: projectsQuery,
+    select: {
+      id: true,
+      status: true,
+      tasks: {
+        where: {
+          status: { notIn: [TaskStatus.COMPLETED, TaskStatus.CANCELLED] },
+          dueDate: { lt: today },
+        },
+        select: { id: true },
+      },
+    },
+  });
+
+  const totalHealthProjects = allProjectsForHealth.length || 1;
+  const completedProjectsCount = allProjectsForHealth.filter(p => p.status === ProjectStatus.COMPLETED).length;
+  const atRiskProjectsCount = allProjectsForHealth.filter(p => p.status !== ProjectStatus.COMPLETED && p.tasks.length > 0).length;
+  const onTrackProjectsCount = Math.max(0, allProjectsForHealth.length - completedProjectsCount - atRiskProjectsCount);
+
+  const completedPct = Math.round((completedProjectsCount / totalHealthProjects) * 100);
+  const atRiskPct = Math.round((atRiskProjectsCount / totalHealthProjects) * 100);
+  const onTrackPct = Math.max(0, 100 - completedPct - atRiskPct);
+
+  // Velocity computation (completed deliverables in the last 7 days)
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const completedThisWeekCount = await db.task.count({
+    where: {
+      status: TaskStatus.COMPLETED,
+      completedAt: { gte: sevenDaysAgo },
+      ...(isAdmin ? {} : { assigneeId: currentUser.id }),
+    },
+  }) || 0;
+
   return (
     <div className="w-full">
       {/* Header */}
@@ -212,6 +256,150 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Portfolio Health & Delivery Momentum Bar */}
+      <div className="bg-white rounded-lg p-5 border border-[#E4E7EC] mb-6 sm:mb-8 max-w-7xl mx-auto space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <div className="flex items-center gap-2">
+              <Activity className="size-4 text-[#5B5FEF]" />
+              <h2 className="text-sm font-bold text-[#101828] tracking-tight">
+                Portfolio Health & Delivery Momentum
+              </h2>
+            </div>
+            <p className="text-xs text-[#667085] mt-0.5">
+              Live status distribution across {allProjectsForHealth.length} tracked workstreams.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold self-start sm:self-auto">
+            <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{completedThisWeekCount} deliverables completed this week</span>
+          </div>
+        </div>
+
+        {/* Multi-Segment Horizontal Distribution Bar */}
+        <div className="h-3 w-full rounded-full bg-slate-100 flex overflow-hidden p-0.5 gap-0.5 border border-slate-200/60">
+          {onTrackPct > 0 && (
+            <div
+              className="h-full bg-[#5B5FEF] rounded-full transition-all duration-500"
+              style={{ width: `${onTrackPct}%` }}
+              title={`On Track: ${onTrackProjectsCount} (${onTrackPct}%)`}
+            />
+          )}
+          {atRiskPct > 0 && (
+            <div
+              className="h-full bg-[#EF4444] rounded-full transition-all duration-500"
+              style={{ width: `${atRiskPct}%` }}
+              title={`At Risk / Overdue: ${atRiskProjectsCount} (${atRiskPct}%)`}
+            />
+          )}
+          {completedPct > 0 && (
+            <div
+              className="h-full bg-[#10B981] rounded-full transition-all duration-500"
+              style={{ width: `${completedPct}%` }}
+              title={`Completed: ${completedProjectsCount} (${completedPct}%)`}
+            />
+          )}
+        </div>
+
+        {/* Legend */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <span className="size-2.5 rounded-full bg-[#5B5FEF]" />
+              <span className="font-medium text-[#344054]">On Track:</span>
+              <span className="font-bold text-[#101828]">{onTrackProjectsCount}</span>
+              <span className="text-[#98A2B3]">({onTrackPct}%)</span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <span className="size-2.5 rounded-full bg-[#EF4444]" />
+              <span className="font-medium text-[#344054]">At Risk:</span>
+              <span className="font-bold text-[#DC2626]">{atRiskProjectsCount}</span>
+              <span className="text-[#98A2B3]">({atRiskPct}%)</span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <span className="size-2.5 rounded-full bg-[#10B981]" />
+              <span className="font-medium text-[#344054]">Completed:</span>
+              <span className="font-bold text-[#15803D]">{completedProjectsCount}</span>
+              <span className="text-[#98A2B3]">({completedPct}%)</span>
+            </div>
+          </div>
+
+          <Link
+            href="/projects"
+            className="text-xs font-semibold text-[#5B5FEF] hover:text-[#4C50D8] flex items-center gap-1 transition-colors"
+          >
+            Manage projects
+            <ArrowRight className="size-3" />
+          </Link>
+        </div>
+      </div>
+
+      {/* Quick Action Shortcuts */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6 sm:mb-8 max-w-7xl mx-auto">
+        <Link
+          href={isAdmin ? "/projects/new" : "/projects"}
+          className="p-3 bg-white hover:bg-slate-50 border border-[#E4E7EC] rounded-lg transition-colors flex items-center gap-3 group"
+        >
+          <div className="size-8 rounded-md bg-indigo-50 border border-indigo-200/60 flex items-center justify-center text-[#5B5FEF] group-hover:scale-105 transition-transform">
+            <FolderPlus className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-[#101828] group-hover:text-[#5B5FEF] transition-colors truncate">
+              {isAdmin ? "New Project" : "All Projects"}
+            </p>
+            <p className="text-[11px] text-[#667085] truncate">Create or browse</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/my-tasks"
+          className="p-3 bg-white hover:bg-slate-50 border border-[#E4E7EC] rounded-lg transition-colors flex items-center gap-3 group"
+        >
+          <div className="size-8 rounded-md bg-blue-50 border border-blue-200/60 flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform">
+            <CheckSquare className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-[#101828] group-hover:text-[#5B5FEF] transition-colors truncate">
+              My Tasks
+            </p>
+            <p className="text-[11px] text-[#667085] truncate">View deliverables</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/team"
+          className="p-3 bg-white hover:bg-slate-50 border border-[#E4E7EC] rounded-lg transition-colors flex items-center gap-3 group"
+        >
+          <div className="size-8 rounded-md bg-purple-50 border border-purple-200/60 flex items-center justify-center text-purple-600 group-hover:scale-105 transition-transform">
+            <Users className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-[#101828] group-hover:text-[#5B5FEF] transition-colors truncate">
+              Team Directory
+            </p>
+            <p className="text-[11px] text-[#667085] truncate">Roster & guests</p>
+          </div>
+        </Link>
+
+        <Link
+          href="/notifications"
+          className="p-3 bg-white hover:bg-slate-50 border border-[#E4E7EC] rounded-lg transition-colors flex items-center gap-3 group"
+        >
+          <div className="size-8 rounded-md bg-emerald-50 border border-emerald-200/60 flex items-center justify-center text-emerald-600 group-hover:scale-105 transition-transform">
+            <Sparkles className="size-4" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-xs font-bold text-[#101828] group-hover:text-[#5B5FEF] transition-colors truncate">
+              Activity Alerts
+            </p>
+            <p className="text-[11px] text-[#667085] truncate">Notifications & review</p>
+          </div>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">

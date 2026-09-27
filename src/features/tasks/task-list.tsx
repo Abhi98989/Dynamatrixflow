@@ -1,12 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { TaskStatusDropdown } from './task-status-dropdown';
+import { TaskDrawer } from './task-drawer';
 import {
   Search,
   Filter,
@@ -58,19 +59,17 @@ export function TaskList({
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(searchParams.get('task') || null);
 
-  const search = searchParams.get('q') || '';
-  const statusFilter = searchParams.get('status') || 'ALL';
-  const priorityFilter = searchParams.get('priority') || 'ALL';
+  const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'ALL');
+  const [priorityFilter, setPriorityFilter] = useState(searchParams.get('priority') || 'ALL');
+  const [quickFilter, setQuickFilter] = useState<'ALL' | 'IN_PROGRESS' | 'IN_REVIEW' | 'OVERDUE' | 'CRITICAL_HIGH' | 'COMPLETED'>('ALL');
 
-  const updateParam = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (value && value !== 'ALL') {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-    router.replace(`${pathname}?${params.toString()}`);
+  const isOverdue = (dueDate: Date | null, status: TaskStatus) => {
+    if (!dueDate) return false;
+    if (status === TaskStatus.COMPLETED || status === TaskStatus.CANCELLED) return false;
+    return new Date(dueDate) < new Date();
   };
 
   const filteredTasks = useMemo(() => {
@@ -86,15 +85,22 @@ export function TaskList({
       const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
       const matchesPriority = priorityFilter === 'ALL' || t.priority === priorityFilter;
 
-      return matchesSearch && matchesStatus && matchesPriority;
-    });
-  }, [tasks, search, statusFilter, priorityFilter]);
+      let matchesQuick = true;
+      if (quickFilter === 'IN_PROGRESS') {
+        matchesQuick = t.status === TaskStatus.IN_PROGRESS;
+      } else if (quickFilter === 'IN_REVIEW') {
+        matchesQuick = t.status === TaskStatus.IN_REVIEW;
+      } else if (quickFilter === 'OVERDUE') {
+        matchesQuick = isOverdue(t.dueDate, t.status);
+      } else if (quickFilter === 'CRITICAL_HIGH') {
+        matchesQuick = t.priority === Priority.CRITICAL || t.priority === Priority.HIGH;
+      } else if (quickFilter === 'COMPLETED') {
+        matchesQuick = t.status === TaskStatus.COMPLETED;
+      }
 
-  const isOverdue = (dueDate: Date | null, status: TaskStatus) => {
-    if (!dueDate) return false;
-    if (status === TaskStatus.COMPLETED || status === TaskStatus.CANCELLED) return false;
-    return new Date(dueDate) < new Date();
-  };
+      return matchesSearch && matchesStatus && matchesPriority && matchesQuick;
+    });
+  }, [tasks, search, statusFilter, priorityFilter, quickFilter]);
 
   const getPriorityBadge = (priority: Priority) => {
     switch (priority) {
@@ -126,7 +132,50 @@ export function TaskList({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      {/* Quick Filter Chips */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
+        {[
+          { id: 'ALL', label: 'All Tasks', count: tasks.length },
+          { id: 'IN_PROGRESS', label: 'In Progress', count: tasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length },
+          { id: 'IN_REVIEW', label: 'Pending Review', count: tasks.filter(t => t.status === TaskStatus.IN_REVIEW).length },
+          { id: 'OVERDUE', label: 'Overdue', count: tasks.filter(t => isOverdue(t.dueDate, t.status)).length, alert: true },
+          { id: 'CRITICAL_HIGH', label: 'Critical & High', count: tasks.filter(t => t.priority === Priority.CRITICAL || t.priority === Priority.HIGH).length },
+          { id: 'COMPLETED', label: 'Completed', count: tasks.filter(t => t.status === TaskStatus.COMPLETED).length },
+        ].map((chip) => {
+          const isActive = quickFilter === chip.id;
+          return (
+            <button
+              key={chip.id}
+              onClick={() => {
+                setQuickFilter(chip.id as any);
+                if (chip.id !== 'ALL') {
+                  setStatusFilter('ALL');
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
+                isActive
+                  ? 'bg-[#5B5FEF] text-white shadow-xs'
+                  : chip.alert && chip.count > 0
+                  ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
+                  : 'bg-white text-text-secondary border border-border hover:bg-surface hover:text-text-primary'
+              }`}
+            >
+              <span>{chip.label}</span>
+              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                isActive
+                  ? 'bg-white/20 text-white'
+                  : chip.alert && chip.count > 0
+                  ? 'bg-red-200 text-red-800'
+                  : 'bg-slate-100 text-slate-600'
+              }`}>
+                {chip.count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
       {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1 min-w-[140px] max-w-md">
@@ -134,7 +183,7 @@ export function TaskList({
           <Input
             placeholder="Search tasks by title, code, or assignee..."
             value={search}
-            onChange={(e) => updateParam('q', e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
           />
         </div>
@@ -147,7 +196,10 @@ export function TaskList({
 
           <select
             value={statusFilter}
-            onChange={(e) => updateParam('status', e.target.value)}
+            onChange={(e) => {
+              setStatusFilter(e.target.value);
+              setQuickFilter('ALL');
+            }}
             className="h-10 rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             aria-label="Filter by task status"
           >
@@ -162,7 +214,10 @@ export function TaskList({
 
           <select
             value={priorityFilter}
-            onChange={(e) => updateParam('priority', e.target.value)}
+            onChange={(e) => {
+              setPriorityFilter(e.target.value);
+              setQuickFilter('ALL');
+            }}
             className="h-10 rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             aria-label="Filter by task priority"
           >
@@ -209,12 +264,13 @@ export function TaskList({
                       <tr key={t.id} className="hover:bg-surface-secondary/30 transition-colors">
                         <td className="px-5 py-3.5">
                           <div className="min-w-[200px] max-w-md">
-                            <Link
-                              href={taskDetailUrl}
-                              className="font-medium text-text-primary hover:text-primary transition-colors text-sm line-clamp-1"
+                            <button
+                              type="button"
+                              onClick={() => setSelectedTaskId(t.id)}
+                              className="font-medium text-text-primary hover:text-primary transition-colors text-sm line-clamp-1 text-left cursor-pointer"
                             >
                               {t.title}
-                            </Link>
+                            </button>
                             {t.project && (
                               <p className="text-xs text-text-muted mt-0.5">
                                 {t.project.name}
@@ -321,6 +377,11 @@ export function TaskList({
           </div>
         </CardContent>
       </Card>
+      <TaskDrawer
+        taskId={selectedTaskId}
+        onClose={() => setSelectedTaskId(null)}
+        onTaskUpdated={() => router.refresh()}
+      />
     </div>
   );
 }
