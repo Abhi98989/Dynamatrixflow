@@ -40,6 +40,20 @@ export default async function ChangePasswordPage() {
           </CardHeader>
           <CardContent className="px-6 pb-8">
             <ChangePasswordForm />
+            <div className="mt-4 pt-4 border-t border-[#E4E7EC] text-center">
+              <form action={async () => {
+                "use server";
+                const { logoutAction } = await import("@/server/auth/actions");
+                await logoutAction();
+              }}>
+                <button
+                  type="submit"
+                  className="text-xs text-[#667085] hover:text-[#101828] underline transition-colors cursor-pointer"
+                >
+                  ← Sign in with a different account
+                </button>
+              </form>
+            </div>
           </CardContent>
         </Card>
       </div>

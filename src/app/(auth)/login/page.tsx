@@ -6,10 +6,7 @@ import { Brand } from "@/components/layout/brand";
 export default async function LoginPage() {
   const session = await auth();
 
-  if (session?.user) {
-    if (session.user.mustChangePassword) {
-      redirect("/change-password");
-    }
+  if (session?.user && !session.user.mustChangePassword) {
     redirect("/dashboard");
   }
 
