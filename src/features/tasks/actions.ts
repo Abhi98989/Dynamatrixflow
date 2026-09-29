@@ -473,14 +473,31 @@ export async function createSubtaskAction(
     return { success: false, error: 'Permission denied.' };
   }
 
-  const count = await db.subtask.count({ where: { taskId } });
+  await db.$transaction(async (tx) => {
+    const count = await tx.subtask.count({ where: { taskId } });
 
-  await db.subtask.create({
-    data: {
-      taskId,
-      title: trimmed,
-      sortOrder: count + 1,
-    },
+    await tx.subtask.create({
+      data: {
+        taskId,
+        title: trimmed,
+        sortOrder: count + 1,
+      },
+    });
+
+    const allSubtasks = await tx.subtask.findMany({
+      where: { taskId },
+      select: { isCompleted: true },
+    });
+
+    if (allSubtasks.length > 0) {
+      const completed = allSubtasks.filter((s) => s.isCompleted).length;
+      const progressPercent = Math.round((completed / allSubtasks.length) * 100);
+
+      await tx.task.update({
+        where: { id: taskId },
+        data: { progress: progressPercent },
+      });
+    }
   });
 
   revalidatePath(`/projects/${task.projectId}/tasks/${taskId}`);
@@ -556,7 +573,29 @@ export async function deleteSubtaskAction(
     return { success: false, error: 'Permission denied.' };
   }
 
-  await db.subtask.delete({ where: { id: subtaskId } });
+  await db.$transaction(async (tx) => {
+    await tx.subtask.delete({ where: { id: subtaskId } });
+
+    const allSubtasks = await tx.subtask.findMany({
+      where: { taskId: subtask.taskId },
+      select: { isCompleted: true },
+    });
+
+    if (allSubtasks.length > 0) {
+      const completed = allSubtasks.filter((s) => s.isCompleted).length;
+      const progressPercent = Math.round((completed / allSubtasks.length) * 100);
+
+      await tx.task.update({
+        where: { id: subtask.taskId },
+        data: { progress: progressPercent },
+      });
+    } else {
+      await tx.task.update({
+        where: { id: subtask.taskId },
+        data: { progress: 0 },
+      });
+    }
+  });
 
   revalidatePath(`/projects/${subtask.task.projectId}/tasks/${subtask.taskId}`);
   return { success: true };

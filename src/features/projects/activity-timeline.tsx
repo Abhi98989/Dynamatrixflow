@@ -54,8 +54,10 @@ export function ActivityTimeline({ logs }: { logs: ActivityLog[] }) {
       case 'PROJECT_MEMBER_REMOVED':
         return { icon: UserMinus, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', text: `removed ${typeof log.metadata?.targetUserName === 'string' ? log.metadata.targetUserName : 'a member'}` };
       case 'CREATED_TASK':
-      case 'TASK_CREATED':
-        return { icon: CheckSquare, color: 'text-primary', bg: 'bg-primary/10', text: `created task ${typeof log.metadata?.taskCode === 'string' ? log.metadata.taskCode : ''}` };
+      case 'TASK_CREATED': {
+        const taskTitle = typeof log.metadata?.title === 'string' ? ` - ${log.metadata.title}` : '';
+        return { icon: CheckSquare, color: 'text-primary', bg: 'bg-primary/10', text: `created task ${typeof log.metadata?.taskCode === 'string' ? log.metadata.taskCode : ''}${taskTitle}` };
+      }
       case 'UPDATED_TASK_STATUS':
       case 'TASK_STATUS_CHANGED': {
         const newStatus = typeof log.metadata?.newStatus === 'string' ? log.metadata.newStatus.replace(/_/g, ' ') : 'a new status';
@@ -121,9 +123,9 @@ export function ActivityTimeline({ logs }: { logs: ActivityLog[] }) {
               </div>
               
               {/* Optional extended metadata display */}
-              {(log.action === 'CREATED_COMMENT' && log.metadata && typeof log.metadata === 'object' && 'content' in log.metadata) && (
+              {((log.action === 'CREATED_COMMENT' || log.action === 'TASK_COMMENT_CREATED') && log.metadata && typeof log.metadata === 'object' && ('content' in log.metadata || 'commentPreview' in log.metadata)) && (
                 <div className="mt-2 pl-8 border-l-2 border-border/50 ml-3">
-                  <p className="text-xs text-text-secondary italic line-clamp-2">&ldquo;{String(log.metadata.content)}&rdquo;</p>
+                  <p className="text-xs text-text-secondary italic line-clamp-2">&ldquo;{String(log.metadata.content || log.metadata.commentPreview)}&rdquo;</p>
                 </div>
               )}
             </div>

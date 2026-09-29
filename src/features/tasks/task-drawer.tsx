@@ -77,17 +77,35 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
 
   const handleStatusChange = (newStatus: string) => {
     if (!task) return;
+
+    let blockerReason = "";
+    if (newStatus === TaskStatus.BLOCKED) {
+      const reason = window.prompt("Please provide a reason for blocking this task:");
+      if (reason === null) return; // User cancelled
+      if (!reason.trim()) {
+        alert("A blocker reason is required.");
+        return;
+      }
+      blockerReason = reason.trim();
+    }
+
     startStatusTransition(async () => {
-      const res = await updateTaskStatusAction(task.id, newStatus as TaskStatus, task.progress);
+      const res = await updateTaskStatusAction(task.id, newStatus as TaskStatus, task.progress, blockerReason);
       if (res.success) {
         await loadTask(task.id);
         if (onTaskUpdated) onTaskUpdated();
+      } else {
+        alert(res.error || "Failed to update status.");
       }
     });
   };
 
   const handleToggleSubtask = async (subtaskId: string) => {
-    await toggleSubtaskAction(subtaskId);
+    const res = await toggleSubtaskAction(subtaskId);
+    if (res.error) {
+      alert(res.error);
+      return;
+    }
     if (task) {
       await loadTask(task.id);
       if (onTaskUpdated) onTaskUpdated();
@@ -98,10 +116,14 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
     e.preventDefault();
     if (!newSubtaskTitle.trim() || !task) return;
 
-    await createSubtaskAction(task.id, newSubtaskTitle.trim());
-    setNewSubtaskTitle("");
-    await loadTask(task.id);
-    if (onTaskUpdated) onTaskUpdated();
+    const res = await createSubtaskAction(task.id, newSubtaskTitle.trim());
+    if (res.success) {
+      setNewSubtaskTitle("");
+      await loadTask(task.id);
+      if (onTaskUpdated) onTaskUpdated();
+    } else {
+      alert(res.error || "Failed to create subtask.");
+    }
   };
 
   const handleTogglePointer = async () => {
@@ -110,6 +132,8 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
     if (res.success) {
       await loadTask(task.id);
       if (onTaskUpdated) onTaskUpdated();
+    } else {
+      alert(res.error || "Failed to toggle pointer.");
     }
   };
 
@@ -119,6 +143,8 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
     if (res.success) {
       await loadTask(task.id);
       if (onTaskUpdated) onTaskUpdated();
+    } else {
+      alert(res.error || "Failed to set highlight.");
     }
   };
 
@@ -127,9 +153,13 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
     if (!newComment.trim() || !task) return;
 
     startCommentTransition(async () => {
-      await createTaskCommentAction(task.id, newComment.trim());
-      setNewComment("");
-      await loadTask(task.id);
+      const res = await createTaskCommentAction(task.id, newComment.trim());
+      if (res.success) {
+        setNewComment("");
+        await loadTask(task.id);
+      } else {
+        alert(res.error || "Failed to add comment.");
+      }
     });
   };
 
