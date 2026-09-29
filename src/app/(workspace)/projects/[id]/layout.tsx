@@ -27,7 +27,7 @@ export default async function ProjectLayout({ children, params }: LayoutProps) {
       priority: true,
       deadline: true,
       projectLead: { select: { id: true, name: true, position: true } },
-      _count: { select: { tasks: true, milestones: true, members: true, resources: true } },
+      _count: { select: { tasks: true, milestones: true, members: true, resources: true, messages: true } },
       tasks: { select: { status: true }, where: { archivedAt: null } },
     },
   });

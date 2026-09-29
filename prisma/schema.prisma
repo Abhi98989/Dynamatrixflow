@@ -125,6 +125,7 @@ model User {
   activityLogs       ActivityLog[]     @relation("Actor")
   milestonesCreated  Milestone[]
   addedMembers       ProjectMember[]   @relation("MemberAddedBy")
+  projectMessages    ProjectMessage[]
 
   @@index([accountStatus])
   @@index([systemRole])
@@ -160,6 +161,7 @@ model Project {
   tasks        Task[]
   resources    ProjectResource[]
   activityLogs ActivityLog[]
+  messages     ProjectMessage[]
 
   @@index([status])
   @@index([priority])
@@ -233,6 +235,9 @@ model Task {
   blockerReason        String?    @db.Text
   submittedForReviewAt DateTime?
   completedAt          DateTime?
+  isPointed            Boolean    @default(false)
+  pointedAt            DateTime?
+  highlightColor       String?
 
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
@@ -364,4 +369,25 @@ model ActivityLog {
   @@index([projectId, createdAt])
   @@index([actorId])
   @@index([entityType, entityId])
+}
+
+model ProjectMessage {
+  id        String           @id @default(cuid())
+  projectId String
+  project   Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content   String           @db.Text
+  replyToId String?
+  replyTo   ProjectMessage?  @relation("MessageReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   ProjectMessage[] @relation("MessageReplies")
+  mentions  String[]         @default([])
+  isPinned  Boolean          @default(false)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([projectId, createdAt])
+  @@index([userId])
 }

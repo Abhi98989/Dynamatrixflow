@@ -14,8 +14,11 @@ import {
   Calendar,
   AlertCircle,
   ArrowRight,
+  Target,
+  Sparkles,
 } from 'lucide-react';
 import { TaskStatus, Priority } from '@prisma/client';
+import { toggleTaskPointerAction, setTaskHighlightAction } from './actions';
 
 export interface TaskListItem {
   id: string;
@@ -28,6 +31,9 @@ export interface TaskListItem {
   startDate: Date | null;
   dueDate: Date | null;
   blockerReason: string | null;
+  isPointed?: boolean;
+  pointedAt?: Date | null;
+  highlightColor?: string | null;
   assignee: {
     id: string;
     name: string;
@@ -63,7 +69,24 @@ export function TaskList({
   const [search, setSearch] = useState(searchParams.get('q') || '');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'ALL');
   const [priorityFilter, setPriorityFilter] = useState(searchParams.get('priority') || 'ALL');
+  const [highlightFilter, setHighlightFilter] = useState('ALL');
   const [quickFilter, setQuickFilter] = useState<'ALL' | 'IN_PROGRESS' | 'IN_REVIEW' | 'OVERDUE' | 'CRITICAL_HIGH' | 'COMPLETED'>('ALL');
+
+  const pointedTask = useMemo(() => tasks.find((t) => t.isPointed), [tasks]);
+
+  const handleTogglePointer = async (taskId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    await toggleTaskPointerAction(taskId);
+    router.refresh();
+  };
+
+  const handleSetHighlight = async (taskId: string, color: string | null, e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    await setTaskHighlightAction(taskId, color);
+    router.refresh();
+  };
 
   const isOverdue = (dueDate: Date | null, status: TaskStatus) => {
     if (!dueDate) return false;
@@ -83,6 +106,12 @@ export function TaskList({
 
       const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
       const matchesPriority = priorityFilter === 'ALL' || t.priority === priorityFilter;
+      const matchesHighlight =
+        highlightFilter === 'ALL'
+          ? true
+          : highlightFilter === 'HIGHLIGHTED'
+            ? Boolean(t.highlightColor)
+            : t.highlightColor === highlightFilter;
 
       let matchesQuick = true;
       if (quickFilter === 'IN_PROGRESS') {
@@ -97,9 +126,9 @@ export function TaskList({
         matchesQuick = t.status === TaskStatus.COMPLETED;
       }
 
-      return matchesSearch && matchesStatus && matchesPriority && matchesQuick;
+      return matchesSearch && matchesStatus && matchesPriority && matchesQuick && matchesHighlight;
     });
-  }, [tasks, search, statusFilter, priorityFilter, quickFilter]);
+  }, [tasks, search, statusFilter, priorityFilter, quickFilter, highlightFilter]);
 
   const getPriorityBadge = (priority: Priority) => {
     switch (priority) {
@@ -180,6 +209,52 @@ export function TaskList({
         })}
       </div>
 
+      {/* Active Team Pointer Banner */}
+      {pointedTask && (
+        <div className="bg-gradient-to-r from-[#EEF4FF] via-white to-[#EEF4FF] border border-[#C7D7FE] rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="size-8 rounded-lg bg-[#5B5FEF] text-white flex items-center justify-center shrink-0 font-bold shadow-xs">
+              <Target className="size-4 animate-pulse" />
+            </span>
+            <div className="truncate">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#5B5FEF] bg-[#5B5FEF]/10 px-1.5 py-0.5 rounded">
+                  Active Team Pointer
+                </span>
+                <span className="font-mono text-[12px] font-bold text-[#101828]">
+                  {pointedTask.taskCode}
+                </span>
+              </div>
+              <p className="text-[13px] font-medium text-[#344054] truncate mt-0.5">
+                {pointedTask.title}
+                {pointedTask.assignee && (
+                  <span className="text-[#667085] ml-2 text-[12px]">
+                    • Assigned to {pointedTask.assignee.name}
+                  </span>
+                )}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`[${pointedTask.taskCode}]`);
+                alert(`Copied pointer [${pointedTask.taskCode}] to clipboard!`);
+              }}
+              className="text-[11px] font-semibold text-[#475467] hover:text-[#101828] bg-white border border-[#D0D5DD] px-2.5 py-1 rounded-md transition-colors"
+            >
+              Copy Pointer Link
+            </button>
+            <button
+              onClick={() => setSelectedTaskId(pointedTask.id)}
+              className="text-[11px] font-semibold text-white bg-[#5B5FEF] hover:bg-[#4C50D8] px-3 py-1 rounded-md transition-colors shadow-xs"
+            >
+              Jump to Task
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Search & Filter Bar */}
       <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div className="relative flex-1 min-w-[140px] max-w-md">
@@ -231,6 +306,21 @@ export function TaskList({
             <option value={Priority.MEDIUM}>Medium</option>
             <option value={Priority.LOW}>Low</option>
           </select>
+
+          <select
+            value={highlightFilter}
+            onChange={(e) => setHighlightFilter(e.target.value)}
+            className="h-10 rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+            aria-label="Filter by task highlight"
+          >
+            <option value="ALL">All Highlights</option>
+            <option value="HIGHLIGHTED">Any Highlight</option>
+            <option value="YELLOW">🟡 Amber</option>
+            <option value="RED">🔴 Red</option>
+            <option value="PURPLE">🟣 Purple</option>
+            <option value="BLUE">🔵 Blue</option>
+            <option value="GREEN">🟢 Green</option>
+          </select>
         </div>
       </div>
 
@@ -264,16 +354,38 @@ export function TaskList({
                     const taskDetailUrl = `/projects/${t.projectId}/tasks/${t.id}`;
                     const isAssignee = t.assignee?.id === currentUserId;
 
+                    const highlightStyles: Record<string, string> = {
+                      YELLOW: 'border-l-4 border-l-[#F59E0B] bg-[#FFFBEB]/40',
+                      RED: 'border-l-4 border-l-[#EF4444] bg-[#FEF2F2]/40',
+                      PURPLE: 'border-l-4 border-l-[#8B5CF6] bg-[#F5F3FF]/40',
+                      BLUE: 'border-l-4 border-l-[#3B82F6] bg-[#EFF6FF]/40',
+                      GREEN: 'border-l-4 border-l-[#10B981] bg-[#F0FDF4]/40',
+                    };
+                    const rowHighlight = t.highlightColor ? highlightStyles[t.highlightColor] || '' : '';
+                    const isPointedTask = Boolean(t.isPointed);
+
                     return (
-                      <tr key={t.id} className="hover:bg-surface-secondary/30 transition-colors">
+                      <tr
+                        key={t.id}
+                        className={`hover:bg-surface-secondary/40 transition-colors ${rowHighlight} ${
+                          isPointedTask ? 'ring-2 ring-inset ring-[#5B5FEF]/40' : ''
+                        }`}
+                      >
                         <td className="px-5 py-3.5">
                           <div className="min-w-[200px] max-w-md">
-                            <Link
-                              href={taskDetailUrl}
-                              className="font-medium text-text-primary hover:text-primary transition-colors text-sm line-clamp-1 text-left cursor-pointer"
-                            >
-                              {t.title}
-                            </Link>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <Link
+                                href={taskDetailUrl}
+                                className="font-medium text-text-primary hover:text-primary transition-colors text-sm line-clamp-1 text-left cursor-pointer"
+                              >
+                                {t.title}
+                              </Link>
+                              {isPointedTask && (
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#5B5FEF] text-white shadow-xs">
+                                  <Target className="size-3 animate-pulse" /> Focus
+                                </span>
+                              )}
+                            </div>
                             {t.project && (
                               <p className="text-xs text-text-muted mt-0.5">
                                 {t.project.name}
@@ -363,13 +475,67 @@ export function TaskList({
                         </td>
 
                         <td className="px-5 py-3.5 text-right whitespace-nowrap">
-                          <Link
-                            href={taskDetailUrl}
-                            className="inline-flex items-center justify-center size-7 rounded-md border border-border hover:bg-surface-secondary text-text-secondary hover:text-primary transition-colors"
-                            title="View Task Details"
-                          >
-                            <ArrowRight className="size-3.5" />
-                          </Link>
+                          <div className="flex items-center justify-end gap-1.5">
+                            {/* Quick Pointer Toggle */}
+                            <button
+                              type="button"
+                              onClick={(e) => handleTogglePointer(t.id, e)}
+                              className={`size-7 rounded-md border flex items-center justify-center transition-colors ${
+                                t.isPointed
+                                  ? 'bg-[#5B5FEF] text-white border-[#4C50D8] shadow-xs'
+                                  : 'border-border text-text-muted hover:text-[#5B5FEF] hover:bg-[#EEF4FF]'
+                              }`}
+                              title={t.isPointed ? 'Clear active focus pointer' : 'Set as team active focus pointer'}
+                            >
+                              <Target className="size-3.5" />
+                            </button>
+
+                            {/* Quick Highlighter Cycle */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                const order = [null, 'YELLOW', 'RED', 'PURPLE', 'BLUE', 'GREEN'];
+                                const nextIdx = (order.indexOf(t.highlightColor || null) + 1) % order.length;
+                                handleSetHighlight(t.id, order[nextIdx] ?? null, e);
+                              }}
+                              className={`size-7 rounded-md border flex items-center justify-center transition-colors ${
+                                t.highlightColor
+                                  ? 'bg-white border-[#D0D5DD] shadow-xs'
+                                  : 'border-border text-text-muted hover:text-text-primary hover:bg-surface-secondary'
+                              }`}
+                              title={
+                                t.highlightColor
+                                  ? `Highlighter: ${t.highlightColor} (Click to cycle/clear)`
+                                  : 'Highlight task'
+                              }
+                            >
+                              {t.highlightColor ? (
+                                <span
+                                  className={`size-3 rounded-full ${
+                                    t.highlightColor === 'YELLOW'
+                                      ? 'bg-[#F59E0B]'
+                                      : t.highlightColor === 'RED'
+                                      ? 'bg-[#EF4444]'
+                                      : t.highlightColor === 'PURPLE'
+                                      ? 'bg-[#8B5CF6]'
+                                      : t.highlightColor === 'BLUE'
+                                      ? 'bg-[#3B82F6]'
+                                      : 'bg-[#10B981]'
+                                  }`}
+                                />
+                              ) : (
+                                <Sparkles className="size-3.5" />
+                              )}
+                            </button>
+
+                            <Link
+                              href={taskDetailUrl}
+                              className="inline-flex items-center justify-center size-7 rounded-md border border-border hover:bg-surface-secondary text-text-secondary hover:text-primary transition-colors"
+                              title="View Task Details"
+                            >
+                              <ArrowRight className="size-3.5" />
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     );

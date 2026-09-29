@@ -4,9 +4,9 @@ import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import {
   X, ExternalLink, Calendar,
-  MessageSquare, Loader2
+  MessageSquare, Loader2, Target
 } from "lucide-react";
-import { getTaskDetailsAction, toggleSubtaskAction, createSubtaskAction } from "./actions";
+import { getTaskDetailsAction, toggleSubtaskAction, createSubtaskAction, toggleTaskPointerAction, setTaskHighlightAction } from "./actions";
 import { updateTaskStatusAction } from "./actions";
 import { createTaskCommentAction } from "@/features/comments/actions";
 import { TaskStatus } from "@prisma/client";
@@ -102,6 +102,24 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
     setNewSubtaskTitle("");
     await loadTask(task.id);
     if (onTaskUpdated) onTaskUpdated();
+  };
+
+  const handleTogglePointer = async () => {
+    if (!task) return;
+    const res = await toggleTaskPointerAction(task.id);
+    if (res.success) {
+      await loadTask(task.id);
+      if (onTaskUpdated) onTaskUpdated();
+    }
+  };
+
+  const handleSetHighlight = async (color: string | null) => {
+    if (!task) return;
+    const res = await setTaskHighlightAction(task.id, color);
+    if (res.success) {
+      await loadTask(task.id);
+      if (onTaskUpdated) onTaskUpdated();
+    }
   };
 
   const handleAddComment = (e: React.FormEvent) => {
@@ -207,6 +225,56 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${priorityColor[task.priority] || priorityColor.MEDIUM}`}>
                     {task.priority} PRIORITY
                   </span>
+
+                  {/* Active Focus Pointer Button */}
+                  <button
+                    type="button"
+                    disabled={!canEdit}
+                    onClick={handleTogglePointer}
+                    className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md border transition-all ${
+                      task.isPointed
+                        ? "bg-[#5B5FEF] text-white border-[#4C50D8] shadow-xs"
+                        : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+                    }`}
+                    title={task.isPointed ? "Active Focus Pointer (Click to clear)" : "Point to this task for team focus"}
+                  >
+                    <Target className="w-3.5 h-3.5" />
+                    {task.isPointed ? "🎯 Focused Pointer" : "Point Task"}
+                  </button>
+
+                  {/* Highlighter Palette */}
+                  <div className="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-md px-1.5 py-1">
+                    <span className="text-[10px] text-slate-500 font-semibold mr-0.5">Highlighter:</span>
+                    {[
+                      { key: "YELLOW", color: "bg-[#F59E0B]", name: "Amber" },
+                      { key: "RED", color: "bg-[#EF4444]", name: "Red" },
+                      { key: "PURPLE", color: "bg-[#8B5CF6]", name: "Purple" },
+                      { key: "BLUE", color: "bg-[#3B82F6]", name: "Blue" },
+                      { key: "GREEN", color: "bg-[#10B981]", name: "Green" },
+                    ].map((c) => (
+                      <button
+                        key={c.key}
+                        type="button"
+                        disabled={!canEdit}
+                        onClick={() => handleSetHighlight(task.highlightColor === c.key ? null : c.key)}
+                        className={`w-3.5 h-3.5 rounded-full ${c.color} transition-transform ${
+                          task.highlightColor === c.key ? "ring-2 ring-slate-900 scale-110" : "opacity-60 hover:opacity-100"
+                        }`}
+                        title={`Highlight ${c.name}`}
+                      />
+                    ))}
+                    {task.highlightColor && (
+                      <button
+                        type="button"
+                        disabled={!canEdit}
+                        onClick={() => handleSetHighlight(null)}
+                        className="text-[10px] text-slate-400 hover:text-slate-700 px-1 font-bold"
+                        title="Clear highlight"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

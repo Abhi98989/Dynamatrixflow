@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutTemplate, CheckSquare, Columns3, Map, Paperclip, Users, History, Settings } from "lucide-react";
+import { LayoutTemplate, CheckSquare, Columns3, Map, Paperclip, Users, History, Settings, MessageSquare } from "lucide-react";
 
 const tabs = [
   { key: "", label: "Overview", icon: LayoutTemplate },
@@ -11,6 +11,7 @@ const tabs = [
   { key: "/milestones", label: "Milestones", icon: Map, countKey: "milestones" },
   { key: "/resources", label: "Resources", icon: Paperclip, countKey: "resources" },
   { key: "/team", label: "Team", icon: Users, countKey: "members" },
+  { key: "/chat", label: "Discussion", icon: MessageSquare, countKey: "messages" },
   { key: "/activity", label: "Activity", icon: History },
   { key: "/settings", label: "Settings", icon: Settings },
 ];

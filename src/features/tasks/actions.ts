@@ -593,3 +593,88 @@ export async function getTaskDetailsAction(taskId: string) {
     canEdit,
   };
 }
+
+export async function toggleTaskPointerAction(taskId: string) {
+  try {
+    const user = await requireActiveUser();
+    const task = await db.task.findUnique({
+      where: { id: taskId, archivedAt: null },
+      select: { id: true, projectId: true, isPointed: true },
+    });
+
+    if (!task) return { error: 'Task not found.' };
+
+    const hasAccess = await canViewProject(user.id, task.projectId);
+    if (!hasAccess) return { error: 'Unauthorized.' };
+
+    const willPoint = !task.isPointed;
+
+    await db.$transaction(async (tx) => {
+      if (willPoint) {
+        // Clear pointer on any other task in the project
+        await tx.task.updateMany({
+          where: { projectId: task.projectId, isPointed: true },
+          data: { isPointed: false, pointedAt: null },
+        });
+
+        // Set pointer on this task
+        await tx.task.update({
+          where: { id: taskId },
+          data: { isPointed: true, pointedAt: new Date() },
+        });
+      } else {
+        await tx.task.update({
+          where: { id: taskId },
+          data: { isPointed: false, pointedAt: null },
+        });
+      }
+    });
+
+    revalidatePath(`/projects/${task.projectId}`);
+    revalidatePath(`/projects/${task.projectId}/tasks`);
+    revalidatePath(`/projects/${task.projectId}/board`);
+    revalidatePath(`/projects/${task.projectId}/tasks/${taskId}`);
+
+    return { success: true, isPointed: willPoint };
+  } catch (error) {
+    console.error('toggleTaskPointerAction error:', error);
+    return { error: 'Failed to toggle pointer.' };
+  }
+}
+
+export async function setTaskHighlightAction(
+  taskId: string,
+  highlightColor: string | null
+) {
+  try {
+    const user = await requireActiveUser();
+    const task = await db.task.findUnique({
+      where: { id: taskId, archivedAt: null },
+      select: { id: true, projectId: true },
+    });
+
+    if (!task) return { error: 'Task not found.' };
+
+    const hasAccess = await canViewProject(user.id, task.projectId);
+    if (!hasAccess) return { error: 'Unauthorized.' };
+
+    const allowed = ['YELLOW', 'RED', 'PURPLE', 'BLUE', 'GREEN', null];
+    const color = allowed.includes(highlightColor) ? highlightColor : null;
+
+    await db.task.update({
+      where: { id: taskId },
+      data: { highlightColor: color },
+    });
+
+    revalidatePath(`/projects/${task.projectId}`);
+    revalidatePath(`/projects/${task.projectId}/tasks`);
+    revalidatePath(`/projects/${task.projectId}/board`);
+    revalidatePath(`/projects/${task.projectId}/tasks/${taskId}`);
+
+    return { success: true, highlightColor: color };
+  } catch (error) {
+    console.error('setTaskHighlightAction error:', error);
+    return { error: 'Failed to update highlight color.' };
+  }
+}
+
