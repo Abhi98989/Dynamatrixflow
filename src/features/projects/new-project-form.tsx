@@ -25,7 +25,6 @@ interface NewProjectFormProps {
 export function NewProjectForm({
   leads,
   currentUserId,
-  currentUserRole: _currentUserRole,
 }: NewProjectFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -85,8 +84,11 @@ export function NewProjectForm({
             <FolderPlus className="w-5 h-5" />
           </div>
           <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+            <span className="text-[11px] font-bold text-[#5B5FEF] uppercase tracking-wider block mb-0.5">
               Create New Project
+            </span>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+              Project Initialization
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
               Initialize a scoped client or internal workspace with dedicated lead and tracking.

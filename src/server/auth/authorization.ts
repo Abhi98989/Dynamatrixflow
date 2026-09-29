@@ -168,12 +168,21 @@ export async function canUpdateTask(
     where: { id: taskId },
     select: {
       assigneeId: true,
-      project: { select: { projectLeadId: true } },
+      project: {
+        select: {
+          projectLeadId: true,
+          members: {
+            where: { userId, removedAt: null },
+            select: { id: true },
+          },
+        },
+      },
     },
   });
 
   if (!task) return false;
-  return task.assigneeId === userId || task.project.projectLeadId === userId;
+  if (task.project.projectLeadId === userId) return true;
+  return task.assigneeId === userId && task.project.members.length > 0;
 }
 
 /**

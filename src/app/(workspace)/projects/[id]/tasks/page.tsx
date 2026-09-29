@@ -48,7 +48,7 @@ export default async function TasksPage({ params }: Props) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-[16px] font-semibold text-[#101828]">Tasks</h2>
+          <h1 className="text-[16px] font-semibold text-[#101828]">Project Tasks</h1>
           <p className="text-[12px] text-[#667085] mt-0.5">{tasks.length} deliverables across all milestones</p>
         </div>
         {isManager && (

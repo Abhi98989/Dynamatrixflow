@@ -77,7 +77,6 @@ export default async function SettingsPage({ params }: Props) {
               <select id="status" name="status" defaultValue={project.status} className="w-full h-9 px-3 rounded-md border border-[#E4E7EC] focus:outline-none focus:border-[#5B5FEF] text-[13px] bg-white text-[#101828]">
                 <option value="PLANNING">Planning</option>
                 <option value="ACTIVE">Active</option>
-                <option value="IN_PROGRESS">In Progress</option>
                 <option value="ON_HOLD">On Hold</option>
                 <option value="COMPLETED">Completed</option>
                 <option value="CANCELLED">Cancelled</option>

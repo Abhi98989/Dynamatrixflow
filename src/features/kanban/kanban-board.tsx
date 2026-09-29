@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { useState, useMemo, useTransition } from 'react';
-import Link from 'next/link';
 import {
   DndContext,
   DragOverlay,
@@ -568,14 +567,13 @@ function DraggableKanbanCard({
 function KanbanCardItem({
   task,
   currentUserId,
-  projectId,
   dragHandleProps,
   isOverlay = false,
   onSelectTask,
 }: {
   task: KanbanTaskItem;
   currentUserId: string;
-  projectId: string;
+  projectId?: string;
   dragHandleProps?: Record<string, unknown>;
   isOverlay?: boolean;
   onSelectTask?: (id: string) => void;

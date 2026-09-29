@@ -99,7 +99,7 @@ export async function createGuestAction(
       data: {
         projectId,
         userId: existingUser.id,
-        projectRole: "VIEWER" as any,
+        projectRole: ProjectMemberRole.VIEWER,
         addedById: currentUser.id,
       },
     });
@@ -149,7 +149,7 @@ export async function createGuestAction(
         email,
         employeeId: guestId,
         passwordHash,
-        systemRole: "GUEST" as any,
+        systemRole: SystemRole.GUEST,
         accountStatus: AccountStatus.ACTIVE,
         position: "Guest Observer",
         mustChangePassword: false,
@@ -160,7 +160,7 @@ export async function createGuestAction(
       data: {
         projectId,
         userId: user.id,
-        projectRole: "VIEWER" as any,
+        projectRole: ProjectMemberRole.VIEWER,
         addedById: currentUser.id,
       },
     });

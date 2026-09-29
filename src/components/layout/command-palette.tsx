@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search, FolderKanban, CheckSquare, Users, FileText,
-  ArrowRight, CornerDownLeft, Loader2, Sparkles, X, LayoutDashboard, Library
+  ArrowRight, CornerDownLeft, Loader2, X
 } from "lucide-react";
 import { globalSearchAction, type SearchResultItem } from "@/features/search/actions";
 
@@ -53,19 +53,24 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
   // Focus input when dialog opens
   useEffect(() => {
     if (open) {
-      setTimeout(() => inputRef.current?.focus(), 50);
-      setQuery("");
-      setResults([]);
-      setSelectedIndex(0);
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+        setQuery("");
+        setResults([]);
+        setSelectedIndex(0);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [open]);
 
   // Live search query
   useEffect(() => {
     if (!query.trim() || query.trim().length < 2) {
-      setResults([]);
-      setSelectedIndex(0);
-      return;
+      const timer = setTimeout(() => {
+        setResults([]);
+        setSelectedIndex(0);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     const timer = setTimeout(() => {

@@ -71,7 +71,7 @@ async function main() {
       systemRole: SystemRole.EMPLOYEE,
       accountStatus: AccountStatus.ACTIVE,
       position: "Frontend Developer",
-      mustChangePassword: false,
+      mustChangePassword: true,
       createdById: admin.id,
     },
   });

@@ -2,7 +2,7 @@
 
 import { db } from "@/server/db/client";
 import { requireActiveUser } from "@/server/auth/authorization";
-import { SystemRole } from "@prisma/client";
+import { SystemRole, type Prisma } from "@prisma/client";
 
 export interface SearchResultItem {
   id: string;
@@ -25,7 +25,7 @@ export async function globalSearchAction(query: string): Promise<SearchResultIte
   const isGuest = (user.systemRole as string) === "GUEST";
 
   // 1. Search Projects
-  const projectWhere: any = {
+  const projectWhere: Prisma.ProjectWhereInput = {
     OR: [
       { name: { contains: trimmed, mode: "insensitive" } },
       { projectCode: { contains: trimmed, mode: "insensitive" } },
@@ -61,7 +61,7 @@ export async function globalSearchAction(query: string): Promise<SearchResultIte
   }));
 
   // 2. Search Tasks
-  const taskWhere: any = {
+  const taskWhere: Prisma.TaskWhereInput = {
     archivedAt: null,
     OR: [
       { title: { contains: trimmed, mode: "insensitive" } },
@@ -133,7 +133,7 @@ export async function globalSearchAction(query: string): Promise<SearchResultIte
   }
 
   // 4. Search Resources
-  const resourceWhere: any = {
+  const resourceWhere: Prisma.ProjectResourceWhereInput = {
     archivedAt: null,
     title: { contains: trimmed, mode: "insensitive" },
   };

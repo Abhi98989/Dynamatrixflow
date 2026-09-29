@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Bell, CalendarClock, CheckSquare, FolderKanban, LayoutDashboard,
+  Bell, CalendarClock, CheckSquare, ClipboardCheck, FolderKanban, LayoutDashboard,
   Users, Library, Settings, UserCircle, type LucideIcon
 } from "lucide-react";
 
@@ -20,6 +20,7 @@ const defaultNavGroups: { label: string, items: NavItem[] }[] = [
     items: [
       { label: "Projects", href: "/projects", icon: FolderKanban },
       { label: "My Tasks", href: "/my-tasks", icon: CheckSquare },
+      { label: "Review Queue", href: "/review", icon: ClipboardCheck },
       { label: "Upcoming", href: "/upcoming", icon: CalendarClock },
     ],
   },
@@ -33,7 +34,7 @@ const defaultNavGroups: { label: string, items: NavItem[] }[] = [
   {
     label: "ACTIVITY",
     items: [
-      { label: "Notifications", href: "/notifications", icon: Bell, badge: 3 },
+      { label: "Notifications", href: "/notifications", icon: Bell },
     ],
   },
   {

@@ -2,11 +2,10 @@
 
 import { useState } from "react";
 import {
-  CheckCircle2, Clock, Calendar, ArrowUpRight, FolderKanban,
-  FileText, ExternalLink, Download, ShieldCheck, ChevronRight,
-  TrendingUp, Sparkles, AlertCircle, Layers
+  CheckCircle2, Clock, Calendar, ArrowUpRight,
+  FileText, ExternalLink, Download, ShieldCheck,
+  TrendingUp
 } from "lucide-react";
-import Link from "next/link";
 
 export interface GuestProjectData {
   id: string;
@@ -78,7 +77,6 @@ export function GuestMonitorView({ guestName, guestId, projects }: GuestMonitorV
   const completedTasks = allTasks.filter((t) => t.status === "COMPLETED");
   const inProgressTasks = allTasks.filter((t) => t.status === "IN_PROGRESS" || t.status === "IN_REVIEW");
   const upcomingTasks = allTasks.filter((t) => t.status === "TODO");
-  const blockedTasks = allTasks.filter((t) => t.status === "BLOCKED");
 
   const progressPercentage = totalTasks > 0 ? Math.round((completedTasks.length / totalTasks) * 100) : 0;
 

@@ -76,7 +76,9 @@ export default async function ProjectLayout({ children, params }: LayoutProps) {
               <span>›</span>
               <span className="font-mono text-[#98A2B3]">{project.projectCode}</span>
             </div>
-            <h1 className="text-[22px] font-semibold text-[#101828] tracking-tight truncate">{project.name}</h1>
+            <div className="text-[22px] font-semibold text-[#101828] tracking-tight truncate">
+              {project.name}
+            </div>
             <div className="flex items-center gap-3 mt-1.5 flex-wrap">
               <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-bold ${statusColor[project.status] || statusColor.PLANNING}`}>
                 <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60" />

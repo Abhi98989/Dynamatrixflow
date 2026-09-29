@@ -360,7 +360,7 @@ export function UpcomingSchedule({
           <div className="flex items-center gap-2.5">
             <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-[#101828] flex items-center gap-2">
               <CalendarClock className="size-5 text-[#5B5FEF]" />
-              Upcoming Deadlines
+              Upcoming Deliverables & Deadlines
             </h1>
             <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE]">
               {filteredList.length} {filteredList.length === 1 ? "deliverable" : "deliverables"}

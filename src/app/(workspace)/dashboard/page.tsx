@@ -181,7 +181,7 @@ export default async function DashboardPage() {
   const onTrackPct = Math.max(0, 100 - completedPct - atRiskPct);
 
   // Velocity computation (completed deliverables in the last 7 days)
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
   const completedThisWeekCount = await db.task.count({
     where: {
       status: TaskStatus.COMPLETED,
@@ -196,10 +196,10 @@ export default async function DashboardPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 max-w-7xl mx-auto">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-[22px] font-semibold text-[#101828] tracking-tight">Overview</h1>
+            <h1 className="text-[22px] font-semibold text-[#101828] tracking-tight">Good morning, {currentUser.name?.split(' ')[0] || "Abhishek"}</h1>
             {isAdmin && <span className="px-2 py-0.5 rounded border border-[#E4E7EC] bg-[#F9FAFC] text-[#475467] text-[11px] font-medium tracking-wide">Command View</span>}
           </div>
-          <p className="text-[#667085] mt-1 text-sm">Welcome back, {currentUser.name?.split(' ')[0] || "Abhishek"}. Here&apos;s what needs attention.</p>
+          <p className="text-[#667085] mt-1 text-sm">Welcome back. Here&apos;s what needs attention.</p>
         </div>
         <div className="flex items-center gap-3">
           <button className="flex items-center gap-2 px-3 py-1.5 bg-white border border-[#E4E7EC] rounded-md text-sm font-medium text-[#475467] hover:bg-[#F9FAFC] transition-colors">

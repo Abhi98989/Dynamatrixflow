@@ -265,8 +265,7 @@ export async function updateTaskStatusAction(
       progress: number;
       blockerReason: string | null;
       submittedForReviewAt?: Date | null;
-      reviewedAt?: Date | null;
-      reviewedById?: string | null;
+      completedAt?: Date | null;
     } = {
       status: newStatus,
       progress: targetProgress,
@@ -275,9 +274,10 @@ export async function updateTaskStatusAction(
 
     if (newStatus === TaskStatus.IN_REVIEW) {
       updateData.submittedForReviewAt = new Date();
-    } else if (newStatus === TaskStatus.COMPLETED && isLeadOrAdmin) {
-      updateData.reviewedAt = new Date();
-      updateData.reviewedById = actor.id;
+    } else if (newStatus === TaskStatus.COMPLETED) {
+      updateData.completedAt = new Date();
+    } else if (task.status === TaskStatus.COMPLETED) {
+      updateData.completedAt = null;
     }
 
     await tx.task.update({

@@ -1,13 +1,31 @@
 import { db } from "@/server/db/client";
-import { requireActiveUser } from "@/server/auth/authorization";
+import { requireActiveUser, canManageProject } from "@/server/auth/authorization";
 import { notFound } from "next/navigation";
+import { AddMemberDialog } from "@/features/projects/add-member-dialog";
 
 interface Props { params: Promise<{ id: string }> }
 
 export default async function OverviewPage({ params }: Props) {
-  await requireActiveUser();
+  const currentUser = await requireActiveUser();
   const { id } = await params;
   const now = new Date();
+
+  const canManage = await canManageProject(currentUser.id, id);
+  const availableUsers = canManage
+    ? await db.user.findMany({
+        where: {
+          accountStatus: "ACTIVE",
+          projectMemberships: { none: { projectId: id, removedAt: null } },
+        },
+        select: {
+          id: true,
+          name: true,
+          employeeId: true,
+          position: true,
+        },
+        orderBy: { name: "asc" },
+      })
+    : [];
 
   const project = await db.project.findUnique({
     where: { id },
@@ -34,6 +52,7 @@ export default async function OverviewPage({ params }: Props) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <h1 className="sr-only">{project.name}</h1>
       {/* Left column */}
       <div className="lg:col-span-2 space-y-4">
         {/* Description */}
@@ -92,6 +111,17 @@ export default async function OverviewPage({ params }: Props) {
 
       {/* Right column */}
       <div className="space-y-4">
+        {/* Team Section */}
+        <div className="bg-white rounded-lg border border-[#E4E7EC] p-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-[13px] font-semibold text-[#101828]">Project Team ({project._count.members})</h3>
+            {canManage && (
+              <AddMemberDialog projectId={project.id} availableUsers={availableUsers} />
+            )}
+          </div>
+          <p className="text-[12px] text-[#667085]">{project._count.members} active contributor{project._count.members === 1 ? '' : 's'}</p>
+        </div>
+
         {/* Details */}
         <div className="bg-white rounded-lg border border-[#E4E7EC] p-4">
           <h3 className="text-[13px] font-semibold text-[#101828] mb-3">Details</h3>

@@ -5,7 +5,8 @@ import { AddMemberForm } from "@/features/projects/add-member-form";
 import { RemoveMemberButton } from "@/features/projects/remove-member-button";
 import { GenerateGuestDialog } from "@/features/guests/generate-guest-dialog";
 import { RevokeGuestButton } from "@/features/guests/revoke-guest-button";
-import { ShieldCheck, Users } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
+import { SystemRole } from "@prisma/client";
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -62,7 +63,7 @@ export default async function TeamPage({ params }: Props) {
     ? await db.user.findMany({
         where: {
           accountStatus: "ACTIVE",
-          systemRole: { not: "GUEST" as any },
+          systemRole: { not: SystemRole.GUEST },
           id: { notIn: memberIds },
         },
         select: { id: true, name: true, employeeId: true, position: true },

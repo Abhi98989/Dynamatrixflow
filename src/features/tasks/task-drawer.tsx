@@ -3,13 +3,15 @@
 import { useState, useEffect, useTransition } from "react";
 import Link from "next/link";
 import {
-  X, ExternalLink, Calendar, Clock, User, CheckCircle2,
-  AlertCircle, MessageSquare, Plus, Loader2, ArrowRight, CornerDownLeft
+  X, ExternalLink, Calendar,
+  MessageSquare, Loader2
 } from "lucide-react";
 import { getTaskDetailsAction, toggleSubtaskAction, createSubtaskAction } from "./actions";
 import { updateTaskStatusAction } from "./actions";
 import { createTaskCommentAction } from "@/features/comments/actions";
-import { TaskStatus, Priority } from "@prisma/client";
+import { TaskStatus } from "@prisma/client";
+
+type TaskDetailsResult = Awaited<ReturnType<typeof getTaskDetailsAction>>;
 
 interface TaskDrawerProps {
   taskId: string | null;
@@ -18,7 +20,7 @@ interface TaskDrawerProps {
 }
 
 export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<TaskDetailsResult>(null);
   const [loading, setLoading] = useState(false);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState("");
   const [newComment, setNewComment] = useState("");
@@ -33,10 +35,27 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
   };
 
   useEffect(() => {
+    let active = true;
     if (taskId) {
-      loadTask(taskId);
+      const timer = setTimeout(() => {
+        if (active) {
+          loadTask(taskId);
+        }
+      }, 0);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
     } else {
-      setData(null);
+      const timer = setTimeout(() => {
+        if (active) {
+          setData(null);
+        }
+      }, 0);
+      return () => {
+        active = false;
+        clearTimeout(timer);
+      };
     }
   }, [taskId]);
 
@@ -55,7 +74,6 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
 
   const task = data?.task;
   const canEdit = data?.canEdit;
-  const isLeadOrAdmin = data?.isLeadOrAdmin;
 
   const handleStatusChange = (newStatus: string) => {
     if (!task) return;
@@ -112,9 +130,6 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
     BLOCKED: "bg-red-100 text-red-700",
     CANCELLED: "bg-slate-100 text-slate-500",
   };
-
-  const formatEnum = (val: string) =>
-    val.split("_").map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/40 backdrop-blur-2xs animate-in fade-in duration-150">
@@ -238,12 +253,12 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                    Checklist ({task.subtasks.filter((s: any) => s.isCompleted).length}/{task.subtasks.length})
+                    Checklist ({task.subtasks.filter((s) => s.isCompleted).length}/{task.subtasks.length})
                   </h4>
                 </div>
 
                 <div className="space-y-1.5">
-                  {task.subtasks.map((st: any) => (
+                  {task.subtasks.map((st) => (
                     <div
                       key={st.id}
                       onClick={() => canEdit && handleToggleSubtask(st.id)}
@@ -298,7 +313,7 @@ export function TaskDrawer({ taskId, onClose, onTaskUpdated }: TaskDrawerProps) 
                       No comments yet. Start the conversation below.
                     </p>
                   ) : (
-                    task.comments.map((c: any) => (
+                    task.comments.map((c) => (
                       <div key={c.id} className="p-3 rounded-lg bg-slate-50 border border-slate-100 text-xs">
                         <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
                           <span className="font-semibold text-slate-700">{c.user.name}</span>

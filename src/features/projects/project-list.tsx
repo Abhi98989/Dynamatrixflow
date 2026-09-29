@@ -50,11 +50,7 @@ export function ProjectList({
         p.name.toLowerCase().includes(q) ||
         p.projectCode.toLowerCase().includes(q) ||
         (p.clientName || "").toLowerCase().includes(q);
-      const matchStatus =
-        statusFilter === "ALL" ||
-        (statusFilter === "ACTIVE_OR_PROGRESS"
-          ? p.status === "ACTIVE" || p.status === "IN_PROGRESS"
-          : p.status === statusFilter);
+      const matchStatus = statusFilter === "ALL" || p.status === statusFilter;
       const matchPriority = priorityFilter === "ALL" || p.priority === priorityFilter;
       const matchLead = leadFilter === "ALL" || p.projectLead?.name === leadFilter;
       return matchSearch && matchStatus && matchPriority && matchLead;
@@ -78,9 +74,9 @@ export function ProjectList({
     return result;
   }, [projects, search, statusFilter, priorityFilter, leadFilter, sortBy]);
 
-  const activeCount = projects.filter(p => p.status === "IN_PROGRESS" || p.status === "PLANNING" || p.status === "ACTIVE").length;
-  const blockedCount = projects.filter(p => p.status === "BLOCKED" || p.status === "ON_HOLD").length;
-  const reviewCount = projects.filter(p => p.status === "IN_REVIEW").length;
+  const activeCount = projects.filter(p => p.status === "ACTIVE").length;
+  const planningCount = projects.filter(p => p.status === "PLANNING").length;
+  const onHoldCount = projects.filter(p => p.status === "ON_HOLD").length;
   const completedCount = projects.filter(p => p.status === "COMPLETED").length;
 
   const getInitials = (name: string) =>
@@ -112,6 +108,7 @@ export function ProjectList({
           {canCreate && (
             <Link
               href="/projects/new"
+              role="button"
               className="inline-flex items-center gap-1.5 px-3 h-8 bg-[#5B5FEF] rounded-md text-[13px] font-semibold text-white hover:bg-[#4C50D8] transition-colors"
             >
               <Plus className="w-3.5 h-3.5" /> New Project
@@ -124,8 +121,8 @@ export function ProjectList({
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Active", value: activeCount, accent: "text-[#2563EB]", sub: "In flight" },
-          { label: "Blocked", value: blockedCount, accent: "text-[#DC2626]", sub: "Needs attention" },
-          { label: "In Review", value: reviewCount, accent: "text-[#7C3AED]", sub: "Awaiting signoff" },
+          { label: "Planning", value: planningCount, accent: "text-[#667085]", sub: "Preparation" },
+          { label: "On Hold", value: onHoldCount, accent: "text-[#D97706]", sub: "Paused" },
           { label: "Completed", value: completedCount, accent: "text-[#15803D]", sub: "Delivered" },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-lg border border-[#E4E7EC] p-3">
@@ -142,10 +139,9 @@ export function ProjectList({
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
         {[
           { id: "ALL", label: "All Projects", count: projects.length },
-          { id: "ACTIVE_OR_PROGRESS", label: "Active", count: activeCount },
-          { id: "PLANNING", label: "Planning", count: projects.filter(p => p.status === "PLANNING").length },
-          { id: "IN_REVIEW", label: "In Review", count: reviewCount },
-          { id: "BLOCKED", label: "Blocked", count: projects.filter(p => p.status === "BLOCKED").length },
+          { id: "ACTIVE", label: "Active", count: activeCount },
+          { id: "PLANNING", label: "Planning", count: planningCount },
+          { id: "ON_HOLD", label: "On Hold", count: onHoldCount },
           { id: "COMPLETED", label: "Completed", count: completedCount },
         ].map((chip) => {
           const isActive = statusFilter === chip.id;
@@ -179,7 +175,7 @@ export function ProjectList({
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search projects…"
+              placeholder="Search projects by name, code or client…"
               className="w-full pl-8 pr-3 h-8 bg-white border border-[#E4E7EC] rounded-md text-[13px] text-[#101828] placeholder:text-[#98A2B3] focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF]/20"
             />
           </div>
@@ -191,11 +187,10 @@ export function ProjectList({
             <option value="ALL">Status: All</option>
             <option value="PLANNING">Planning</option>
             <option value="ACTIVE">Active</option>
-            <option value="IN_PROGRESS">In Progress</option>
             <option value="ON_HOLD">On Hold</option>
-            <option value="BLOCKED">Blocked</option>
-            <option value="IN_REVIEW">In Review</option>
             <option value="COMPLETED">Completed</option>
+            <option value="CANCELLED">Cancelled</option>
+            <option value="ARCHIVED">Archived</option>
           </select>
           <select
             value={priorityFilter}
@@ -220,7 +215,7 @@ export function ProjectList({
           </select>
           <select
             value={sortBy}
-            onChange={e => setSortBy(e.target.value as any)}
+            onChange={e => setSortBy(e.target.value as "NEWEST" | "DEADLINE" | "ALPHABETICAL" | "PROGRESS")}
             className="h-8 px-2.5 bg-white border border-[#E4E7EC] rounded-md text-[13px] text-[#475467] focus:outline-none"
           >
             <option value="NEWEST">Sort: Default</option>

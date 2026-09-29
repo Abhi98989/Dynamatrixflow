@@ -11,6 +11,15 @@ import { generateNextMilestoneCode } from './code-generator';
 import { MilestoneStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
+const progressOverrideSchema = z
+  .union([z.string(), z.number(), z.null(), z.undefined()])
+  .transform((val) => {
+    if (val === '' || val === null || val === undefined) return null;
+    const num = Number(val);
+    if (isNaN(num)) return null;
+    return Math.min(100, Math.max(0, Math.round(num)));
+  });
+
 const createMilestoneSchema = z.object({
   projectId: z.string().min(1),
   name: z.string().min(2, 'Milestone name must be at least 2 characters').trim(),
@@ -18,7 +27,7 @@ const createMilestoneSchema = z.object({
   status: z.nativeEnum(MilestoneStatus).default(MilestoneStatus.PLANNED),
   startDate: z.string().optional(),
   deadline: z.string().optional(),
-  progressOverride: z.coerce.number().min(0).max(100).optional(),
+  progressOverride: progressOverrideSchema,
 });
 
 const updateMilestoneSchema = z.object({
@@ -28,7 +37,7 @@ const updateMilestoneSchema = z.object({
   status: z.nativeEnum(MilestoneStatus),
   startDate: z.string().optional(),
   deadline: z.string().optional(),
-  progressOverride: z.coerce.number().min(0).max(100).optional(),
+  progressOverride: progressOverrideSchema,
 });
 
 export async function createMilestoneAction(_prevState: unknown, formData: FormData) {
@@ -64,7 +73,7 @@ export async function createMilestoneAction(_prevState: unknown, formData: FormD
           status,
           startDate: startParsed,
           deadline: deadlineParsed,
-          progressOverride: progressOverride !== undefined && !isNaN(progressOverride) ? progressOverride : null,
+          progressOverride: typeof progressOverride === 'number' && !Number.isNaN(progressOverride) ? progressOverride : null,
           createdById: user.id,
         },
       });
@@ -132,7 +141,7 @@ export async function updateMilestoneAction(_prevState: unknown, formData: FormD
           status,
           startDate: startParsed,
           deadline: deadlineParsed,
-          progressOverride: progressOverride !== undefined && !isNaN(progressOverride) ? progressOverride : null,
+          progressOverride: typeof progressOverride === 'number' && !Number.isNaN(progressOverride) ? progressOverride : null,
         },
       });
 

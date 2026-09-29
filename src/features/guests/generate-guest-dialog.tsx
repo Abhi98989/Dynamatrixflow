@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useActionState, useEffect } from "react";
+import { useState, useActionState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createGuestAction, type CreateGuestResult } from "./actions";
-import { ShieldCheck, Copy, Check, Eye, EyeOff, UserPlus, KeyRound, ExternalLink, Sparkles } from "lucide-react";
+import { ShieldCheck, Copy, Check, Eye, EyeOff, Sparkles } from "lucide-react";
 
 interface GenerateGuestDialogProps {
   projectId: string;

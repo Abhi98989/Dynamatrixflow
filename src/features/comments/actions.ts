@@ -42,6 +42,10 @@ export async function createTaskCommentAction(taskId: string, content: string) {
 
     if (!task) return { error: 'Task not found or archived.' };
 
+    if ((user.systemRole as string) === 'GUEST') {
+      return { error: 'Guest observers have read-only privileges and cannot post comments.' };
+    }
+
     const hasAccess = await canViewProject(user.id, task.projectId);
     if (!hasAccess) {
       return { error: 'You do not have access to comment on this task.' };

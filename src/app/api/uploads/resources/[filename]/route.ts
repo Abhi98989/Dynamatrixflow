@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { auth } from "@/server/auth";
+import { AccountStatus } from "@prisma/client";
 
 const MIME_MAP: Record<string, string> = {
   pdf: "application/pdf",
@@ -27,6 +29,11 @@ export async function GET(
   { params }: { params: Promise<{ filename: string }> }
 ) {
   try {
+    const session = await auth();
+    if (!session?.user || session.user.accountStatus !== AccountStatus.ACTIVE) {
+      return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     const { filename } = await params;
 
     // Path traversal defense
@@ -50,7 +57,7 @@ export async function GET(
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": disposition,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Cache-Control": "private, no-cache, no-store, max-age=0, must-revalidate",
       },
     });
   } catch (error) {

@@ -11,7 +11,6 @@ import {
   FolderKanban,
   MessageSquare,
   AlertCircle,
-  ExternalLink,
   ChevronRight,
   Loader2,
 } from "lucide-react";
@@ -110,10 +109,15 @@ export function NotificationPopover() {
   };
 
   useEffect(() => {
-    loadData();
+    const timer = setTimeout(() => {
+      loadData();
+    }, 0);
     // Poll every 30s for notifications
     const interval = setInterval(loadData, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, []);
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -161,6 +165,8 @@ export function NotificationPopover() {
 
       <PopoverContent
         align="end"
+        role="dialog"
+        aria-label="Notifications"
         className="w-[360px] sm:w-[400px] p-0 shadow-xl border border-slate-200 rounded-xl overflow-hidden"
       >
         {/* Header */}

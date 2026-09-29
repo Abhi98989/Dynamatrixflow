@@ -7,7 +7,8 @@ export async function GET(request: Request) {
   // In a real application, you should verify a secret or token here to ensure
   // this endpoint is only called by a trusted cron scheduler (e.g. Vercel Cron, Google Cloud Scheduler)
   const authHeader = request.headers.get('authorization');
-  if (process.env.CRON_SECRET && authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const cronSecret = process.env.CRON_SECRET;
+  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return new NextResponse('Unauthorized', { status: 401 });
   }
 
@@ -43,11 +44,19 @@ export async function GET(request: Request) {
     let notificationsCreated = 0;
 
     await db.$transaction(async (tx) => {
-      // Due Soon notifications (only if we haven't already notified them for being due soon recently, ideally.
-      // For MVP, we might create duplicates if run daily, so usually we'd add a flag on the task like `notifiedDueSoonAt`)
-      // For MVP, we will assume it's acceptable or we just create them. Let's just create them for demonstration.
+      // Check existing notifications created today for these tasks to prevent duplicate spamming
+      const existingToday = await tx.notification.findMany({
+        where: {
+          entityType: 'Task',
+          createdAt: { gte: today },
+          type: { in: [NotificationType.TASK_DUE_SOON, NotificationType.TASK_OVERDUE] },
+        },
+        select: { entityId: true, type: true },
+      });
+      const notifiedSet = new Set(existingToday.map((n) => `${n.entityId}:${n.type}`));
+
       for (const task of dueSoonTasks) {
-        if (!task.assigneeId) continue;
+        if (!task.assigneeId || notifiedSet.has(`${task.id}:${NotificationType.TASK_DUE_SOON}`)) continue;
         await tx.notification.create({
           data: {
             userId: task.assigneeId,
@@ -59,11 +68,12 @@ export async function GET(request: Request) {
             entityId: task.id,
           }
         });
+        notifiedSet.add(`${task.id}:${NotificationType.TASK_DUE_SOON}`);
         notificationsCreated++;
       }
 
       for (const task of overdueTasks) {
-        if (!task.assigneeId) continue;
+        if (!task.assigneeId || notifiedSet.has(`${task.id}:${NotificationType.TASK_OVERDUE}`)) continue;
         await tx.notification.create({
           data: {
             userId: task.assigneeId,
@@ -75,6 +85,7 @@ export async function GET(request: Request) {
             entityId: task.id,
           }
         });
+        notifiedSet.add(`${task.id}:${NotificationType.TASK_OVERDUE}`);
         notificationsCreated++;
       }
     });

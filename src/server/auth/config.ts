@@ -124,6 +124,22 @@ export const authConfig: NextAuthConfig = {
         token.mustChangePassword = user.mustChangePassword;
       }
 
+      // If token indicates password change needed, check DB to pick up any completed changes immediately
+      if (!user && token.id && token.mustChangePassword) {
+        try {
+          const freshUser = await db.user.findUnique({
+            where: { id: token.id as string },
+            select: { mustChangePassword: true, accountStatus: true },
+          });
+          if (freshUser) {
+            token.mustChangePassword = freshUser.mustChangePassword;
+            token.accountStatus = freshUser.accountStatus;
+          }
+        } catch {
+          // Keep current token state if DB error occurs
+        }
+      }
+
       if (trigger === "update" && session?.user) {
         if (typeof session.user.mustChangePassword === "boolean") {
           token.mustChangePassword = session.user.mustChangePassword;

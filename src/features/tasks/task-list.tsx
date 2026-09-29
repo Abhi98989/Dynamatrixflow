@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useState, useMemo } from 'react';
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -58,7 +58,6 @@ export function TaskList({
 }: TaskListProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const pathname = usePathname();
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(searchParams.get('task') || null);
 
   const [search, setSearch] = useState(searchParams.get('q') || '');
@@ -135,20 +134,25 @@ export function TaskList({
     <div className="space-y-3">
       {/* Quick Filter Chips */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
-        {[
+        {([
           { id: 'ALL', label: 'All Tasks', count: tasks.length },
           { id: 'IN_PROGRESS', label: 'In Progress', count: tasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length },
           { id: 'IN_REVIEW', label: 'Pending Review', count: tasks.filter(t => t.status === TaskStatus.IN_REVIEW).length },
           { id: 'OVERDUE', label: 'Overdue', count: tasks.filter(t => isOverdue(t.dueDate, t.status)).length, alert: true },
           { id: 'CRITICAL_HIGH', label: 'Critical & High', count: tasks.filter(t => t.priority === Priority.CRITICAL || t.priority === Priority.HIGH).length },
           { id: 'COMPLETED', label: 'Completed', count: tasks.filter(t => t.status === TaskStatus.COMPLETED).length },
-        ].map((chip) => {
+        ] as Array<{
+          id: 'ALL' | 'IN_PROGRESS' | 'IN_REVIEW' | 'OVERDUE' | 'CRITICAL_HIGH' | 'COMPLETED';
+          label: string;
+          count: number;
+          alert?: boolean;
+        }>).map((chip) => {
           const isActive = quickFilter === chip.id;
           return (
             <button
               key={chip.id}
               onClick={() => {
-                setQuickFilter(chip.id as any);
+                setQuickFilter(chip.id);
                 if (chip.id !== 'ALL') {
                   setStatusFilter('ALL');
                 }
@@ -264,13 +268,12 @@ export function TaskList({
                       <tr key={t.id} className="hover:bg-surface-secondary/30 transition-colors">
                         <td className="px-5 py-3.5">
                           <div className="min-w-[200px] max-w-md">
-                            <button
-                              type="button"
-                              onClick={() => setSelectedTaskId(t.id)}
+                            <Link
+                              href={taskDetailUrl}
                               className="font-medium text-text-primary hover:text-primary transition-colors text-sm line-clamp-1 text-left cursor-pointer"
                             >
                               {t.title}
-                            </button>
+                            </Link>
                             {t.project && (
                               <p className="text-xs text-text-muted mt-0.5">
                                 {t.project.name}
