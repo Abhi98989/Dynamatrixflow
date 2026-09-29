@@ -45,29 +45,46 @@ export function ActivityTimeline({ logs }: { logs: ActivityLog[] }) {
   const getActionDetails = (log: ActivityLog) => {
     switch (log.action) {
       case 'CREATED_PROJECT':
+      case 'PROJECT_CREATED':
         return { icon: FolderKanban, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-900/20', text: 'created the project' };
       case 'ADDED_MEMBER':
-        return { icon: UserPlus, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: `added ${typeof log.metadata?.memberRole === 'string' ? log.metadata.memberRole : 'a member'}` };
+      case 'PROJECT_MEMBER_ADDED':
+        return { icon: UserPlus, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: `added ${typeof log.metadata?.targetUserName === 'string' ? log.metadata.targetUserName : typeof log.metadata?.memberRole === 'string' ? log.metadata.memberRole : 'a member'}` };
       case 'REMOVED_MEMBER':
-        return { icon: UserMinus, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', text: 'removed a member' };
+      case 'PROJECT_MEMBER_REMOVED':
+        return { icon: UserMinus, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', text: `removed ${typeof log.metadata?.targetUserName === 'string' ? log.metadata.targetUserName : 'a member'}` };
       case 'CREATED_TASK':
+      case 'TASK_CREATED':
         return { icon: CheckSquare, color: 'text-primary', bg: 'bg-primary/10', text: `created task ${typeof log.metadata?.taskCode === 'string' ? log.metadata.taskCode : ''}` };
-      case 'UPDATED_TASK_STATUS': {
-        const newStatus = typeof log.metadata?.newStatus === 'string' ? log.metadata.newStatus.replace('_', ' ') : 'a new status';
+      case 'UPDATED_TASK_STATUS':
+      case 'TASK_STATUS_CHANGED': {
+        const newStatus = typeof log.metadata?.newStatus === 'string' ? log.metadata.newStatus.replace(/_/g, ' ') : 'a new status';
         const taskCode = typeof log.metadata?.taskCode === 'string' ? log.metadata.taskCode : '';
         return { icon: Edit2, color: 'text-orange-500', bg: 'bg-orange-50 dark:bg-orange-900/20', text: `moved task ${taskCode} to ${newStatus}` };
       }
       case 'REQUESTED_REVIEW':
+      case 'TASK_SUBMITTED_FOR_REVIEW':
         return { icon: AlertCircle, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', text: `requested review for task ${typeof log.metadata?.taskCode === 'string' ? log.metadata.taskCode : ''}` };
       case 'APPROVED_REVIEW':
+      case 'TASK_REVIEW_APPROVED':
         return { icon: FileCheck, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: `approved task ${typeof log.metadata?.taskCode === 'string' ? log.metadata.taskCode : ''}` };
       case 'CREATED_COMMENT':
-        return { icon: MessageSquare, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', text: 'commented on a task' };
+      case 'TASK_COMMENT_CREATED': {
+        const taskCode = typeof log.metadata?.taskCode === 'string' ? ` [${log.metadata.taskCode}]` : '';
+        return { icon: MessageSquare, color: 'text-indigo-500', bg: 'bg-indigo-50 dark:bg-indigo-900/20', text: `commented on task${taskCode}` };
+      }
+      case 'GUEST_ACCESS_GRANTED':
+        return { icon: UserPlus, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-900/20', text: `granted guest access to ${typeof log.metadata?.name === 'string' ? log.metadata.name : 'a guest'}` };
+      case 'GUEST_ACCESS_REVOKED':
+        return { icon: UserMinus, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', text: `revoked guest access for ${typeof log.metadata?.name === 'string' ? log.metadata.name : 'a guest'}` };
       case 'CREATED_RESOURCE':
+      case 'RESOURCE_CREATED':
         return { icon: BookOpen, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20', text: `added resource "${typeof log.metadata?.title === 'string' ? log.metadata.title : 'link'}"` };
       case 'UPDATED_RESOURCE':
+      case 'RESOURCE_UPDATED':
         return { icon: Edit2, color: 'text-teal-500', bg: 'bg-teal-50 dark:bg-teal-900/20', text: `updated resource "${typeof log.metadata?.title === 'string' ? log.metadata.title : 'link'}"` };
       case 'ARCHIVED_RESOURCE':
+      case 'RESOURCE_ARCHIVED':
         return { icon: Trash2, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-900/20', text: `archived resource "${typeof log.metadata?.title === 'string' ? log.metadata.title : 'link'}"` };
       default:
         return { icon: Activity, color: 'text-text-muted', bg: 'bg-surface-secondary', text: log.action.replace(/_/g, ' ').toLowerCase() };

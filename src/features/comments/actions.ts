@@ -96,7 +96,9 @@ export async function createTaskCommentAction(taskId: string, content: string) {
           entityId: task.id,
           metadata: {
             taskCode: task.taskCode,
+            taskTitle: task.title,
             commentId: newComment.id,
+            commentPreview: cleanContent.slice(0, 160),
           },
         },
       });
@@ -105,6 +107,8 @@ export async function createTaskCommentAction(taskId: string, content: string) {
     });
 
     revalidatePath(`/projects/${task.projectId}/tasks/${taskId}`);
+    revalidatePath(`/projects/${task.projectId}/activity`);
+    revalidatePath(`/projects/${task.projectId}`);
     return { success: true, commentId: comment.id };
   } catch (error) {
     console.error('createTaskCommentAction error:', error);
