@@ -286,7 +286,9 @@ export default async function EmployeeProfilePage({ params }: PageProps) {
                       </div>
                       <span className="text-xs text-text-secondary">
                         Joined{" "}
-                        {new Date(membership.joinedAt).toLocaleDateString("en-US")}
+                        {new Date(membership.joinedAt).toLocaleDateString(
+                          "en-US",
+                        )}
                       </span>
                     </div>
                   ))}

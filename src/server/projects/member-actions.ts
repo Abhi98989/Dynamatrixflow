@@ -1,7 +1,10 @@
 "use server";
 
 import { db } from "@/server/db/client";
-import { requireActiveUser, canManageProject } from "@/server/auth/authorization";
+import {
+  requireActiveUser,
+  canManageProject,
+} from "@/server/auth/authorization";
 import { ProjectMemberRole } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 

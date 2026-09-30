@@ -3,10 +3,20 @@
 import { useState, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Search, FolderKanban, CheckSquare, Users, FileText,
-  ArrowRight, CornerDownLeft, Loader2, X
+  Search,
+  FolderKanban,
+  CheckSquare,
+  Users,
+  FileText,
+  ArrowRight,
+  CornerDownLeft,
+  Loader2,
+  X,
 } from "lucide-react";
-import { globalSearchAction, type SearchResultItem } from "@/features/search/actions";
+import {
+  globalSearchAction,
+  type SearchResultItem,
+} from "@/features/search/actions";
 
 interface CommandPaletteProps {
   open: boolean;
@@ -14,7 +24,11 @@ interface CommandPaletteProps {
   userRole?: string;
 }
 
-export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteProps) {
+export function CommandPalette({
+  open,
+  onOpenChange,
+  userRole,
+}: CommandPaletteProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResultItem[]>([]);
@@ -25,13 +39,45 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
   const isGuest = userRole === "GUEST";
 
   const defaultNavItems: SearchResultItem[] = [
-    { id: "nav-dash", type: "navigation" as const, title: isGuest ? "Guest Monitor" : "Dashboard", subtitle: "Overview and real-time activity", url: "/dashboard" },
-    { id: "nav-proj", type: "navigation" as const, title: "Projects", subtitle: "View and manage active projects", url: "/projects" },
-    ...(!isGuest ? [
-      { id: "nav-tasks", type: "navigation" as const, title: "My Tasks", subtitle: "Assigned technical deliverables", url: "/my-tasks" },
-      { id: "nav-team", type: "navigation" as const, title: "Team Directory", subtitle: "Internal engineers & staff", url: "/team" },
-    ] : []),
-    { id: "nav-res", type: "navigation" as const, title: "Resources & Deliverables", subtitle: "Shared files, docs, & links", url: "/resources" },
+    {
+      id: "nav-dash",
+      type: "navigation" as const,
+      title: isGuest ? "Guest Monitor" : "Dashboard",
+      subtitle: "Overview and real-time activity",
+      url: "/dashboard",
+    },
+    {
+      id: "nav-proj",
+      type: "navigation" as const,
+      title: "Projects",
+      subtitle: "View and manage active projects",
+      url: "/projects",
+    },
+    ...(!isGuest
+      ? [
+          {
+            id: "nav-tasks",
+            type: "navigation" as const,
+            title: "My Tasks",
+            subtitle: "Assigned technical deliverables",
+            url: "/my-tasks",
+          },
+          {
+            id: "nav-team",
+            type: "navigation" as const,
+            title: "Team Directory",
+            subtitle: "Internal engineers & staff",
+            url: "/team",
+          },
+        ]
+      : []),
+    {
+      id: "nav-res",
+      type: "navigation" as const,
+      title: "Resources & Deliverables",
+      subtitle: "Shared files, docs, & links",
+      url: "/resources",
+    },
   ];
 
   // Global keyboard shortcut: Cmd+K / Ctrl+K
@@ -103,7 +149,9 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
       setSelectedIndex((prev) => (prev + 1) % displayedItems.length);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setSelectedIndex((prev) => (prev - 1 + displayedItems.length) % displayedItems.length);
+      setSelectedIndex(
+        (prev) => (prev - 1 + displayedItems.length) % displayedItems.length,
+      );
     } else if (e.key === "Enter") {
       e.preventDefault();
       const current = displayedItems[selectedIndex];
@@ -116,7 +164,7 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
   const getIcon = (type: SearchResultItem["type"]) => {
     switch (type) {
       case "project":
-        return <FolderKanban className="w-4 h-4 text-[#5B5FEF]" />;
+        return <FolderKanban className="w-4 h-4 text-primary" />;
       case "task":
         return <CheckSquare className="w-4 h-4 text-emerald-600" />;
       case "member":
@@ -124,7 +172,7 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
       case "resource":
         return <FileText className="w-4 h-4 text-purple-600" />;
       default:
-        return <ArrowRight className="w-4 h-4 text-[#667085]" />;
+        return <ArrowRight className="w-4 h-4 text-text-muted" />;
     }
   };
 
@@ -133,7 +181,7 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-950/50 backdrop-blur-xs animate-in fade-in duration-150">
       <div
-        className="w-full max-w-xl bg-white rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-150"
+        className="w-full max-w-xl bg-surface rounded-2xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col max-h-[80vh] animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input Bar */}
@@ -149,7 +197,7 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
             className="w-full bg-transparent text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none"
           />
           {isSearching ? (
-            <Loader2 className="w-4 h-4 text-[#5B5FEF] animate-spin shrink-0" />
+            <Loader2 className="w-4 h-4 text-primary animate-spin shrink-0" />
           ) : query ? (
             <button
               onClick={() => setQuery("")}
@@ -158,7 +206,7 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
               <X className="w-4 h-4" />
             </button>
           ) : (
-            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-white border border-slate-200 rounded">
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-surface border border-slate-200 rounded">
               ESC
             </kbd>
           )}
@@ -168,7 +216,9 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
         <div className="overflow-y-auto p-2 divide-y divide-slate-50 flex-1 max-h-[420px]">
           {query.trim().length >= 2 && results.length === 0 && !isSearching && (
             <div className="py-12 text-center text-xs text-slate-500">
-              No results found for &ldquo;<span className="font-semibold text-slate-800">{query}</span>&rdquo;
+              No results found for &ldquo;
+              <span className="font-semibold text-slate-800">{query}</span>
+              &rdquo;
             </div>
           )}
 
@@ -187,16 +237,18 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
                 onMouseEnter={() => setSelectedIndex(index)}
                 className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${
                   isSelected
-                    ? "bg-[#5B5FEF]/10 text-slate-900"
+                    ? "bg-primary/10 text-slate-900"
                     : "hover:bg-slate-50 text-slate-700"
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="w-7 h-7 rounded-lg bg-white border border-slate-200 shadow-2xs flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-surface border border-slate-200 shadow-2xs flex items-center justify-center shrink-0">
                     {getIcon(item.type)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className={`text-xs font-semibold truncate ${isSelected ? "text-[#5B5FEF]" : "text-slate-900"}`}>
+                    <p
+                      className={`text-xs font-semibold truncate ${isSelected ? "text-primary" : "text-slate-900"}`}
+                    >
                       {item.title}
                     </p>
                     {item.subtitle && (
@@ -214,7 +266,7 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
                     </span>
                   )}
                   {isSelected && (
-                    <CornerDownLeft className="w-3.5 h-3.5 text-[#5B5FEF]" />
+                    <CornerDownLeft className="w-3.5 h-3.5 text-primary" />
                   )}
                 </div>
               </div>
@@ -226,12 +278,18 @@ export function CommandPalette({ open, onOpenChange, userRole }: CommandPaletteP
         <div className="px-4 py-2 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.2 bg-white border border-slate-200 rounded font-mono text-[9px]">↑</kbd>
-              <kbd className="px-1 py-0.2 bg-white border border-slate-200 rounded font-mono text-[9px]">↓</kbd>
+              <kbd className="px-1 py-0.2 bg-surface border border-slate-200 rounded font-mono text-[9px]">
+                ↑
+              </kbd>
+              <kbd className="px-1 py-0.2 bg-surface border border-slate-200 rounded font-mono text-[9px]">
+                ↓
+              </kbd>
               navigate
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1 py-0.2 bg-white border border-slate-200 rounded font-mono text-[9px]">↵</kbd>
+              <kbd className="px-1 py-0.2 bg-surface border border-slate-200 rounded font-mono text-[9px]">
+                ↵
+              </kbd>
               select
             </span>
           </div>

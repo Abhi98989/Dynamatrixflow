@@ -50,7 +50,10 @@ function timeAgo(date: Date | string): string {
   if (diffHour < 24) return `${diffHour}h ago`;
   const diffDay = Math.floor(diffHour / 24);
   if (diffDay < 7) return `${diffDay}d ago`;
-  return new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function getNotificationIcon(type: string) {
@@ -101,7 +104,9 @@ export function NotificationPopover() {
         setUnreadCount(countRes.count);
       }
       if (recentsRes.notifications) {
-        setNotifications(recentsRes.notifications as unknown as PopoverNotification[]);
+        setNotifications(
+          recentsRes.notifications as unknown as PopoverNotification[],
+        );
       }
     } catch {
       // Graceful fallback
@@ -130,7 +135,7 @@ export function NotificationPopover() {
 
   const handleMarkAsRead = (id: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
     );
     setUnreadCount((prev) => Math.max(0, prev - 1));
     startTransition(async () => {
@@ -172,7 +177,9 @@ export function NotificationPopover() {
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 bg-slate-50/80 border-b border-slate-200">
           <div className="flex items-center gap-2">
-            <h3 className="text-xs font-bold text-slate-900 tracking-tight">Notifications</h3>
+            <h3 className="text-xs font-bold text-slate-900 tracking-tight">
+              Notifications
+            </h3>
             {unreadCount > 0 ? (
               <span className="text-[10px] font-semibold px-1.5 py-0.2 rounded-full bg-blue-100 text-blue-700">
                 {unreadCount} new
@@ -184,7 +191,7 @@ export function NotificationPopover() {
             <button
               onClick={handleMarkAllAsRead}
               disabled={isPending}
-              className="text-[11px] font-medium text-slate-500 hover:text-[#5B5FEF] flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
+              className="text-[11px] font-medium text-slate-500 hover:text-primary flex items-center gap-1 transition-colors cursor-pointer disabled:opacity-50"
             >
               <CheckCheck className="size-3.5" />
               Mark all read
@@ -196,7 +203,7 @@ export function NotificationPopover() {
         <div className="max-h-[360px] overflow-y-auto divide-y divide-slate-100">
           {loading ? (
             <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400">
-              <Loader2 className="w-5 h-5 animate-spin text-[#5B5FEF]" />
+              <Loader2 className="w-5 h-5 animate-spin text-primary" />
               <span className="text-xs">Loading alerts...</span>
             </div>
           ) : notifications.length === 0 ? (
@@ -228,7 +235,7 @@ export function NotificationPopover() {
                           if (!n.isRead) handleMarkAsRead(n.id);
                           setOpen(false);
                         }}
-                        className="text-xs font-semibold text-slate-900 hover:text-[#5B5FEF] truncate block"
+                        className="text-xs font-semibold text-slate-900 hover:text-primary truncate block"
                       >
                         {n.title}
                       </Link>
@@ -247,7 +254,7 @@ export function NotificationPopover() {
                     <button
                       onClick={() => handleMarkAsRead(n.id)}
                       title="Mark as read"
-                      className="mt-1 size-2 rounded-full bg-[#5B5FEF] shrink-0 hover:scale-125 transition-transform"
+                      className="mt-1 size-2 rounded-full bg-primary shrink-0 hover:scale-125 transition-transform"
                     />
                   )}
                 </div>
@@ -261,7 +268,7 @@ export function NotificationPopover() {
           <Link
             href="/notifications"
             onClick={() => setOpen(false)}
-            className="text-xs font-semibold text-[#5B5FEF] hover:text-[#4a4ee4] inline-flex items-center gap-1.5 transition-colors"
+            className="text-xs font-semibold text-primary hover:text-[#4a4ee4] inline-flex items-center gap-1.5 transition-colors"
           >
             View all notifications
             <ChevronRight className="w-3.5 h-3.5" />

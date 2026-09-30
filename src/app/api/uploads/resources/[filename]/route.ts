@@ -26,7 +26,7 @@ const MIME_MAP: Record<string, string> = {
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ filename: string }> }
+  { params }: { params: Promise<{ filename: string }> },
 ) {
   try {
     const session = await auth();
@@ -38,7 +38,13 @@ export async function GET(
 
     // Path traversal defense
     const safeFilename = path.basename(filename);
-    const targetPath = path.join(process.cwd(), "public", "uploads", "resources", safeFilename);
+    const targetPath = path.join(
+      process.cwd(),
+      "public",
+      "uploads",
+      "resources",
+      safeFilename,
+    );
 
     if (!fs.existsSync(/*turbopackIgnore: true*/ targetPath)) {
       return new NextResponse("File not found", { status: 404 });
@@ -46,9 +52,20 @@ export async function GET(
 
     const ext = path.extname(safeFilename).replace(".", "").toLowerCase();
     const contentType = MIME_MAP[ext] || "application/octet-stream";
-    const fileBuffer = await fs.promises.readFile(/*turbopackIgnore: true*/ targetPath);
+    const fileBuffer = await fs.promises.readFile(
+      /*turbopackIgnore: true*/ targetPath,
+    );
 
-    const isInline = ["pdf", "png", "jpg", "jpeg", "webp", "svg", "gif", "txt"].includes(ext);
+    const isInline = [
+      "pdf",
+      "png",
+      "jpg",
+      "jpeg",
+      "webp",
+      "svg",
+      "gif",
+      "txt",
+    ].includes(ext);
     const disposition = isInline
       ? "inline"
       : `attachment; filename="${encodeURIComponent(safeFilename)}"`;
@@ -57,7 +74,8 @@ export async function GET(
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": disposition,
-        "Cache-Control": "private, no-cache, no-store, max-age=0, must-revalidate",
+        "Cache-Control":
+          "private, no-cache, no-store, max-age=0, must-revalidate",
       },
     });
   } catch (error) {

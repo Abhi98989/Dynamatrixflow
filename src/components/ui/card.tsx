@@ -6,7 +6,20 @@ export function Card({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "rounded-lg border bg-card text-card-foreground shadow-card",
+        "rounded-2xl border border-border-strong bg-surface text-card-foreground shadow-card",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+export function ClayCard({ className, ...props }: ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="clay-card"
+      className={cn(
+        "rounded-[20px] border border-[rgba(220,227,240,0.9)] bg-surface text-card-foreground shadow-clay",
         className,
       )}
       {...props}

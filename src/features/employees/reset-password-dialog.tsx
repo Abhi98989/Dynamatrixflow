@@ -23,7 +23,10 @@ interface ResetPasswordDialogProps {
   trigger?: React.ReactNode;
 }
 
-export function ResetPasswordDialog({ employee, trigger }: ResetPasswordDialogProps) {
+export function ResetPasswordDialog({
+  employee,
+  trigger,
+}: ResetPasswordDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);

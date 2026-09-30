@@ -1,102 +1,281 @@
 "use client";
 
 import * as React from "react";
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import { loginAction } from "@/server/auth/actions";
-import { AlertCircle, Lock, User, Loader2, ArrowRight, Eye, EyeOff } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  Lock,
+  User,
+  Loader2,
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Building2,
+  X,
+  Sparkles,
+} from "lucide-react";
+
+interface ToastState {
+  type: "error" | "success" | "info";
+  title: string;
+  message: string;
+}
 
 export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, undefined);
   const [showPassword, setShowPassword] = useState(false);
+  const [employeeId, setEmployeeId] = useState("");
+  const [password, setPassword] = useState("");
+  const [toast, setToast] = useState<ToastState | null>(null);
+
+  // Trigger floating toast whenever form action returns an error or success
+  useEffect(() => {
+    if (state?.error) {
+      setToast({
+        type: "error",
+        title: "Authentication Failed",
+        message: state.error,
+      });
+      const timer = setTimeout(() => setToast(null), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
+
+  const handleAutofill = (id: string, pass: string, role: string) => {
+    setEmployeeId(id);
+    setPassword(pass);
+    setToast({
+      type: "info",
+      title: "Credentials Loaded",
+      message: `${role} credentials populated for ${id}.`,
+    });
+    const timer = setTimeout(() => setToast(null), 3500);
+    return () => clearTimeout(timer);
+  };
 
   return (
-    <form action={formAction} className="space-y-4">
-      {state?.error && (
+    <>
+      {/* Floating Claymorphic Toast / Snackbar Notification */}
+      {toast && (
         <div
-          role="alert"
-          className="flex items-start gap-2.5 rounded-[6px] border border-[#FDA29B] bg-[#FEF3F2] p-3 text-[13px] text-[#B42318]"
+          role="status"
+          aria-live="polite"
+          className="fixed top-5 right-5 sm:top-6 sm:right-6 z-50 flex items-start gap-3 rounded-[20px] bg-white/95 backdrop-blur-md border border-white p-3.5 sm:p-4 shadow-[16px_20px_45px_rgba(15,23,42,0.18),-8px_-8px_24px_rgba(255,255,255,1),inset_0_2px_3px_rgba(255,255,255,0.95)] max-w-[380px] w-[calc(100vw-40px)] animate-in slide-in-from-top-4 fade-in duration-300 transition-all"
         >
-          <AlertCircle className="mt-0.5 size-4 shrink-0 text-[#D92D20]" />
-          <p className="flex-1 font-medium">{state.error}</p>
+          <div className="shrink-0 mt-0.5">
+            {toast.type === "error" && (
+              <div className="size-8 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
+                <AlertCircle className="size-4.5" />
+              </div>
+            )}
+            {toast.type === "success" && (
+              <div className="size-8 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
+                <CheckCircle2 className="size-4.5" />
+              </div>
+            )}
+            {toast.type === "info" && (
+              <div className="size-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0724D0] shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
+                <Sparkles className="size-4" />
+              </div>
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0 pr-1">
+            <h4 className="text-[12.5px] font-bold text-[#0B1220] leading-tight">
+              {toast.title}
+            </h4>
+            <p className="text-[11.5px] text-[#475569] mt-0.5 leading-snug">
+              {toast.message}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setToast(null)}
+            className="size-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            aria-label="Dismiss notification"
+          >
+            <X className="size-3.5" />
+          </button>
         </div>
       )}
 
-      <div className="space-y-1.5">
-        <label
-          htmlFor="employeeId"
-          className="block text-[12px] font-semibold text-[#344054]"
-        >
-          Employee ID
-        </label>
-        <div className="relative">
-          <input
-            id="employeeId"
-            name="employeeId"
-            type="text"
-            required
-            autoComplete="username"
-            placeholder="e.g. DMS-001"
-            className="w-full pl-9 pr-3.5 h-10 rounded-[6px] border border-[#D0D5DD] bg-white text-[#101828] placeholder:text-[#98A2B3] focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] font-mono text-[13px] transition-colors"
-            disabled={isPending}
-          />
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#98A2B3]" />
-        </div>
-      </div>
+      <form action={formAction} className="space-y-3">
+        <div className="space-y-2">
+          {/* Employee ID */}
+          <div className="space-y-1">
+            <label
+              htmlFor="employeeId"
+              className="block text-[10px] font-bold tracking-wider text-[#475569] uppercase"
+            >
+              Employee ID
+            </label>
+            <div className="relative">
+              <input
+                id="employeeId"
+                name="employeeId"
+                type="text"
+                required
+                autoComplete="username"
+                value={employeeId}
+                onChange={(e) => setEmployeeId(e.target.value)}
+                placeholder="e.g. DMS-001"
+                className="w-full pl-9 pr-3.5 h-9.5 sm:h-10 rounded-[13px] border border-slate-200/50 bg-[#EEF2F8] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0724D0]/60 shadow-[inset_2.5px_3px_5px_rgba(160,175,200,0.45),inset_-2.5px_-3px_5px_rgba(255,255,255,0.95)] focus:shadow-[inset_3px_3.5px_6px_rgba(0,47,167,0.18),inset_-2.5px_-3px_5px_rgba(255,255,255,1),0_0_0_2px_rgba(0,47,167,0.25)] text-[12.5px] font-medium transition-all"
+                disabled={isPending}
+              />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 size-[14px] text-[#64748B]" />
+            </div>
+          </div>
 
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <label
-            htmlFor="password"
-            className="block text-[12px] font-semibold text-[#344054]"
-          >
-            Password
+          {/* Password */}
+          <div className="space-y-1">
+            <label
+              htmlFor="password"
+              className="block text-[10px] font-bold tracking-wider text-[#475569] uppercase"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                className="w-full pl-9 pr-9 h-9.5 sm:h-10 rounded-[13px] border border-slate-200/50 bg-[#EEF2F8] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0724D0]/60 shadow-[inset_2.5px_3px_5px_rgba(160,175,200,0.45),inset_-2.5px_-3px_5px_rgba(255,255,255,0.95)] focus:shadow-[inset_3px_3.5px_6px_rgba(0,47,167,0.18),inset_-2.5px_-3px_5px_rgba(255,255,255,1),0_0_0_2px_rgba(0,47,167,0.25)] text-[12.5px] font-medium transition-all"
+                disabled={isPending}
+              />
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-[14px] text-[#64748B]" />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#64748B] hover:text-[#0F172A] transition-colors"
+                tabIndex={-1}
+                aria-label={
+                  showPassword ? "Hide password visibility" : "Toggle visibility"
+                }
+              >
+                {showPassword ? (
+                  <EyeOff className="size-[14px]" />
+                ) : (
+                  <Eye className="size-[14px]" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Options */}
+        <div className="flex items-center justify-between pt-0.5">
+          <label className="flex items-center gap-1.5 cursor-pointer select-none">
+            <div className="relative flex items-center justify-center">
+              <input
+                type="checkbox"
+                className="peer sr-only"
+                defaultChecked
+              />
+              <div className="w-3.5 h-3.5 rounded-[4px] border border-[#CBD5E1] bg-[#EEF2F8] peer-checked:bg-[#0724D0] peer-checked:border-[#0724D0] shadow-[inset_1px_1px_2px_rgba(160,175,200,0.3)] transition-all flex items-center justify-center">
+                <svg
+                  className="w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={3}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <span className="text-[11.5px] font-medium text-[#475569]">Keep me signed in</span>
           </label>
+          
+          <a href="#" className="text-[11.5px] font-semibold text-[#0724D0] hover:underline">
+            Forgot password?
+          </a>
         </div>
-        <div className="relative">
-          <input
-            id="password"
-            name="password"
-            type={showPassword ? "text" : "password"}
-            required
-            autoComplete="current-password"
-            placeholder="••••••••••••"
-            className="w-full pl-9 pr-10 h-10 rounded-[6px] border border-[#D0D5DD] bg-white text-[#101828] placeholder:text-[#98A2B3] focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] font-mono text-[13px] transition-colors"
-            disabled={isPending}
-          />
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[#98A2B3]" />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#98A2B3] hover:text-[#475467] transition-colors"
-            tabIndex={-1}
-            aria-label={showPassword ? "Hide password visibility" : "Toggle visibility"}
-          >
-            {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-          </button>
+
+        {/* Main Submit Button */}
+        <button
+          type="submit"
+          className="w-full h-10 sm:h-10.5 font-bold bg-gradient-to-r from-[#0034B8] via-[#002FA7] to-[#001F7A] hover:from-[#002688] hover:via-[#0030B8] hover:to-[#001860] active:scale-[0.985] text-white rounded-full shadow-[0_10px_22px_-3px_rgba(0,47,167,0.5),inset_0_2px_2.5px_rgba(255,255,255,0.48),inset_0_-2px_4px_rgba(0,18,80,0.35)] active:shadow-[inset_0_3px_6px_rgba(0,18,80,0.65)] transition-all flex items-center justify-center gap-2 text-[13px] disabled:opacity-60 cursor-pointer"
+          disabled={isPending}
+        >
+          {isPending ? (
+            <>
+              <Loader2 className="size-3.5 animate-spin" />
+              <span>Signing in...</span>
+            </>
+          ) : (
+            <>
+              <span>Sign In to Workspace</span>
+              <ArrowRight className="size-[14px]" />
+            </>
+          )}
+        </button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-2.5 py-0.5">
+          <div className="h-px bg-slate-200/70 flex-1" />
+          <span className="text-[10px] font-medium text-[#94A3B8]">or</span>
+          <div className="h-px bg-slate-200/70 flex-1" />
         </div>
-      </div>
 
-      <button
-        type="submit"
-        className="w-full h-10 mt-2 font-semibold bg-[#5B5FEF] hover:bg-[#4C50D8] active:bg-[#3E42C2] text-white rounded-[6px] transition-colors flex items-center justify-center gap-2 text-[13px] disabled:opacity-60 cursor-pointer"
-        disabled={isPending}
-      >
-        {isPending ? (
-          <>
-            <Loader2 className="size-4 animate-spin" />
-            <span>Signing in...</span>
-          </>
-        ) : (
-          <>
-            <span>Sign In to Workspace</span>
-            <ArrowRight className="size-4" />
-          </>
-        )}
-      </button>
+        {/* SSO Button */}
+        <button
+          type="button"
+          className="w-full h-9.5 sm:h-10 font-semibold bg-white hover:bg-slate-50/80 text-[#0B1220] rounded-full border border-slate-200/70 shadow-[2.5px_4px_10px_rgba(164,178,202,0.2),-2px_-2px_6px_rgba(255,255,255,1),inset_0_1px_1px_rgba(255,255,255,1)] active:scale-[0.985] active:shadow-[inset_1.5px_2px_3px_rgba(0,0,0,0.06)] transition-all flex items-center justify-center gap-2 text-[12px] cursor-pointer"
+          disabled={isPending}
+        >
+          <Building2 className="size-[14px] text-[#0B1220]" />
+          <span>Sign in with SSO</span>
+        </button>
 
-      <p className="text-[11px] text-[#667085] text-center pt-2">
-        No public registration. Accounts are issued by Dynamatrix administration.
-      </p>
-    </form>
+        {/* Interactive Demo Credentials Box */}
+        <div className="rounded-[14px] bg-[#F4F7FC] border border-[#E2E8F0]/80 p-2.5 space-y-1.5 shadow-[inset_1px_1px_2px_rgba(160,175,200,0.1)]">
+          <div className="flex items-center justify-between">
+            <h3 className="text-[10.5px] font-bold text-[#0B1220] tracking-tight">Demo Credentials</h3>
+            <span className="text-[9px] font-semibold text-primary uppercase tracking-wide">
+              Click to autofill
+            </span>
+          </div>
+          
+          <div className="space-y-1">
+            <button
+              type="button"
+              onClick={() => handleAutofill("DMS-001", "DynamatrixDev123!", "Admin")}
+              className="w-full flex items-center justify-between px-2 py-1 rounded-[8px] hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200/60 transition-all text-left group cursor-pointer"
+            >
+              <span className="text-[10.5px] text-[#64748B] group-hover:text-primary font-medium">Admin</span>
+              <span className="font-mono text-[10.5px] font-semibold text-[#0B1220] group-hover:text-primary">DMS-001</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => handleAutofill("DMS-003", "DynamatrixDev123!", "Employee")}
+              className="w-full flex items-center justify-between px-2 py-1 rounded-[8px] hover:bg-white hover:shadow-sm border border-transparent hover:border-slate-200/60 transition-all text-left group cursor-pointer"
+            >
+              <span className="text-[10.5px] text-[#64748B] group-hover:text-primary font-medium">Employee</span>
+              <span className="font-mono text-[10.5px] font-semibold text-[#0B1220] group-hover:text-primary">DMS-003</span>
+            </button>
+
+            <div className="flex items-center justify-between px-2 py-0.5 text-[10px]">
+              <span className="text-[#64748B]">Password</span>
+              <span className="font-mono text-[10.5px] font-semibold text-[#0B1220]">DynamatrixDev123!</span>
+            </div>
+          </div>
+
+          <div className="border-t border-[#E2E8F0]/80 pt-1">
+            <p className="text-[8.5px] text-[#94A3B8] text-center leading-tight">
+              Click either account to autofill credentials and sign in.
+            </p>
+          </div>
+        </div>
+      </form>
+    </>
   );
 }

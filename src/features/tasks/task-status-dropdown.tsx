@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { updateTaskStatusAction } from './actions';
-import { TaskStatus } from '@prisma/client';
-import { Loader2, AlertCircle } from 'lucide-react';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import { updateTaskStatusAction } from "./actions";
+import { TaskStatus } from "@prisma/client";
+import { Loader2, AlertCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 interface TaskStatusDropdownProps {
   taskId: string;
@@ -34,7 +34,7 @@ export function TaskStatusDropdown({
 }: TaskStatusDropdownProps) {
   const [isPending, startTransition] = useTransition();
   const [blockerModalOpen, setBlockerModalOpen] = useState(false);
-  const [reasonInput, setReasonInput] = useState(initialBlockerReason || '');
+  const [reasonInput, setReasonInput] = useState(initialBlockerReason || "");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const getAvailableStatuses = (): TaskStatus[] => {
@@ -69,7 +69,11 @@ export function TaskStatusDropdown({
     }
 
     startTransition(async () => {
-      const res = await updateTaskStatusAction(taskId, newStatus, currentProgress);
+      const res = await updateTaskStatusAction(
+        taskId,
+        newStatus,
+        currentProgress,
+      );
       if (res.error) {
         setErrorMsg(res.error);
       }
@@ -79,7 +83,7 @@ export function TaskStatusDropdown({
   const handleBlockerSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!reasonInput.trim()) {
-      setErrorMsg('Blocker reason is required.');
+      setErrorMsg("Blocker reason is required.");
       return;
     }
 
@@ -89,7 +93,7 @@ export function TaskStatusDropdown({
         taskId,
         TaskStatus.BLOCKED,
         currentProgress,
-        reasonInput.trim()
+        reasonInput.trim(),
       );
       if (res.error) {
         setErrorMsg(res.error);
@@ -100,17 +104,17 @@ export function TaskStatusDropdown({
   const getStatusColor = (st: TaskStatus) => {
     switch (st) {
       case TaskStatus.TODO:
-        return 'bg-surface-secondary text-text-secondary border-border';
+        return "bg-surface-secondary text-text-secondary border-border";
       case TaskStatus.IN_PROGRESS:
-        return 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300';
+        return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300";
       case TaskStatus.BLOCKED:
-        return 'bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300';
+        return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300";
       case TaskStatus.IN_REVIEW:
-        return 'bg-purple-50 text-primary border-purple-200 dark:bg-purple-950/40 dark:text-purple-300';
+        return "bg-purple-50 text-primary border-purple-200 dark:bg-purple-950/40 dark:text-purple-300";
       case TaskStatus.COMPLETED:
-        return 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300';
+        return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/40 dark:text-green-300";
       case TaskStatus.CANCELLED:
-        return 'bg-neutral-100 text-neutral-500 border-neutral-300';
+        return "bg-neutral-100 text-neutral-500 border-neutral-300";
     }
   };
 
@@ -123,13 +127,13 @@ export function TaskStatusDropdown({
         disabled={isPending || (!isLeadOrAdmin && !isAssignee)}
         onChange={(e) => handleChange(e.target.value as TaskStatus)}
         className={`h-7 rounded-sm border px-2 py-0.5 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-70 ${getStatusColor(
-          currentStatus
+          currentStatus,
         )}`}
         aria-label="Update task status"
       >
         {statuses.map((st) => (
           <option key={st} value={st}>
-            {st.replace('_', ' ')}
+            {st.replace("_", " ")}
           </option>
         ))}
       </select>
@@ -137,7 +141,10 @@ export function TaskStatusDropdown({
       {isPending && <Loader2 className="size-3 animate-spin text-text-muted" />}
 
       {errorMsg && (
-        <span className="text-[11px] text-red-600 flex items-center gap-0.5" title={errorMsg}>
+        <span
+          className="text-[11px] text-red-600 flex items-center gap-0.5"
+          title={errorMsg}
+        >
           <AlertCircle className="size-3 shrink-0" />
         </span>
       )}
@@ -150,7 +157,8 @@ export function TaskStatusDropdown({
               <AlertCircle className="size-5" /> Mark Task as Blocked
             </DialogTitle>
             <DialogDescription>
-              Specify the blocker reason so project leads and team members can unblock this deliverable.
+              Specify the blocker reason so project leads and team members can
+              unblock this deliverable.
             </DialogDescription>
           </DialogHeader>
 

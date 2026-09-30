@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition, useRef } from 'react';
-import { ResourceCategory } from '@prisma/client';
+import * as React from "react";
+import { useState, useTransition, useRef } from "react";
+import { ResourceCategory } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -10,10 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Plus,
   Link as LinkIcon,
@@ -27,22 +27,25 @@ import {
   File,
   X,
   CheckCircle2,
-} from 'lucide-react';
-import { createResourceAction } from './actions';
+} from "lucide-react";
+import { createResourceAction } from "./actions";
 
 interface AddResourceDialogProps {
   projectId: string;
   tasks: { id: string; taskCode: string; title: string }[];
 }
 
-export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) {
+export function AddResourceDialog({
+  projectId,
+  tasks,
+}: AddResourceDialogProps) {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<'file' | 'url'>('file');
+  const [mode, setMode] = useState<"file" | "url">("file");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState<ResourceCategory>('DOCUMENTATION');
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<ResourceCategory>("DOCUMENTATION");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -55,17 +58,17 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
   };
 
   const getFileIcon = (fileName: string) => {
-    const ext = fileName.split('.').pop()?.toLowerCase();
-    if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext || '')) {
+    const ext = fileName.split(".").pop()?.toLowerCase();
+    if (["png", "jpg", "jpeg", "webp", "svg", "gif"].includes(ext || "")) {
       return <ImageIcon className="size-6 text-purple-600" />;
     }
-    if (['xls', 'xlsx', 'csv'].includes(ext || '')) {
+    if (["xls", "xlsx", "csv"].includes(ext || "")) {
       return <FileSpreadsheet className="size-6 text-emerald-600" />;
     }
-    if (['zip', 'rar', 'tar', 'gz'].includes(ext || '')) {
+    if (["zip", "rar", "tar", "gz"].includes(ext || "")) {
       return <FileArchive className="size-6 text-amber-600" />;
     }
-    if (['pdf'].includes(ext || '')) {
+    if (["pdf"].includes(ext || "")) {
       return <FileText className="size-6 text-red-600" />;
     }
     return <File className="size-6 text-blue-600" />;
@@ -75,10 +78,10 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
     setSelectedFile(file);
     setErrorMsg(null);
 
-    const ext = file.name.split('.').pop() || '';
+    const ext = file.name.split(".").pop() || "";
     const cleanName = file.name
-      .replace(new RegExp(`\\.${ext}$`, 'i'), '')
-      .replace(/[-_]/g, ' ')
+      .replace(new RegExp(`\\.${ext}$`, "i"), "")
+      .replace(/[-_]/g, " ")
       .trim();
 
     if (!title || title.trim().length === 0) {
@@ -86,40 +89,40 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
     }
 
     const extLower = ext.toLowerCase();
-    if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(extLower)) {
-      setCategory('DESIGN');
-    } else if (['pdf', 'doc', 'docx', 'txt', 'md'].includes(extLower)) {
-      setCategory('DOCUMENTATION');
-    } else if (['xls', 'xlsx', 'csv'].includes(extLower)) {
-      setCategory('RESEARCH');
-    } else if (['ppt', 'pptx'].includes(extLower)) {
-      setCategory('CLIENT_REFERENCE');
+    if (["png", "jpg", "jpeg", "webp", "svg", "gif"].includes(extLower)) {
+      setCategory("DESIGN");
+    } else if (["pdf", "doc", "docx", "txt", "md"].includes(extLower)) {
+      setCategory("DOCUMENTATION");
+    } else if (["xls", "xlsx", "csv"].includes(extLower)) {
+      setCategory("RESEARCH");
+    } else if (["ppt", "pptx"].includes(extLower)) {
+      setCategory("CLIENT_REFERENCE");
     }
   };
 
   const handleReset = () => {
-    setTitle('');
+    setTitle("");
     setSelectedFile(null);
     setErrorMsg(null);
-    setCategory('DOCUMENTATION');
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    setCategory("DOCUMENTATION");
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (mode === 'file' && !selectedFile) {
-      setErrorMsg('Please choose a file to upload (PDF, Docs, or Image).');
+    if (mode === "file" && !selectedFile) {
+      setErrorMsg("Please choose a file to upload (PDF, Docs, or Image).");
       return;
     }
 
     setErrorMsg(null);
     const formData = new FormData(e.currentTarget);
-    formData.set('mode', mode);
-    formData.set('title', title);
-    formData.set('category', category);
+    formData.set("mode", mode);
+    formData.set("title", title);
+    formData.set("category", category);
 
-    if (mode === 'file' && selectedFile) {
-      formData.set('file', selectedFile);
+    if (mode === "file" && selectedFile) {
+      formData.set("file", selectedFile);
     }
 
     startTransition(async () => {
@@ -154,7 +157,8 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
             Add Knowledge Resource
           </DialogTitle>
           <DialogDescription>
-            Upload files (PDF, DOCX, Images, Sheets) or share an external web link.
+            Upload files (PDF, DOCX, Images, Sheets) or share an external web
+            link.
           </DialogDescription>
         </DialogHeader>
 
@@ -163,13 +167,13 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
           <button
             type="button"
             onClick={() => {
-              setMode('file');
+              setMode("file");
               setErrorMsg(null);
             }}
             className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-2 transition-all ${
-              mode === 'file'
-                ? 'bg-surface text-text-primary shadow-xs'
-                : 'text-text-secondary hover:text-text-primary'
+              mode === "file"
+                ? "bg-surface text-text-primary shadow-xs"
+                : "text-text-secondary hover:text-text-primary"
             }`}
           >
             <UploadCloud className="size-3.5 text-primary" />
@@ -178,13 +182,13 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
           <button
             type="button"
             onClick={() => {
-              setMode('url');
+              setMode("url");
               setErrorMsg(null);
             }}
             className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-2 transition-all ${
-              mode === 'url'
-                ? 'bg-surface text-text-primary shadow-xs'
-                : 'text-text-secondary hover:text-text-primary'
+              mode === "url"
+                ? "bg-surface text-text-primary shadow-xs"
+                : "text-text-secondary hover:text-text-primary"
             }`}
           >
             <LinkIcon className="size-3.5 text-primary" />
@@ -201,7 +205,7 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
           )}
 
           {/* FILE UPLOAD MODE */}
-          {mode === 'file' ? (
+          {mode === "file" ? (
             <div className="space-y-2">
               <Label className="text-xs">
                 Select or Drop File <span className="text-red-500">*</span>
@@ -241,15 +245,18 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
                   onClick={() => fileInputRef.current?.click()}
                   className={`border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-colors ${
                     isDragging
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border bg-surface-secondary/40 hover:bg-surface-secondary'
+                      ? "border-primary bg-primary/5"
+                      : "border-border bg-surface-secondary/40 hover:bg-surface-secondary"
                   }`}
                 >
                   <div className="w-9 h-9 rounded-full bg-surface shadow-xs border border-border flex items-center justify-center mx-auto mb-2 text-primary">
                     <UploadCloud className="size-4" />
                   </div>
                   <p className="text-xs font-semibold text-text-primary">
-                    Click to upload <span className="font-normal text-text-secondary">or drag and drop</span>
+                    Click to upload{" "}
+                    <span className="font-normal text-text-secondary">
+                      or drag and drop
+                    </span>
                   </p>
                   <p className="text-[11px] text-text-muted mt-0.5">
                     PDF, DOC, DOCX, PNG, JPG, XLSX, PPTX, or ZIP (max 30MB)
@@ -287,7 +294,8 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
                       disabled={isPending}
                       onClick={() => {
                         setSelectedFile(null);
-                        if (fileInputRef.current) fileInputRef.current.value = '';
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
                       }}
                       className="p-1 text-text-muted hover:text-red-600 rounded transition-colors"
                       title="Remove file"
@@ -308,7 +316,7 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
                 id="url"
                 name="url"
                 type="url"
-                required={mode === 'url'}
+                required={mode === "url"}
                 disabled={isPending}
                 placeholder="https://..."
                 className="text-xs"
@@ -343,12 +351,14 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
                 required
                 disabled={isPending}
                 value={category}
-                onChange={(e) => setCategory(e.target.value as ResourceCategory)}
+                onChange={(e) =>
+                  setCategory(e.target.value as ResourceCategory)
+                }
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 {Object.values(ResourceCategory).map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat.replace('_', ' ')}
+                    {cat.replace("_", " ")}
                   </option>
                 ))}
               </select>
@@ -416,7 +426,7 @@ export function AddResourceDialog({ projectId, tasks }: AddResourceDialogProps) 
             </Button>
             <Button type="submit" size="sm" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 size-3.5 animate-spin" />}
-              {mode === 'file' ? 'Upload & Save' : 'Save Resource'}
+              {mode === "file" ? "Upload & Save" : "Save Resource"}
             </Button>
           </div>
         </form>

@@ -5,7 +5,15 @@ import { useState, useActionState, useTransition } from "react";
 import { updateOwnProfileAction, changeOwnPasswordAction } from "./actions";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User, Lock, Check, AlertCircle, Loader2, Briefcase, Hash } from "lucide-react";
+import {
+  User,
+  Lock,
+  Check,
+  AlertCircle,
+  Loader2,
+  Briefcase,
+  Hash,
+} from "lucide-react";
 
 interface ProfileFormProps {
   user: {
@@ -50,14 +58,14 @@ export function ProfileForm({ user }: ProfileFormProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* 1. Edit Profile Details */}
-      <div className="bg-white rounded-[8px] border border-[#E4E7EC] overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#EEF1F5] flex items-center justify-between">
+      <div className="bg-surface rounded-[8px] border border-border overflow-hidden">
+        <div className="px-5 py-4 border-b border-border-subtle flex items-center justify-between">
           <div>
-            <h2 className="text-[15px] font-semibold text-[#101828] flex items-center gap-2">
-              <User className="size-4 text-[#5B5FEF]" />
+            <h2 className="text-[15px] font-semibold text-foreground flex items-center gap-2">
+              <User className="size-4 text-primary" />
               Personal Information
             </h2>
-            <p className="text-[12px] text-[#667085] mt-0.5">
+            <p className="text-[12px] text-text-muted mt-0.5">
               Update your display name and contact email address.
             </p>
           </div>
@@ -83,20 +91,20 @@ export function ProfileForm({ user }: ProfileFormProps) {
             )}
 
             {/* Readonly Corporate Info */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-[#F9FAFC] rounded-[6px] border border-[#EEF1F5]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3 bg-surface-hover rounded-[6px] border border-border-subtle">
               <div>
-                <span className="text-[11px] font-medium text-[#667085] flex items-center gap-1">
+                <span className="text-[11px] font-medium text-text-muted flex items-center gap-1">
                   <Hash className="size-3" /> Employee ID
                 </span>
-                <p className="text-[12px] font-mono font-bold text-[#101828] mt-0.5">
+                <p className="text-[12px] font-mono font-bold text-foreground mt-0.5">
                   {user.employeeId}
                 </p>
               </div>
               <div>
-                <span className="text-[11px] font-medium text-[#667085] flex items-center gap-1">
+                <span className="text-[11px] font-medium text-text-muted flex items-center gap-1">
                   <Briefcase className="size-3" /> Position
                 </span>
-                <p className="text-[12px] font-semibold text-[#101828] mt-0.5">
+                <p className="text-[12px] font-semibold text-foreground mt-0.5">
                   {user.position || "Staff Member"}
                 </p>
               </div>
@@ -104,7 +112,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
             {/* Full Name */}
             <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-[12px] font-semibold text-[#101828]">
+              <Label
+                htmlFor="name"
+                className="text-[12px] font-semibold text-foreground"
+              >
                 Full Name <span className="text-[#DC2626]">*</span>
               </Label>
               <Input
@@ -119,7 +130,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
 
             {/* Email Address */}
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-[12px] font-semibold text-[#101828]">
+              <Label
+                htmlFor="email"
+                className="text-[12px] font-semibold text-foreground"
+              >
                 Email Address
               </Label>
               <Input
@@ -130,7 +144,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                 placeholder="name@dynamatrix.com"
                 className="h-9 text-[13px] rounded-[6px]"
               />
-              <p className="text-[11px] text-[#667085]">
+              <p className="text-[11px] text-text-muted">
                 Used for notification dispatches and account communication.
               </p>
             </div>
@@ -139,9 +153,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
               <button
                 type="submit"
                 disabled={isProfilePending}
-                className="w-full h-9 rounded-[6px] bg-[#5B5FEF] hover:bg-[#4C50D8] text-white text-[13px] font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="w-full h-9 rounded-[6px] bg-primary hover:bg-primary-hover text-white text-[13px] font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
-                {isProfilePending && <Loader2 className="size-3.5 animate-spin" />}
+                {isProfilePending && (
+                  <Loader2 className="size-3.5 animate-spin" />
+                )}
                 {isProfilePending ? "Saving..." : "Save Profile Details"}
               </button>
             </div>
@@ -150,14 +166,14 @@ export function ProfileForm({ user }: ProfileFormProps) {
       </div>
 
       {/* 2. Security & Password */}
-      <div className="bg-white rounded-[8px] border border-[#E4E7EC] overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#EEF1F5] flex items-center justify-between">
+      <div className="bg-surface rounded-[8px] border border-border overflow-hidden">
+        <div className="px-5 py-4 border-b border-border-subtle flex items-center justify-between">
           <div>
-            <h2 className="text-[15px] font-semibold text-[#101828] flex items-center gap-2">
-              <Lock className="size-4 text-[#5B5FEF]" />
+            <h2 className="text-[15px] font-semibold text-foreground flex items-center gap-2">
+              <Lock className="size-4 text-primary" />
               Security & Credentials
             </h2>
-            <p className="text-[12px] text-[#667085] mt-0.5">
+            <p className="text-[12px] text-text-muted mt-0.5">
               Maintain account password credentials. Minimum 8 characters.
             </p>
           </div>
@@ -180,7 +196,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="currentPassword" className="text-[12px] font-semibold text-[#101828]">
+              <Label
+                htmlFor="currentPassword"
+                className="text-[12px] font-semibold text-foreground"
+              >
                 Current Password <span className="text-[#DC2626]">*</span>
               </Label>
               <Input
@@ -193,7 +212,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="newPassword" className="text-[12px] font-semibold text-[#101828]">
+              <Label
+                htmlFor="newPassword"
+                className="text-[12px] font-semibold text-foreground"
+              >
                 New Password <span className="text-[#DC2626]">*</span>
               </Label>
               <Input
@@ -207,7 +229,10 @@ export function ProfileForm({ user }: ProfileFormProps) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="confirmPassword" className="text-[12px] font-semibold text-[#101828]">
+              <Label
+                htmlFor="confirmPassword"
+                className="text-[12px] font-semibold text-foreground"
+              >
                 Confirm New Password <span className="text-[#DC2626]">*</span>
               </Label>
               <Input
@@ -224,9 +249,11 @@ export function ProfileForm({ user }: ProfileFormProps) {
               <button
                 type="submit"
                 disabled={isPasswordPending}
-                className="w-full h-9 rounded-[6px] border border-[#D0D5DD] bg-white hover:bg-[#F9FAFC] text-[#101828] text-[13px] font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+                className="w-full h-9 rounded-[6px] border border-border-subtle bg-surface hover:bg-surface-hover text-foreground text-[13px] font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
               >
-                {isPasswordPending && <Loader2 className="size-3.5 animate-spin" />}
+                {isPasswordPending && (
+                  <Loader2 className="size-3.5 animate-spin" />
+                )}
                 {isPasswordPending ? "Updating Password..." : "Update Password"}
               </button>
             </div>

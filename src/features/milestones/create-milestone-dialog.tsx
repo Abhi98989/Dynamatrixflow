@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { createMilestoneAction } from './actions';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import { createMilestoneAction } from "./actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -13,15 +13,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Plus, Layers, AlertCircle, Loader2 } from 'lucide-react';
-import { MilestoneStatus } from '@prisma/client';
+} from "@/components/ui/dialog";
+import { Plus, Layers, AlertCircle, Loader2 } from "lucide-react";
+import { MilestoneStatus } from "@prisma/client";
 
 interface CreateMilestoneDialogProps {
   projectId: string;
 }
 
-export function CreateMilestoneDialog({ projectId }: CreateMilestoneDialogProps) {
+export function CreateMilestoneDialog({
+  projectId,
+}: CreateMilestoneDialogProps) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -30,7 +32,7 @@ export function CreateMilestoneDialog({ projectId }: CreateMilestoneDialogProps)
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.currentTarget);
-    formData.append('projectId', projectId);
+    formData.append("projectId", projectId);
 
     startTransition(async () => {
       const res = await createMilestoneAction(undefined, formData);
@@ -53,10 +55,13 @@ export function CreateMilestoneDialog({ projectId }: CreateMilestoneDialogProps)
         <DialogHeader>
           <div className="flex items-center gap-2 text-primary pb-1">
             <Layers className="size-5" />
-            <DialogTitle className="text-lg font-bold">Create Milestone</DialogTitle>
+            <DialogTitle className="text-lg font-bold">
+              Create Milestone
+            </DialogTitle>
           </div>
           <DialogDescription>
-            Define key delivery phases and anchor critical deadlines for this project.
+            Define key delivery phases and anchor critical deadlines for this
+            project.
           </DialogDescription>
         </DialogHeader>
 
@@ -113,12 +118,22 @@ export function CreateMilestoneDialog({ projectId }: CreateMilestoneDialogProps)
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="milestone-start">Start Date</Label>
-              <Input id="milestone-start" name="startDate" type="date" disabled={isPending} />
+              <Input
+                id="milestone-start"
+                name="startDate"
+                type="date"
+                disabled={isPending}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="milestone-deadline">Target Deadline</Label>
-              <Input id="milestone-deadline" name="deadline" type="date" disabled={isPending} />
+              <Input
+                id="milestone-deadline"
+                name="deadline"
+                type="date"
+                disabled={isPending}
+              />
             </div>
           </div>
 
@@ -137,7 +152,7 @@ export function CreateMilestoneDialog({ projectId }: CreateMilestoneDialogProps)
                   <Loader2 className="mr-2 size-4 animate-spin" /> Creating...
                 </>
               ) : (
-                'Create Milestone'
+                "Create Milestone"
               )}
             </Button>
           </div>

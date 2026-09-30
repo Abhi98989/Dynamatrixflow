@@ -13,7 +13,9 @@ export interface SearchResultItem {
   url: string;
 }
 
-export async function globalSearchAction(query: string): Promise<SearchResultItem[]> {
+export async function globalSearchAction(
+  query: string,
+): Promise<SearchResultItem[]> {
   const user = await requireActiveUser();
   const trimmed = query.trim();
 
@@ -168,5 +170,10 @@ export async function globalSearchAction(query: string): Promise<SearchResultIte
     url: r.url,
   }));
 
-  return [...projectResults, ...taskResults, ...memberResults, ...resourceResults];
+  return [
+    ...projectResults,
+    ...taskResults,
+    ...memberResults,
+    ...resourceResults,
+  ];
 }

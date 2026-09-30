@@ -1,11 +1,15 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { createSubtaskAction, toggleSubtaskAction, deleteSubtaskAction } from './actions';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Plus, Check, Trash2, Loader2, CheckSquare } from 'lucide-react';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import {
+  createSubtaskAction,
+  toggleSubtaskAction,
+  deleteSubtaskAction,
+} from "./actions";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Plus, Check, Trash2, Loader2, CheckSquare } from "lucide-react";
 
 interface SubtaskItem {
   id: string;
@@ -20,8 +24,12 @@ interface SubtaskChecklistProps {
   canEdit: boolean;
 }
 
-export function SubtaskChecklist({ taskId, subtasks, canEdit }: SubtaskChecklistProps) {
-  const [newTitle, setNewTitle] = useState('');
+export function SubtaskChecklist({
+  taskId,
+  subtasks,
+  canEdit,
+}: SubtaskChecklistProps) {
+  const [newTitle, setNewTitle] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const handleAddSubtask = (e: React.FormEvent) => {
@@ -30,7 +38,7 @@ export function SubtaskChecklist({ taskId, subtasks, canEdit }: SubtaskChecklist
 
     startTransition(async () => {
       await createSubtaskAction(taskId, newTitle);
-      setNewTitle('');
+      setNewTitle("");
     });
   };
 
@@ -80,8 +88,8 @@ export function SubtaskChecklist({ taskId, subtasks, canEdit }: SubtaskChecklist
             key={st.id}
             className={`group flex items-center justify-between p-2 rounded-md border transition-colors ${
               st.isCompleted
-                ? 'bg-surface-secondary/40 border-border/60 text-text-muted'
-                : 'bg-surface border-border text-text-primary'
+                ? "bg-surface-secondary/40 border-border/60 text-text-muted"
+                : "bg-surface border-border text-text-primary"
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
@@ -91,8 +99,8 @@ export function SubtaskChecklist({ taskId, subtasks, canEdit }: SubtaskChecklist
                 disabled={!canEdit || isPending}
                 className={`size-4 rounded-sm border flex items-center justify-center transition-colors ${
                   st.isCompleted
-                    ? 'bg-primary border-primary text-primary-foreground'
-                    : 'border-border bg-surface hover:border-primary'
+                    ? "bg-primary border-primary text-primary-foreground"
+                    : "border-border bg-surface hover:border-primary"
                 }`}
                 aria-label={`Toggle subtask "${st.title}"`}
               >
@@ -100,7 +108,9 @@ export function SubtaskChecklist({ taskId, subtasks, canEdit }: SubtaskChecklist
               </button>
               <span
                 className={`text-xs truncate ${
-                  st.isCompleted ? 'line-through text-text-muted' : 'text-text-primary'
+                  st.isCompleted
+                    ? "line-through text-text-muted"
+                    : "text-text-primary"
                 }`}
               >
                 {st.title}
@@ -124,7 +134,10 @@ export function SubtaskChecklist({ taskId, subtasks, canEdit }: SubtaskChecklist
 
       {/* Add New Subtask Form */}
       {canEdit && (
-        <form onSubmit={handleAddSubtask} className="flex items-center gap-2 pt-1">
+        <form
+          onSubmit={handleAddSubtask}
+          className="flex items-center gap-2 pt-1"
+        >
           <Input
             value={newTitle}
             onChange={(e) => setNewTitle(e.target.value)}

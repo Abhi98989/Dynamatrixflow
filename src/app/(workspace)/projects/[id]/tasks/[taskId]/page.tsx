@@ -1,17 +1,14 @@
-import { notFound } from 'next/navigation';
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { db } from '@/server/db/client';
-import {
-  requireActiveUser,
-  canViewProject,
-} from '@/server/auth/authorization';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { TaskStatusDropdown } from '@/features/tasks/task-status-dropdown';
-import { SubtaskChecklist } from '@/features/tasks/subtask-checklist';
-import { ReassignTaskDialog } from '@/features/tasks/reassign-task-dialog';
-import { ReviewActionBanner } from '@/features/reviews/review-action-banner';
-import { TaskCommentsSection } from '@/features/comments/task-comments-section';
+import { notFound } from "next/navigation";
+import { Metadata } from "next";
+import Link from "next/link";
+import { db } from "@/server/db/client";
+import { requireActiveUser, canViewProject } from "@/server/auth/authorization";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { TaskStatusDropdown } from "@/features/tasks/task-status-dropdown";
+import { SubtaskChecklist } from "@/features/tasks/subtask-checklist";
+import { ReassignTaskDialog } from "@/features/tasks/reassign-task-dialog";
+import { ReviewActionBanner } from "@/features/reviews/review-action-banner";
+import { TaskCommentsSection } from "@/features/comments/task-comments-section";
 import {
   ArrowLeft,
   Calendar,
@@ -20,21 +17,23 @@ import {
   AlertCircle,
   History,
   Layers,
-} from 'lucide-react';
-import { Priority, TaskStatus, SystemRole } from '@prisma/client';
+} from "lucide-react";
+import { Priority, TaskStatus, SystemRole } from "@prisma/client";
 
 interface PageProps {
   params: Promise<{ id: string; taskId: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { taskId } = await params;
   const task = await db.task.findUnique({
     where: { id: taskId },
     select: { title: true, taskCode: true },
   });
 
-  if (!task) return { title: 'Task Not Found | Dynamatrix Flow' };
+  if (!task) return { title: "Task Not Found | Dynamatrix Flow" };
 
   return {
     title: `${task.taskCode}: ${task.title} | Dynamatrix Flow`,
@@ -98,7 +97,7 @@ export default async function TaskDetailPage({ params }: PageProps) {
         },
       },
       subtasks: {
-        orderBy: { sortOrder: 'asc' },
+        orderBy: { sortOrder: "asc" },
       },
       comments: {
         where: { deletedAt: null },
@@ -112,7 +111,7 @@ export default async function TaskDetailPage({ params }: PageProps) {
             },
           },
         },
-        orderBy: { createdAt: 'asc' },
+        orderBy: { createdAt: "asc" },
       },
       updates: {
         include: {
@@ -124,7 +123,7 @@ export default async function TaskDetailPage({ params }: PageProps) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       },
     },
   });
@@ -189,9 +188,11 @@ export default async function TaskDetailPage({ params }: PageProps) {
         <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-red-900 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300 text-xs">
           <AlertCircle className="size-4 shrink-0 text-red-600" />
           <span>
-            <strong>Task is Overdue:</strong> Due date was{' '}
-            {task.dueDate ? new Date(task.dueDate).toLocaleDateString("en-US") : 'past due'}.
-            Immediate attention required.
+            <strong>Task is Overdue:</strong> Due date was{" "}
+            {task.dueDate
+              ? new Date(task.dueDate).toLocaleDateString("en-US")
+              : "past due"}
+            . Immediate attention required.
           </span>
         </div>
       )}
@@ -201,9 +202,12 @@ export default async function TaskDetailPage({ params }: PageProps) {
         <div className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 p-4 text-red-900 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
           <AlertCircle className="size-5 shrink-0 text-red-600 mt-0.5" />
           <div>
-            <h2 className="text-sm font-bold">This task is currently BLOCKED</h2>
+            <h2 className="text-sm font-bold">
+              This task is currently BLOCKED
+            </h2>
             <p className="mt-1 text-xs text-red-800 dark:text-red-300 leading-relaxed">
-              Reason: {task.blockerReason || 'No specific blocker details recorded.'}
+              Reason:{" "}
+              {task.blockerReason || "No specific blocker details recorded."}
             </p>
           </div>
         </div>
@@ -240,8 +244,8 @@ export default async function TaskDetailPage({ params }: PageProps) {
             {getPriorityBadge(task.priority)}
             {task.milestone && (
               <span className="inline-flex items-center gap-1 rounded-sm bg-purple-50 px-2 py-0.5 text-xs font-medium text-primary border border-purple-200">
-                <Layers className="size-3" />
-                [{task.milestone.milestoneCode}] {task.milestone.name}
+                <Layers className="size-3" />[{task.milestone.milestoneCode}]{" "}
+                {task.milestone.name}
               </span>
             )}
           </div>
@@ -266,11 +270,13 @@ export default async function TaskDetailPage({ params }: PageProps) {
           {/* Description */}
           <Card>
             <CardHeader className="pb-3 border-b border-border">
-              <CardTitle className="text-sm font-semibold">Description & Requirements</CardTitle>
+              <CardTitle className="text-sm font-semibold">
+                Description & Requirements
+              </CardTitle>
             </CardHeader>
             <CardContent className="pt-4">
               <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">
-                {task.description || 'No description provided.'}
+                {task.description || "No description provided."}
               </p>
             </CardContent>
           </Card>
@@ -302,7 +308,8 @@ export default async function TaskDetailPage({ params }: PageProps) {
           <Card>
             <CardHeader className="pb-3 border-b border-border flex flex-row items-center justify-between">
               <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <History className="size-4 text-primary" /> Activity & History Log
+                <History className="size-4 text-primary" /> Activity & History
+                Log
               </CardTitle>
               <span className="text-xs text-text-muted">
                 {task.updates.length} Events
@@ -326,8 +333,8 @@ export default async function TaskDetailPage({ params }: PageProps) {
                         </span>
                         <span className="text-text-muted">
                           {new Date(u.createdAt).toLocaleString(undefined, {
-                            dateStyle: 'short',
-                            timeStyle: 'short',
+                            dateStyle: "short",
+                            timeStyle: "short",
                           })}
                         </span>
                       </div>
@@ -371,14 +378,19 @@ export default async function TaskDetailPage({ params }: PageProps) {
                       {task.assignee.name.charAt(0)}
                     </span>
                     <div>
-                      <p className="font-semibold text-sm text-text-primary">{task.assignee.name}</p>
+                      <p className="font-semibold text-sm text-text-primary">
+                        {task.assignee.name}
+                      </p>
                       <p className="text-text-muted text-[11px]">
-                        {task.assignee.position || 'Contributor'} · {task.assignee.employeeId}
+                        {task.assignee.position || "Contributor"} ·{" "}
+                        {task.assignee.employeeId}
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <p className="mt-1 font-medium text-text-muted italic">Unassigned</p>
+                  <p className="mt-1 font-medium text-text-muted italic">
+                    Unassigned
+                  </p>
                 )}
               </div>
 
@@ -395,7 +407,9 @@ export default async function TaskDetailPage({ params }: PageProps) {
                     <Calendar className="size-3.5 text-text-muted" /> Start Date
                   </span>
                   <span className="font-medium text-text-primary">
-                    {task.startDate ? new Date(task.startDate).toLocaleDateString("en-US") : 'Not set'}
+                    {task.startDate
+                      ? new Date(task.startDate).toLocaleDateString("en-US")
+                      : "Not set"}
                   </span>
                 </div>
 
@@ -405,10 +419,12 @@ export default async function TaskDetailPage({ params }: PageProps) {
                   </span>
                   <span
                     className={`font-medium ${
-                      isOverdue ? 'text-red-600 font-bold' : 'text-text-primary'
+                      isOverdue ? "text-red-600 font-bold" : "text-text-primary"
                     }`}
                   >
-                    {task.dueDate ? new Date(task.dueDate).toLocaleDateString("en-US") : 'Not set'}
+                    {task.dueDate
+                      ? new Date(task.dueDate).toLocaleDateString("en-US")
+                      : "Not set"}
                   </span>
                 </div>
 

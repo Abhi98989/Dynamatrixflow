@@ -75,8 +75,12 @@ export default async function TeamPage() {
 
   const employees: EmployeeItem[] = rawEmployees.map((emp) => {
     const activeTasks = emp.tasksAssigned;
-    const blockedCount = activeTasks.filter((t) => t.status === TaskStatus.BLOCKED).length;
-    const inProgressCount = activeTasks.filter((t) => t.status === TaskStatus.IN_PROGRESS).length;
+    const blockedCount = activeTasks.filter(
+      (t) => t.status === TaskStatus.BLOCKED,
+    ).length;
+    const inProgressCount = activeTasks.filter(
+      (t) => t.status === TaskStatus.IN_PROGRESS,
+    ).length;
 
     return {
       id: emp.id,
@@ -107,26 +111,28 @@ export default async function TeamPage() {
       blockedTasksCount: blockedCount,
       inProgressTasksCount: inProgressCount,
       totalTasksAssigned: emp._count.tasksAssigned,
-      totalProjectsCount: emp.projectMemberships.length + emp.projectsLed.length,
+      totalProjectsCount:
+        emp.projectMemberships.length + emp.projectsLed.length,
     };
   });
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E4E7EC] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-[#101828] flex items-center gap-2">
-              <Users className="size-5 text-[#5B5FEF]" />
+            <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-foreground flex items-center gap-2">
+              <Users className="size-5 text-primary" />
               Team Directory
             </h1>
             <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE]">
               {employees.length} {employees.length === 1 ? "Member" : "Members"}
             </span>
           </div>
-          <p className="mt-1 text-[13px] text-[#475467]">
-            Internal personnel roster, project staffing allocations, system roles, and active workload visibility.
+          <p className="mt-1 text-[13px] text-text-secondary">
+            Internal personnel roster, project staffing allocations, system
+            roles, and active workload visibility.
           </p>
         </div>
 

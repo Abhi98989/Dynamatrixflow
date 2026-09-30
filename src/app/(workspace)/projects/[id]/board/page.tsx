@@ -3,7 +3,9 @@ import { requireActiveUser, canViewProject } from "@/server/auth/authorization";
 import { notFound } from "next/navigation";
 import { KanbanBoard } from "@/features/tasks/kanban-board";
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 export default async function BoardPage({ params }: Props) {
   const currentUser = await requireActiveUser();
@@ -23,8 +25,10 @@ export default async function BoardPage({ params }: Props) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-[16px] font-semibold text-[#101828]">Board</h2>
-        <p className="text-[12px] text-[#667085] mt-0.5">Kanban view of all tasks</p>
+        <h2 className="text-[16px] font-semibold text-foreground">Board</h2>
+        <p className="text-[12px] text-text-muted mt-0.5">
+          Kanban view of all tasks
+        </p>
       </div>
       <KanbanBoard tasks={tasks} projectId={projectId} />
     </div>

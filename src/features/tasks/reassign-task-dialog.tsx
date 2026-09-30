@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { reassignTaskAction } from './actions';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import { reassignTaskAction } from "./actions";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -12,8 +12,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { UserCheck, AlertCircle, Loader2 } from 'lucide-react';
+} from "@/components/ui/dialog";
+import { UserCheck, AlertCircle, Loader2 } from "lucide-react";
 
 interface ReassignTaskDialogProps {
   taskId: string;
@@ -35,7 +35,7 @@ export function ReassignTaskDialog({
   members,
 }: ReassignTaskDialogProps) {
   const [open, setOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(currentAssigneeId || '');
+  const [selectedUser, setSelectedUser] = useState(currentAssigneeId || "");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -60,7 +60,11 @@ export function ReassignTaskDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-6 px-1.5 text-xs text-primary hover:underline">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-6 px-1.5 text-xs text-primary hover:underline"
+        >
           Reassign
         </Button>
       </DialogTrigger>
@@ -68,7 +72,9 @@ export function ReassignTaskDialog({
         <DialogHeader>
           <div className="flex items-center gap-2 text-primary pb-1">
             <UserCheck className="size-5" />
-            <DialogTitle className="text-base font-bold">Reassign Task</DialogTitle>
+            <DialogTitle className="text-base font-bold">
+              Reassign Task
+            </DialogTitle>
           </div>
           <DialogDescription>
             Select a project contributor to take ownership of this deliverable.
@@ -113,13 +119,19 @@ export function ReassignTaskDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || !selectedUser || selectedUser === currentAssigneeId}>
+            <Button
+              type="submit"
+              disabled={
+                isPending || !selectedUser || selectedUser === currentAssigneeId
+              }
+            >
               {isPending ? (
                 <>
-                  <Loader2 className="mr-2 size-3.5 animate-spin" /> Reassigning...
+                  <Loader2 className="mr-2 size-3.5 animate-spin" />{" "}
+                  Reassigning...
                 </>
               ) : (
-                'Confirm Reassignment'
+                "Confirm Reassignment"
               )}
             </Button>
           </div>

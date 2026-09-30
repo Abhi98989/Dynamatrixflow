@@ -11,14 +11,20 @@ interface User {
   position: string | null;
 }
 
-export function AddMemberForm({ projectId, availableUsers }: { projectId: string; availableUsers: User[] }) {
+export function AddMemberForm({
+  projectId,
+  availableUsers,
+}: {
+  projectId: string;
+  availableUsers: User[];
+}) {
   const [open, setOpen] = useState(false);
 
   if (!open) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 px-3 h-8 bg-[#5B5FEF] rounded-md text-[13px] font-semibold text-white hover:bg-[#4C50D8] transition-colors"
+        className="inline-flex items-center gap-1.5 px-3 h-8 bg-primary rounded-md text-[13px] font-semibold text-white hover:bg-primary-hover transition-colors"
       >
         <UserPlus className="w-3.5 h-3.5" /> Add Member
       </button>
@@ -38,10 +44,10 @@ export function AddMemberForm({ projectId, availableUsers }: { projectId: string
       <select
         name="userId"
         required
-        className="h-8 px-2.5 bg-white border border-[#E4E7EC] rounded-md text-[13px] text-[#101828] focus:outline-none focus:border-[#5B5FEF] min-w-[180px]"
+        className="h-8 px-2.5 bg-surface border border-border rounded-md text-[13px] text-foreground focus:outline-none focus:border-primary min-w-[180px]"
       >
         <option value="">Select employee…</option>
-        {availableUsers.map(u => (
+        {availableUsers.map((u) => (
           <option key={u.id} value={u.id}>
             {u.name} ({u.employeeId})
           </option>
@@ -50,7 +56,7 @@ export function AddMemberForm({ projectId, availableUsers }: { projectId: string
 
       <select
         name="projectRole"
-        className="h-8 px-2.5 bg-white border border-[#E4E7EC] rounded-md text-[13px] text-[#101828] focus:outline-none focus:border-[#5B5FEF]"
+        className="h-8 px-2.5 bg-surface border border-border rounded-md text-[13px] text-foreground focus:outline-none focus:border-primary"
       >
         <option value="DEVELOPER">Developer</option>
         <option value="DESIGNER">Designer</option>
@@ -62,7 +68,7 @@ export function AddMemberForm({ projectId, availableUsers }: { projectId: string
 
       <button
         type="submit"
-        className="inline-flex items-center gap-1.5 px-3 h-8 bg-[#5B5FEF] rounded-md text-[13px] font-semibold text-white hover:bg-[#4C50D8] transition-colors"
+        className="inline-flex items-center gap-1.5 px-3 h-8 bg-primary rounded-md text-[13px] font-semibold text-white hover:bg-primary-hover transition-colors"
       >
         <Plus className="w-3.5 h-3.5" /> Add
       </button>
@@ -70,7 +76,7 @@ export function AddMemberForm({ projectId, availableUsers }: { projectId: string
       <button
         type="button"
         onClick={() => setOpen(false)}
-        className="h-8 px-3 border border-[#E4E7EC] rounded-md text-[13px] font-medium text-[#667085] hover:bg-[#F9FAFC] transition-colors"
+        className="h-8 px-3 border border-border rounded-md text-[13px] font-medium text-text-muted hover:bg-surface-hover transition-colors"
       >
         Cancel
       </button>

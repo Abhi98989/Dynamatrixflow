@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useMemo, useTransition } from 'react';
+import * as React from "react";
+import { useState, useMemo, useTransition } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -12,22 +12,25 @@ import {
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
-} from '@dnd-kit/core';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { updateTaskStatusAction, createTaskAction } from '@/features/tasks/actions';
-import { TaskDrawer } from '@/features/tasks/task-drawer';
-import { TaskStatus, Priority } from '@prisma/client';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from "@dnd-kit/core";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  updateTaskStatusAction,
+  createTaskAction,
+} from "@/features/tasks/actions";
+import { TaskDrawer } from "@/features/tasks/task-drawer";
+import { TaskStatus, Priority } from "@prisma/client";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Search,
   Filter,
@@ -38,7 +41,7 @@ import {
   Clock,
   Layers,
   Plus,
-} from 'lucide-react';
+} from "lucide-react";
 
 export interface KanbanTaskItem {
   id: string;
@@ -83,11 +86,23 @@ interface KanbanBoardProps {
 }
 
 const COLUMNS: { id: TaskStatus; label: string; headerColor: string }[] = [
-  { id: TaskStatus.TODO, label: 'To Do', headerColor: 'border-t-zinc-400' },
-  { id: TaskStatus.IN_PROGRESS, label: 'In Progress', headerColor: 'border-t-blue-500' },
-  { id: TaskStatus.BLOCKED, label: 'Blocked', headerColor: 'border-t-red-500' },
-  { id: TaskStatus.IN_REVIEW, label: 'In Review', headerColor: 'border-t-purple-500' },
-  { id: TaskStatus.COMPLETED, label: 'Completed', headerColor: 'border-t-emerald-500' },
+  { id: TaskStatus.TODO, label: "To Do", headerColor: "border-t-zinc-400" },
+  {
+    id: TaskStatus.IN_PROGRESS,
+    label: "In Progress",
+    headerColor: "border-t-blue-500",
+  },
+  { id: TaskStatus.BLOCKED, label: "Blocked", headerColor: "border-t-red-500" },
+  {
+    id: TaskStatus.IN_REVIEW,
+    label: "In Review",
+    headerColor: "border-t-purple-500",
+  },
+  {
+    id: TaskStatus.COMPLETED,
+    label: "Completed",
+    headerColor: "border-t-emerald-500",
+  },
 ];
 
 export function KanbanBoard({
@@ -99,26 +114,30 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [drawerTaskId, setDrawerTaskId] = useState<string | null>(searchParams?.get('task') || null);
+  const [drawerTaskId, setDrawerTaskId] = useState<string | null>(
+    searchParams?.get("task") || null,
+  );
   const [tasks, setTasks] = useState<KanbanTaskItem[]>(initialTasks);
   const [activeTask, setActiveTask] = useState<KanbanTaskItem | null>(null);
-  const [search, setSearch] = useState('');
-  const [assigneeFilter, setAssigneeFilter] = useState('ALL');
-  const [priorityFilter, setPriorityFilter] = useState('ALL');
+  const [search, setSearch] = useState("");
+  const [assigneeFilter, setAssigneeFilter] = useState("ALL");
+  const [priorityFilter, setPriorityFilter] = useState("ALL");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   // Blocker modal state
   const [blockerModalOpen, setBlockerModalOpen] = useState(false);
-  const [pendingBlockedTaskId, setPendingBlockedTaskId] = useState<string | null>(null);
-  const [blockerReasonInput, setBlockerReasonInput] = useState('');
+  const [pendingBlockedTaskId, setPendingBlockedTaskId] = useState<
+    string | null
+  >(null);
+  const [blockerReasonInput, setBlockerReasonInput] = useState("");
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
         distance: 5,
       },
-    })
+    }),
   );
 
   const filteredTasks = useMemo(() => {
@@ -130,10 +149,13 @@ export function KanbanBoard({
         t.taskCode.toLowerCase().includes(q);
 
       const matchesAssignee =
-        assigneeFilter === 'ALL' ||
-        (assigneeFilter === 'UNASSIGNED' ? !t.assignee : t.assignee?.id === assigneeFilter);
+        assigneeFilter === "ALL" ||
+        (assigneeFilter === "UNASSIGNED"
+          ? !t.assignee
+          : t.assignee?.id === assigneeFilter);
 
-      const matchesPriority = priorityFilter === 'ALL' || t.priority === priorityFilter;
+      const matchesPriority =
+        priorityFilter === "ALL" || t.priority === priorityFilter;
 
       return matchesSearch && matchesAssignee && matchesPriority;
     });
@@ -162,14 +184,16 @@ export function KanbanBoard({
     // Check if transition is to BLOCKED -> open blocker reason dialog
     if (newStatus === TaskStatus.BLOCKED) {
       setPendingBlockedTaskId(taskId);
-      setBlockerReasonInput(task.blockerReason || '');
+      setBlockerReasonInput(task.blockerReason || "");
       setBlockerModalOpen(true);
       return;
     }
 
     // Role guard: Assignee cannot complete task directly without Lead review
     if (newStatus === TaskStatus.COMPLETED && !isLeadOrAdmin) {
-      setErrorMsg('Contributors cannot mark deliverables directly as Completed. Please drag to In Review for Project Lead approval.');
+      setErrorMsg(
+        "Contributors cannot mark deliverables directly as Completed. Please drag to In Review for Project Lead approval.",
+      );
       return;
     }
 
@@ -177,15 +201,21 @@ export function KanbanBoard({
     const previousStatus = task.status;
     setErrorMsg(null);
     setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
+      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t)),
     );
 
     startTransition(async () => {
-      const res = await updateTaskStatusAction(taskId, newStatus, task.progress);
+      const res = await updateTaskStatusAction(
+        taskId,
+        newStatus,
+        task.progress,
+      );
       if (res.error) {
         // Rollback
         setTasks((prev) =>
-          prev.map((t) => (t.id === taskId ? { ...t, status: previousStatus } : t))
+          prev.map((t) =>
+            t.id === taskId ? { ...t, status: previousStatus } : t,
+          ),
         );
         setErrorMsg(res.error);
       }
@@ -197,7 +227,7 @@ export function KanbanBoard({
     if (!pendingBlockedTaskId) return;
 
     if (!blockerReasonInput.trim()) {
-      setErrorMsg('Blocker reason is required.');
+      setErrorMsg("Blocker reason is required.");
       return;
     }
 
@@ -213,8 +243,8 @@ export function KanbanBoard({
       prev.map((t) =>
         t.id === taskId
           ? { ...t, status: TaskStatus.BLOCKED, blockerReason: reason }
-          : t
-      )
+          : t,
+      ),
     );
 
     startTransition(async () => {
@@ -222,11 +252,13 @@ export function KanbanBoard({
         taskId,
         TaskStatus.BLOCKED,
         task?.progress || 0,
-        reason
+        reason,
       );
       if (res.error) {
         setTasks((prev) =>
-          prev.map((t) => (t.id === taskId ? { ...t, status: previousStatus } : t))
+          prev.map((t) =>
+            t.id === taskId ? { ...t, status: previousStatus } : t,
+          ),
         );
         setErrorMsg(res.error);
       }
@@ -306,7 +338,9 @@ export function KanbanBoard({
       >
         <div className="grid grid-cols-1 md:grid-cols-5 gap-3.5 items-start overflow-x-auto pb-4">
           {COLUMNS.map((col) => {
-            const columnTasks = filteredTasks.filter((t) => t.status === col.id);
+            const columnTasks = filteredTasks.filter(
+              (t) => t.status === col.id,
+            );
             return (
               <KanbanColumn
                 key={col.id}
@@ -352,7 +386,8 @@ export function KanbanBoard({
               <AlertCircle className="size-5" /> Mark Deliverable as Blocked
             </DialogTitle>
             <DialogDescription>
-              Specify what is blocking this deliverable so leads and team members can help resolve it.
+              Specify what is blocking this deliverable so leads and team
+              members can help resolve it.
             </DialogDescription>
           </DialogHeader>
 
@@ -379,7 +414,9 @@ export function KanbanBoard({
                 Cancel
               </Button>
               <Button type="submit" variant="destructive" disabled={isPending}>
-                {isPending ? <Loader2 className="size-3.5 animate-spin mr-1.5" /> : null}
+                {isPending ? (
+                  <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                ) : null}
                 Set Blocked
               </Button>
             </div>
@@ -400,7 +437,7 @@ function KanbanQuickAdd({
   onTaskCreated: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -409,12 +446,12 @@ function KanbanQuickAdd({
 
     startTransition(async () => {
       const formData = new FormData();
-      formData.set('projectId', projectId);
-      formData.set('title', title.trim());
-      formData.set('status', columnId);
+      formData.set("projectId", projectId);
+      formData.set("title", title.trim());
+      formData.set("status", columnId);
       const res = await createTaskAction(undefined, formData);
       if (res.success) {
-        setTitle('');
+        setTitle("");
         setIsOpen(false);
         onTaskCreated();
       }
@@ -434,7 +471,10 @@ function KanbanQuickAdd({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-2.5 rounded-lg border border-border bg-surface shadow-xs space-y-2 mt-1">
+    <form
+      onSubmit={handleSubmit}
+      className="p-2.5 rounded-lg border border-border bg-surface shadow-xs space-y-2 mt-1"
+    >
       <input
         autoFocus
         type="text"
@@ -446,7 +486,10 @@ function KanbanQuickAdd({
       <div className="flex items-center justify-end gap-1.5">
         <button
           type="button"
-          onClick={() => { setIsOpen(false); setTitle(''); }}
+          onClick={() => {
+            setIsOpen(false);
+            setTitle("");
+          }}
           className="px-2 py-0.5 text-[11px] text-text-muted hover:text-text-primary font-medium"
         >
           Cancel
@@ -456,7 +499,7 @@ function KanbanQuickAdd({
           disabled={!title.trim() || isPending}
           className="px-2.5 py-1 text-[11px] bg-primary text-white rounded font-medium hover:bg-primary/90 disabled:opacity-50"
         >
-          {isPending ? 'Adding...' : 'Add'}
+          {isPending ? "Adding..." : "Add"}
         </button>
       </div>
     </form>
@@ -489,7 +532,7 @@ function KanbanColumn({
       ref={setNodeRef}
       className={`flex flex-col rounded-xl border border-border bg-surface-secondary/40 min-h-[500px] transition-colors ${
         column.headerColor
-      } border-t-2 ${isOver ? 'bg-primary/5 border-primary/40' : ''}`}
+      } border-t-2 ${isOver ? "bg-primary/5 border-primary/40" : ""}`}
     >
       {/* Column Header */}
       <div className="p-3 border-b border-border/80 flex items-center justify-between">
@@ -549,10 +592,7 @@ function DraggableKanbanCard({
   });
 
   return (
-    <div
-      ref={setNodeRef}
-      className={isDragging ? 'opacity-30' : 'opacity-100'}
-    >
+    <div ref={setNodeRef} className={isDragging ? "opacity-30" : "opacity-100"}>
       <KanbanCardItem
         task={task}
         currentUserId={currentUserId}
@@ -588,20 +628,20 @@ function KanbanCardItem({
   const getPriorityDot = (p: Priority) => {
     switch (p) {
       case Priority.CRITICAL:
-        return 'bg-red-600 text-red-600';
+        return "bg-red-600 text-red-600";
       case Priority.HIGH:
-        return 'bg-orange-500 text-orange-500';
+        return "bg-orange-500 text-orange-500";
       case Priority.MEDIUM:
-        return 'bg-blue-500 text-blue-500';
+        return "bg-blue-500 text-blue-500";
       case Priority.LOW:
-        return 'bg-zinc-400 text-zinc-400';
+        return "bg-zinc-400 text-zinc-400";
     }
   };
 
   return (
     <Card
       className={`p-3 rounded-lg border border-border bg-surface hover:shadow-xs transition-shadow space-y-2.5 text-xs ${
-        isOverlay ? 'shadow-lg border-primary' : ''
+        isOverlay ? "shadow-lg border-primary" : ""
       }`}
     >
       {/* Top Header: Code, Priority, Drag Handle */}
@@ -611,7 +651,7 @@ function KanbanCardItem({
             {task.taskCode}
           </span>
           <span
-            className={`size-2 rounded-full ${getPriorityDot(task.priority).split(' ')[0]}`}
+            className={`size-2 rounded-full ${getPriorityDot(task.priority).split(" ")[0]}`}
             title={`Priority: ${task.priority}`}
           />
         </div>
@@ -628,7 +668,7 @@ function KanbanCardItem({
       {/* Task Title */}
       <button
         type="button"
-        onClick={() => onSelectTask ? onSelectTask(task.id) : undefined}
+        onClick={() => (onSelectTask ? onSelectTask(task.id) : undefined)}
         className="font-medium text-text-primary hover:text-primary transition-colors text-xs line-clamp-2 block leading-snug text-left cursor-pointer w-full"
       >
         {task.title}
@@ -658,10 +698,10 @@ function KanbanCardItem({
             </span>
             <span
               className={`truncate max-w-[80px] ${
-                isAssignee ? 'font-bold text-primary' : 'text-text-secondary'
+                isAssignee ? "font-bold text-primary" : "text-text-secondary"
               }`}
             >
-              {task.assignee.name.split(' ')[0]}
+              {task.assignee.name.split(" ")[0]}
             </span>
           </div>
         ) : (
@@ -670,7 +710,10 @@ function KanbanCardItem({
 
         <div className="flex items-center gap-2">
           {task._count && task._count.subtasks > 0 && (
-            <span className="flex items-center gap-0.5 text-text-muted" title="Checklist steps">
+            <span
+              className="flex items-center gap-0.5 text-text-muted"
+              title="Checklist steps"
+            >
               <CheckSquare className="size-3" />
               {task._count.subtasks}
             </span>
@@ -679,14 +722,14 @@ function KanbanCardItem({
           {task.dueDate && (
             <span
               className={`flex items-center gap-0.5 ${
-                isOverdue ? 'text-red-600 font-bold' : 'text-text-muted'
+                isOverdue ? "text-red-600 font-bold" : "text-text-muted"
               }`}
               title={new Date(task.dueDate).toLocaleDateString("en-US")}
             >
               <Clock className="size-3" />
               {new Date(task.dueDate).toLocaleDateString("en-US", {
-                month: 'numeric',
-                day: 'numeric',
+                month: "numeric",
+                day: "numeric",
               })}
             </span>
           )}

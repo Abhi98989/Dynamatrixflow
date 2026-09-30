@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { ResourceCategory } from '@prisma/client';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import { ResourceCategory } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Link, Loader2, AlertCircle } from 'lucide-react';
-import { updateResourceAction } from './actions';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Link, Loader2, AlertCircle } from "lucide-react";
+import { updateResourceAction } from "./actions";
 
 interface EditResourceDialogProps {
   open: boolean;
@@ -31,7 +31,13 @@ interface EditResourceDialogProps {
   tasks: { id: string; taskCode: string; title: string }[];
 }
 
-export function EditResourceDialog({ open, onOpenChange, resource, projectId, tasks }: EditResourceDialogProps) {
+export function EditResourceDialog({
+  open,
+  onOpenChange,
+  resource,
+  projectId,
+  tasks,
+}: EditResourceDialogProps) {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -39,7 +45,7 @@ export function EditResourceDialog({ open, onOpenChange, resource, projectId, ta
     e.preventDefault();
     setErrorMsg(null);
     const formData = new FormData(e.currentTarget);
-    
+
     startTransition(async () => {
       const res = await updateResourceAction(resource.id, projectId, formData);
       if (res?.error) {
@@ -109,7 +115,7 @@ export function EditResourceDialog({ open, onOpenChange, resource, projectId, ta
               >
                 {Object.values(ResourceCategory).map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat.replace('_', ' ')}
+                    {cat.replace("_", " ")}
                   </option>
                 ))}
               </select>
@@ -122,7 +128,7 @@ export function EditResourceDialog({ open, onOpenChange, resource, projectId, ta
               <select
                 id="relatedTaskId"
                 name="relatedTaskId"
-                defaultValue={resource.relatedTask?.id || ''}
+                defaultValue={resource.relatedTask?.id || ""}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <option value="">-- None --</option>
@@ -142,7 +148,7 @@ export function EditResourceDialog({ open, onOpenChange, resource, projectId, ta
             <Input
               id="tags"
               name="tags"
-              defaultValue={resource.tags.join(', ')}
+              defaultValue={resource.tags.join(", ")}
               placeholder="e.g., frontend, auth, guide"
               className="text-xs"
             />
@@ -156,7 +162,7 @@ export function EditResourceDialog({ open, onOpenChange, resource, projectId, ta
               id="description"
               name="description"
               rows={2}
-              defaultValue={resource.description || ''}
+              defaultValue={resource.description || ""}
               className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-xs shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               placeholder="Brief context about this resource..."
             />

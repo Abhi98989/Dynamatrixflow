@@ -1,20 +1,20 @@
-'use server';
+"use server";
 
-import { z } from 'zod';
-import { db } from '@/server/db/client';
+import { z } from "zod";
+import { db } from "@/server/db/client";
 import {
   requireActiveUser,
   requireProjectManage,
   canUpdateTask,
-} from '@/server/auth/authorization';
-import { generateNextMilestoneCode } from './code-generator';
-import { MilestoneStatus } from '@prisma/client';
-import { revalidatePath } from 'next/cache';
+} from "@/server/auth/authorization";
+import { generateNextMilestoneCode } from "./code-generator";
+import { MilestoneStatus } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const progressOverrideSchema = z
   .union([z.string(), z.number(), z.null(), z.undefined()])
   .transform((val) => {
-    if (val === '' || val === null || val === undefined) return null;
+    if (val === "" || val === null || val === undefined) return null;
     const num = Number(val);
     if (isNaN(num)) return null;
     return Math.min(100, Math.max(0, Math.round(num)));
@@ -22,7 +22,10 @@ const progressOverrideSchema = z
 
 const createMilestoneSchema = z.object({
   projectId: z.string().min(1),
-  name: z.string().min(2, 'Milestone name must be at least 2 characters').trim(),
+  name: z
+    .string()
+    .min(2, "Milestone name must be at least 2 characters")
+    .trim(),
   description: z.string().optional(),
   status: z.nativeEnum(MilestoneStatus).default(MilestoneStatus.PLANNED),
   startDate: z.string().optional(),
@@ -32,7 +35,10 @@ const createMilestoneSchema = z.object({
 
 const updateMilestoneSchema = z.object({
   id: z.string().min(1),
-  name: z.string().min(2, 'Milestone name must be at least 2 characters').trim(),
+  name: z
+    .string()
+    .min(2, "Milestone name must be at least 2 characters")
+    .trim(),
   description: z.string().optional(),
   status: z.nativeEnum(MilestoneStatus),
   startDate: z.string().optional(),
@@ -40,17 +46,29 @@ const updateMilestoneSchema = z.object({
   progressOverride: progressOverrideSchema,
 });
 
-export async function createMilestoneAction(_prevState: unknown, formData: FormData) {
+export async function createMilestoneAction(
+  _prevState: unknown,
+  formData: FormData,
+) {
   try {
     const user = await requireActiveUser();
     const raw = Object.fromEntries(formData.entries());
     const validated = createMilestoneSchema.safeParse(raw);
     if (!validated.success) {
-      return { error: validated.error.issues[0]?.message || 'Invalid milestone input.' };
+      return {
+        error: validated.error.issues[0]?.message || "Invalid milestone input.",
+      };
     }
 
-    const { projectId, name, description, status, startDate, deadline, progressOverride } =
-      validated.data;
+    const {
+      projectId,
+      name,
+      description,
+      status,
+      startDate,
+      deadline,
+      progressOverride,
+    } = validated.data;
 
     await requireProjectManage(projectId);
 
@@ -58,7 +76,7 @@ export async function createMilestoneAction(_prevState: unknown, formData: FormD
     const deadlineParsed = deadline ? new Date(deadline) : null;
 
     if (startParsed && deadlineParsed && deadlineParsed < startParsed) {
-      return { error: 'Deadline cannot be earlier than start date.' };
+      return { error: "Deadline cannot be earlier than start date." };
     }
 
     const milestoneCode = await generateNextMilestoneCode(projectId);
@@ -73,7 +91,11 @@ export async function createMilestoneAction(_prevState: unknown, formData: FormD
           status,
           startDate: startParsed,
           deadline: deadlineParsed,
-          progressOverride: typeof progressOverride === 'number' && !Number.isNaN(progressOverride) ? progressOverride : null,
+          progressOverride:
+            typeof progressOverride === "number" &&
+            !Number.isNaN(progressOverride)
+              ? progressOverride
+              : null,
           createdById: user.id,
         },
       });
@@ -82,8 +104,8 @@ export async function createMilestoneAction(_prevState: unknown, formData: FormD
         data: {
           actorId: user.id,
           projectId,
-          action: 'MILESTONE_CREATED',
-          entityType: 'Milestone',
+          action: "MILESTONE_CREATED",
+          entityType: "Milestone",
           entityId: created.id,
           metadata: {
             milestoneCode: created.milestoneCode,
@@ -99,29 +121,44 @@ export async function createMilestoneAction(_prevState: unknown, formData: FormD
     revalidatePath(`/projects/${projectId}`);
     return { success: true, milestoneId: milestone.id };
   } catch (error) {
-    console.error('createMilestoneAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to create milestone.' };
+    console.error("createMilestoneAction error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to create milestone.",
+    };
   }
 }
 
-export async function updateMilestoneAction(_prevState: unknown, formData: FormData) {
+export async function updateMilestoneAction(
+  _prevState: unknown,
+  formData: FormData,
+) {
   try {
     const user = await requireActiveUser();
     const raw = Object.fromEntries(formData.entries());
     const validated = updateMilestoneSchema.safeParse(raw);
     if (!validated.success) {
-      return { error: validated.error.issues[0]?.message || 'Invalid milestone input.' };
+      return {
+        error: validated.error.issues[0]?.message || "Invalid milestone input.",
+      };
     }
 
-    const { id, name, description, status, startDate, deadline, progressOverride } =
-      validated.data;
+    const {
+      id,
+      name,
+      description,
+      status,
+      startDate,
+      deadline,
+      progressOverride,
+    } = validated.data;
 
     const existing = await db.milestone.findUnique({
       where: { id, archivedAt: null },
       select: { projectId: true },
     });
 
-    if (!existing) return { error: 'Milestone not found or archived.' };
+    if (!existing) return { error: "Milestone not found or archived." };
 
     await requireProjectManage(existing.projectId);
 
@@ -129,7 +166,7 @@ export async function updateMilestoneAction(_prevState: unknown, formData: FormD
     const deadlineParsed = deadline ? new Date(deadline) : null;
 
     if (startParsed && deadlineParsed && deadlineParsed < startParsed) {
-      return { error: 'Deadline cannot be earlier than start date.' };
+      return { error: "Deadline cannot be earlier than start date." };
     }
 
     await db.$transaction(async (tx) => {
@@ -141,7 +178,11 @@ export async function updateMilestoneAction(_prevState: unknown, formData: FormD
           status,
           startDate: startParsed,
           deadline: deadlineParsed,
-          progressOverride: typeof progressOverride === 'number' && !Number.isNaN(progressOverride) ? progressOverride : null,
+          progressOverride:
+            typeof progressOverride === "number" &&
+            !Number.isNaN(progressOverride)
+              ? progressOverride
+              : null,
         },
       });
 
@@ -149,8 +190,8 @@ export async function updateMilestoneAction(_prevState: unknown, formData: FormD
         data: {
           actorId: user.id,
           projectId: existing.projectId,
-          action: 'MILESTONE_UPDATED',
-          entityType: 'Milestone',
+          action: "MILESTONE_UPDATED",
+          entityType: "Milestone",
           entityId: id,
           metadata: { name, status },
         },
@@ -161,8 +202,11 @@ export async function updateMilestoneAction(_prevState: unknown, formData: FormD
     revalidatePath(`/projects/${existing.projectId}`);
     return { success: true };
   } catch (error) {
-    console.error('updateMilestoneAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to update milestone.' };
+    console.error("updateMilestoneAction error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to update milestone.",
+    };
   }
 }
 
@@ -174,7 +218,8 @@ export async function archiveMilestoneAction(milestoneId: string) {
       select: { projectId: true, name: true, milestoneCode: true },
     });
 
-    if (!milestone) return { error: 'Milestone not found or already archived.' };
+    if (!milestone)
+      return { error: "Milestone not found or already archived." };
 
     await requireProjectManage(milestone.projectId);
 
@@ -194,8 +239,8 @@ export async function archiveMilestoneAction(milestoneId: string) {
         data: {
           actorId: user.id,
           projectId: milestone.projectId,
-          action: 'MILESTONE_ARCHIVED',
-          entityType: 'Milestone',
+          action: "MILESTONE_ARCHIVED",
+          entityType: "Milestone",
           entityId: milestoneId,
           metadata: {
             milestoneCode: milestone.milestoneCode,
@@ -209,12 +254,18 @@ export async function archiveMilestoneAction(milestoneId: string) {
     revalidatePath(`/projects/${milestone.projectId}`);
     return { success: true };
   } catch (error) {
-    console.error('archiveMilestoneAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to archive milestone.' };
+    console.error("archiveMilestoneAction error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to archive milestone.",
+    };
   }
 }
 
-export async function linkTaskToMilestoneAction(taskId: string, milestoneId: string | null) {
+export async function linkTaskToMilestoneAction(
+  taskId: string,
+  milestoneId: string | null,
+) {
   try {
     const user = await requireActiveUser();
 
@@ -223,18 +274,19 @@ export async function linkTaskToMilestoneAction(taskId: string, milestoneId: str
       select: { projectId: true },
     });
 
-    if (!task) return { error: 'Task not found or archived.' };
+    if (!task) return { error: "Task not found or archived." };
 
     const canEdit = await canUpdateTask(user.id, taskId);
     if (!canEdit) {
-      return { error: 'You do not have permission to modify this task.' };
+      return { error: "You do not have permission to modify this task." };
     }
 
     if (milestoneId) {
       const milestone = await db.milestone.findUnique({
         where: { id: milestoneId, projectId: task.projectId, archivedAt: null },
       });
-      if (!milestone) return { error: 'Selected milestone does not belong to this project.' };
+      if (!milestone)
+        return { error: "Selected milestone does not belong to this project." };
     }
 
     await db.task.update({
@@ -248,7 +300,10 @@ export async function linkTaskToMilestoneAction(taskId: string, milestoneId: str
     revalidatePath(`/projects/${task.projectId}/milestones`);
     return { success: true };
   } catch (error) {
-    console.error('linkTaskToMilestoneAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to link milestone.' };
+    console.error("linkTaskToMilestoneAction error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to link milestone.",
+    };
   }
 }

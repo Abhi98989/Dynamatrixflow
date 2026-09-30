@@ -1,23 +1,23 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
+import * as React from "react";
+import { useState, useTransition } from "react";
 import {
   submitForReviewAction,
   approveTaskReviewAction,
   requestChangesAction,
   reopenTaskAction,
-} from './actions';
-import { TaskStatus } from '@prisma/client';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from "./actions";
+import { TaskStatus } from "@prisma/client";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Clock,
   CheckCircle2,
@@ -26,7 +26,7 @@ import {
   AlertCircle,
   Loader2,
   FileQuestion,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface ReviewActionBannerProps {
   taskId: string;
@@ -52,16 +52,16 @@ export function ReviewActionBanner({
 
   // Modals state
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
-  const [submitNote, setSubmitNote] = useState('');
+  const [submitNote, setSubmitNote] = useState("");
 
   const [approveModalOpen, setApproveModalOpen] = useState(false);
-  const [approveNote, setApproveNote] = useState('');
+  const [approveNote, setApproveNote] = useState("");
 
   const [changesModalOpen, setChangesModalOpen] = useState(false);
-  const [changesFeedback, setChangesFeedback] = useState('');
+  const [changesFeedback, setChangesFeedback] = useState("");
 
   const [reopenModalOpen, setReopenModalOpen] = useState(false);
-  const [reopenReason, setReopenReason] = useState('');
+  const [reopenReason, setReopenReason] = useState("");
 
   const handleSubmitReview = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +72,7 @@ export function ReviewActionBanner({
         setErrorMsg(res.error);
       } else {
         setSubmitModalOpen(false);
-        setSubmitNote('');
+        setSubmitNote("");
       }
     });
   };
@@ -86,7 +86,7 @@ export function ReviewActionBanner({
         setErrorMsg(res.error);
       } else {
         setApproveModalOpen(false);
-        setApproveNote('');
+        setApproveNote("");
       }
     });
   };
@@ -95,7 +95,9 @@ export function ReviewActionBanner({
     e.preventDefault();
     setErrorMsg(null);
     if (!changesFeedback.trim()) {
-      setErrorMsg('Please specify what changes are required before submitting.');
+      setErrorMsg(
+        "Please specify what changes are required before submitting.",
+      );
       return;
     }
 
@@ -105,7 +107,7 @@ export function ReviewActionBanner({
         setErrorMsg(res.error);
       } else {
         setChangesModalOpen(false);
-        setChangesFeedback('');
+        setChangesFeedback("");
       }
     });
   };
@@ -114,7 +116,9 @@ export function ReviewActionBanner({
     e.preventDefault();
     setErrorMsg(null);
     if (!reopenReason.trim() || reopenReason.trim().length < 5) {
-      setErrorMsg('A clear audit reason of at least 5 characters is required to reopen this task.');
+      setErrorMsg(
+        "A clear audit reason of at least 5 characters is required to reopen this task.",
+      );
       return;
     }
 
@@ -124,7 +128,7 @@ export function ReviewActionBanner({
         setErrorMsg(res.error);
       } else {
         setReopenModalOpen(false);
-        setReopenReason('');
+        setReopenReason("");
       }
     });
   };
@@ -154,11 +158,13 @@ export function ReviewActionBanner({
               </h3>
               <p className="text-xs text-text-muted mt-0.5">
                 {submittedForReviewAt
-                  ? `Submitted on ${new Date(submittedForReviewAt).toLocaleString(undefined, {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
+                  ? `Submitted on ${new Date(
+                      submittedForReviewAt,
+                    ).toLocaleString(undefined, {
+                      dateStyle: "medium",
+                      timeStyle: "short",
                     })}`
-                  : 'Awaiting review decision from Project Lead.'}
+                  : "Awaiting review decision from Project Lead."}
               </p>
             </div>
           </div>
@@ -181,7 +187,8 @@ export function ReviewActionBanner({
                   disabled={isPending}
                   className="h-8 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white"
                 >
-                  <CheckCircle2 className="mr-1.5 size-3.5" /> Approve Deliverable
+                  <CheckCircle2 className="mr-1.5 size-3.5" /> Approve
+                  Deliverable
                 </Button>
               </>
             ) : (
@@ -206,10 +213,12 @@ export function ReviewActionBanner({
               </h3>
               <p className="text-xs text-text-muted mt-0.5">
                 {completedAt
-                  ? `Verified and completed on ${new Date(completedAt).toLocaleDateString("en-US", {
-                      dateStyle: 'medium',
+                  ? `Verified and completed on ${new Date(
+                      completedAt,
+                    ).toLocaleDateString("en-US", {
+                      dateStyle: "medium",
                     })}`
-                  : 'All acceptance criteria satisfied.'}
+                  : "All acceptance criteria satisfied."}
               </p>
             </div>
           </div>
@@ -229,40 +238,46 @@ export function ReviewActionBanner({
       )}
 
       {/* Case 3: Task is In Progress -> Allow Submit for Review */}
-      {(status === TaskStatus.IN_PROGRESS || status === TaskStatus.TODO) && (isAssignee || isLeadOrAdmin) && (
-        <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-3.5">
-          <div className="flex items-center gap-2">
-            <Send className="size-4 text-primary" />
-            <p className="text-xs text-text-secondary">
-              Finished implementation? Submit this deliverable for Project Lead review.
-            </p>
+      {(status === TaskStatus.IN_PROGRESS || status === TaskStatus.TODO) &&
+        (isAssignee || isLeadOrAdmin) && (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-3.5">
+            <div className="flex items-center gap-2">
+              <Send className="size-4 text-primary" />
+              <p className="text-xs text-text-secondary">
+                Finished implementation? Submit this deliverable for Project
+                Lead review.
+              </p>
+            </div>
+            <Button
+              size="sm"
+              onClick={() => setSubmitModalOpen(true)}
+              disabled={isPending}
+              className="h-8 text-xs font-semibold shrink-0"
+            >
+              Submit for Review
+            </Button>
           </div>
-          <Button
-            size="sm"
-            onClick={() => setSubmitModalOpen(true)}
-            disabled={isPending}
-            className="h-8 text-xs font-semibold shrink-0"
-          >
-            Submit for Review
-          </Button>
-        </div>
-      )}
+        )}
 
       {/* Modal: Submit for Review */}
       <Dialog open={submitModalOpen} onOpenChange={setSubmitModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold flex items-center gap-2">
-              <Send className="size-4 text-primary" /> Submit {taskCode} for Review
+              <Send className="size-4 text-primary" /> Submit {taskCode} for
+              Review
             </DialogTitle>
             <DialogDescription>
-              Your deliverable will be moved to In Review and your Project Lead will be notified.
+              Your deliverable will be moved to In Review and your Project Lead
+              will be notified.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleSubmitReview} className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label htmlFor="submitNotesInput">Summary Note / PR / Demo Link (Optional)</Label>
+              <Label htmlFor="submitNotesInput">
+                Summary Note / PR / Demo Link (Optional)
+              </Label>
               <textarea
                 id="submitNotesInput"
                 value={submitNote}
@@ -274,11 +289,17 @@ export function ReviewActionBanner({
             </div>
 
             <div className="flex justify-end gap-2 pt-2 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setSubmitModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setSubmitModalOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? <Loader2 className="size-3.5 animate-spin mr-1.5" /> : null}
+                {isPending ? (
+                  <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                ) : null}
                 Confirm Submission
               </Button>
             </div>
@@ -291,16 +312,20 @@ export function ReviewActionBanner({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-emerald-800 flex items-center gap-2">
-              <CheckCircle2 className="size-5 text-emerald-600" /> Approve {taskCode}
+              <CheckCircle2 className="size-5 text-emerald-600" /> Approve{" "}
+              {taskCode}
             </DialogTitle>
             <DialogDescription>
-              Mark this deliverable as completed and record formal verification in the audit trail.
+              Mark this deliverable as completed and record formal verification
+              in the audit trail.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleApprove} className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label htmlFor="approveNotesInput">Approval Comments / Praise (Optional)</Label>
+              <Label htmlFor="approveNotesInput">
+                Approval Comments / Praise (Optional)
+              </Label>
               <textarea
                 id="approveNotesInput"
                 value={approveNote}
@@ -312,7 +337,11 @@ export function ReviewActionBanner({
             </div>
 
             <div className="flex justify-end gap-2 pt-2 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setApproveModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setApproveModalOpen(false)}
+              >
                 Cancel
               </Button>
               <Button
@@ -320,7 +349,9 @@ export function ReviewActionBanner({
                 disabled={isPending}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white"
               >
-                {isPending ? <Loader2 className="size-3.5 animate-spin mr-1.5" /> : null}
+                {isPending ? (
+                  <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                ) : null}
                 Approve & Complete
               </Button>
             </div>
@@ -333,16 +364,20 @@ export function ReviewActionBanner({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-amber-800 flex items-center gap-2">
-              <FileQuestion className="size-5 text-amber-600" /> Request Changes on {taskCode}
+              <FileQuestion className="size-5 text-amber-600" /> Request Changes
+              on {taskCode}
             </DialogTitle>
             <DialogDescription>
-              Move deliverable back to In Progress and specify what modifications are required.
+              Move deliverable back to In Progress and specify what
+              modifications are required.
             </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={handleRequestChanges} className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label htmlFor="feedbackInput">Required Changes & Feedback *</Label>
+              <Label htmlFor="feedbackInput">
+                Required Changes & Feedback *
+              </Label>
               <textarea
                 id="feedbackInput"
                 value={changesFeedback}
@@ -355,7 +390,11 @@ export function ReviewActionBanner({
             </div>
 
             <div className="flex justify-end gap-2 pt-2 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setChangesModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setChangesModalOpen(false)}
+              >
                 Cancel
               </Button>
               <Button
@@ -363,7 +402,9 @@ export function ReviewActionBanner({
                 disabled={isPending}
                 className="bg-amber-600 hover:bg-amber-700 text-white"
               >
-                {isPending ? <Loader2 className="size-3.5 animate-spin mr-1.5" /> : null}
+                {isPending ? (
+                  <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                ) : null}
                 Send Feedback & Return
               </Button>
             </div>
@@ -376,10 +417,12 @@ export function ReviewActionBanner({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-red-800 flex items-center gap-2">
-              <RotateCcw className="size-5 text-red-600" /> Reopen Completed Deliverable
+              <RotateCcw className="size-5 text-red-600" /> Reopen Completed
+              Deliverable
             </DialogTitle>
             <DialogDescription>
-              Reopening a completed deliverable requires a clear audit reason recorded in project history.
+              Reopening a completed deliverable requires a clear audit reason
+              recorded in project history.
             </DialogDescription>
           </DialogHeader>
 
@@ -398,15 +441,17 @@ export function ReviewActionBanner({
             </div>
 
             <div className="flex justify-end gap-2 pt-2 border-t border-border">
-              <Button type="button" variant="outline" onClick={() => setReopenModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setReopenModalOpen(false)}
+              >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isPending}
-                variant="destructive"
-              >
-                {isPending ? <Loader2 className="size-3.5 animate-spin mr-1.5" /> : null}
+              <Button type="submit" disabled={isPending} variant="destructive">
+                {isPending ? (
+                  <Loader2 className="size-3.5 animate-spin mr-1.5" />
+                ) : null}
                 Reopen Deliverable
               </Button>
             </div>

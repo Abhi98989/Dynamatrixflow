@@ -1,17 +1,23 @@
-import { Metadata } from 'next';
-import { db } from '@/server/db/client';
-import { requireActiveUser } from '@/server/auth/authorization';
-import { TaskStatus, SystemRole, MilestoneStatus, ProjectStatus } from '@prisma/client';
+import { Metadata } from "next";
+import { db } from "@/server/db/client";
+import { requireActiveUser } from "@/server/auth/authorization";
+import {
+  TaskStatus,
+  SystemRole,
+  MilestoneStatus,
+  ProjectStatus,
+} from "@prisma/client";
 import {
   UpcomingSchedule,
   UpcomingTaskItem,
   UpcomingMilestoneItem,
   UpcomingProjectItem,
-} from '@/features/upcoming/upcoming-schedule';
+} from "@/features/upcoming/upcoming-schedule";
 
 export const metadata: Metadata = {
-  title: 'Upcoming Deadlines | Dynamatrix Flow',
-  description: 'Chronological timeline of deliverables, milestones, and project deadlines across Dynamatrix Flow.',
+  title: "Upcoming Deadlines | Dynamatrix Flow",
+  description:
+    "Chronological timeline of deliverables, milestones, and project deadlines across Dynamatrix Flow.",
 };
 
 export default async function UpcomingDeadlinesPage() {
@@ -42,7 +48,7 @@ export default async function UpcomingDeadlinesPage() {
       projectLead: { select: { id: true, name: true, employeeId: true } },
       _count: { select: { tasks: { where: { archivedAt: null } } } },
     },
-    orderBy: { name: 'asc' },
+    orderBy: { name: "asc" },
   });
 
   const accessibleProjectIds = accessibleProjects.map((p) => p.id);
@@ -56,11 +62,18 @@ export default async function UpcomingDeadlinesPage() {
       projectId: { in: accessibleProjectIds },
     },
     include: {
-      project: { select: { id: true, name: true, projectCode: true, projectLeadId: true } },
+      project: {
+        select: {
+          id: true,
+          name: true,
+          projectCode: true,
+          projectLeadId: true,
+        },
+      },
       assignee: { select: { id: true, name: true, employeeId: true } },
       milestone: { select: { id: true, name: true, milestoneCode: true } },
     },
-    orderBy: { dueDate: 'asc' },
+    orderBy: { dueDate: "asc" },
   });
 
   // 2. Fetch upcoming milestones with deadlines
@@ -72,10 +85,17 @@ export default async function UpcomingDeadlinesPage() {
       projectId: { in: accessibleProjectIds },
     },
     include: {
-      project: { select: { id: true, name: true, projectCode: true, projectLeadId: true } },
+      project: {
+        select: {
+          id: true,
+          name: true,
+          projectCode: true,
+          projectLeadId: true,
+        },
+      },
       tasks: { where: { archivedAt: null }, select: { status: true } },
     },
-    orderBy: { deadline: 'asc' },
+    orderBy: { deadline: "asc" },
   });
 
   // 3. Extract projects that have deadlines and are not completed
@@ -83,12 +103,12 @@ export default async function UpcomingDeadlinesPage() {
     (p) =>
       p.deadline !== null &&
       p.status !== ProjectStatus.COMPLETED &&
-      p.status !== ProjectStatus.ARCHIVED
+      p.status !== ProjectStatus.ARCHIVED,
   );
 
   // Serialize to JSON-safe client format
   const tasks: UpcomingTaskItem[] = rawTasks.map((t) => ({
-    type: 'TASK',
+    type: "TASK",
     id: t.id,
     taskCode: t.taskCode,
     title: t.title,
@@ -121,7 +141,7 @@ export default async function UpcomingDeadlinesPage() {
   }));
 
   const milestones: UpcomingMilestoneItem[] = rawMilestones.map((m) => ({
-    type: 'MILESTONE',
+    type: "MILESTONE",
     id: m.id,
     milestoneCode: m.milestoneCode,
     name: m.name,
@@ -135,11 +155,12 @@ export default async function UpcomingDeadlinesPage() {
       projectLeadId: m.project.projectLeadId,
     },
     totalTasks: m.tasks.length,
-    completedTasks: m.tasks.filter((t) => t.status === TaskStatus.COMPLETED).length,
+    completedTasks: m.tasks.filter((t) => t.status === TaskStatus.COMPLETED)
+      .length,
   }));
 
   const projects: UpcomingProjectItem[] = rawProjectDeadlines.map((p) => ({
-    type: 'PROJECT',
+    type: "PROJECT",
     id: p.id,
     projectCode: p.projectCode,
     name: p.name,

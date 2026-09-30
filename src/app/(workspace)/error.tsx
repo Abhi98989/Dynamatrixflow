@@ -18,7 +18,7 @@ export default function WorkspaceError({
 
   return (
     <div className="w-full max-w-lg mx-auto py-16 px-4">
-      <div className="bg-white rounded-xl border border-slate-200 p-8 text-center shadow-xs">
+      <div className="bg-surface rounded-xl border border-slate-200 p-8 text-center shadow-xs">
         <div className="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center mx-auto mb-4 border border-red-100">
           <AlertCircle className="w-6 h-6" />
         </div>
@@ -33,7 +33,7 @@ export default function WorkspaceError({
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <Button
             onClick={() => reset()}
-            className="flex items-center gap-2 bg-[#5B5FEF] text-white hover:bg-[#4C50D8]"
+            className="flex items-center gap-2 bg-primary text-white hover:bg-primary-hover"
           >
             <RefreshCw className="w-4 h-4" /> Try again
           </Button>

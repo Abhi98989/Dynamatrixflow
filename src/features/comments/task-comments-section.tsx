@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { createTaskCommentAction, deleteTaskCommentAction } from './actions';
-import { Button } from '@/components/ui/button';
-import { MessageSquare, Send, Trash2, Loader2, AlertCircle } from 'lucide-react';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import { createTaskCommentAction, deleteTaskCommentAction } from "./actions";
+import { Button } from "@/components/ui/button";
+import {
+  MessageSquare,
+  Send,
+  Trash2,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 
 interface CommentItem {
   id: string;
@@ -33,7 +39,7 @@ export function TaskCommentsSection({
   currentUserId,
   isLeadOrAdmin,
 }: TaskCommentsSectionProps) {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -49,13 +55,14 @@ export function TaskCommentsSection({
       if (res.error) {
         setErrorMsg(res.error);
       } else {
-        setContent('');
+        setContent("");
       }
     });
   };
 
   const handleDelete = (commentId: string) => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) return;
+    if (!window.confirm("Are you sure you want to delete this comment?"))
+      return;
     setErrorMsg(null);
     startTransition(async () => {
       const res = await deleteTaskCommentAction(commentId);
@@ -69,10 +76,12 @@ export function TaskCommentsSection({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold flex items-center gap-2 text-text-primary">
-          <MessageSquare className="size-4 text-primary" /> Deliverable Discussion
+          <MessageSquare className="size-4 text-primary" /> Deliverable
+          Discussion
         </h3>
         <span className="text-xs text-text-muted">
-          {activeComments.length} {activeComments.length === 1 ? 'Comment' : 'Comments'}
+          {activeComments.length}{" "}
+          {activeComments.length === 1 ? "Comment" : "Comments"}
         </span>
       </div>
 
@@ -120,8 +129,8 @@ export function TaskCommentsSection({
                   <div className="flex items-center gap-2 text-text-muted text-[11px]">
                     <span>
                       {new Date(c.createdAt).toLocaleString(undefined, {
-                        dateStyle: 'short',
-                        timeStyle: 'short',
+                        dateStyle: "short",
+                        timeStyle: "short",
                       })}
                     </span>
                     {canDelete && (

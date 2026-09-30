@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition, useRef } from 'react';
-import { ResourceCategory } from '@prisma/client';
+import * as React from "react";
+import { useState, useTransition, useRef } from "react";
+import { ResourceCategory } from "@prisma/client";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Plus,
   Link as LinkIcon,
@@ -26,8 +26,8 @@ import {
   File,
   X,
   CheckCircle2,
-} from 'lucide-react';
-import { createResourceAction } from './actions';
+} from "lucide-react";
+import { createResourceAction } from "./actions";
 
 interface ProjectOption {
   id: string;
@@ -40,29 +40,31 @@ interface WorkspaceAddResourceDialogProps {
 }
 
 const CATEGORIES: { label: string; value: ResourceCategory }[] = [
-  { label: 'Documentation', value: 'DOCUMENTATION' },
-  { label: 'Development', value: 'DEVELOPMENT' },
-  { label: 'API Reference', value: 'API' },
-  { label: 'Research', value: 'RESEARCH' },
-  { label: 'Design Asset', value: 'DESIGN' },
-  { label: 'Client Reference', value: 'CLIENT_REFERENCE' },
-  { label: 'Competitor', value: 'COMPETITOR' },
-  { label: 'Meeting Note', value: 'MEETING' },
-  { label: 'Tutorial', value: 'TUTORIAL' },
-  { label: 'Other', value: 'OTHER' },
+  { label: "Documentation", value: "DOCUMENTATION" },
+  { label: "Development", value: "DEVELOPMENT" },
+  { label: "API Reference", value: "API" },
+  { label: "Research", value: "RESEARCH" },
+  { label: "Design Asset", value: "DESIGN" },
+  { label: "Client Reference", value: "CLIENT_REFERENCE" },
+  { label: "Competitor", value: "COMPETITOR" },
+  { label: "Meeting Note", value: "MEETING" },
+  { label: "Tutorial", value: "TUTORIAL" },
+  { label: "Other", value: "OTHER" },
 ];
 
-export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDialogProps) {
+export function WorkspaceAddResourceDialog({
+  projects,
+}: WorkspaceAddResourceDialogProps) {
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<'file' | 'url'>('file');
+  const [mode, setMode] = useState<"file" | "url">("file");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const [selectedProjectId, setSelectedProjectId] = useState<string>(
-    projects[0]?.id || ''
+    projects[0]?.id || "",
   );
-  const [title, setTitle] = useState('');
-  const [category, setCategory] = useState<ResourceCategory>('DOCUMENTATION');
+  const [title, setTitle] = useState("");
+  const [category, setCategory] = useState<ResourceCategory>("DOCUMENTATION");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -75,17 +77,17 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
   };
 
   const getFileIcon = (fileName: string) => {
-    const ext = fileName.split('.').pop()?.toLowerCase();
-    if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext || '')) {
+    const ext = fileName.split(".").pop()?.toLowerCase();
+    if (["png", "jpg", "jpeg", "webp", "svg", "gif"].includes(ext || "")) {
       return <ImageIcon className="size-6 text-purple-600" />;
     }
-    if (['xls', 'xlsx', 'csv'].includes(ext || '')) {
+    if (["xls", "xlsx", "csv"].includes(ext || "")) {
       return <FileSpreadsheet className="size-6 text-emerald-600" />;
     }
-    if (['zip', 'rar', 'tar', 'gz'].includes(ext || '')) {
+    if (["zip", "rar", "tar", "gz"].includes(ext || "")) {
       return <FileArchive className="size-6 text-amber-600" />;
     }
-    if (['pdf'].includes(ext || '')) {
+    if (["pdf"].includes(ext || "")) {
       return <FileText className="size-6 text-red-600" />;
     }
     return <File className="size-6 text-blue-600" />;
@@ -96,10 +98,10 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
     setErrorMsg(null);
 
     // Auto-populate Title if empty or was previously auto-filled
-    const ext = file.name.split('.').pop() || '';
+    const ext = file.name.split(".").pop() || "";
     const cleanName = file.name
-      .replace(new RegExp(`\\.${ext}$`, 'i'), '')
-      .replace(/[-_]/g, ' ')
+      .replace(new RegExp(`\\.${ext}$`, "i"), "")
+      .replace(/[-_]/g, " ")
       .trim();
 
     if (!title || title.trim().length === 0) {
@@ -108,14 +110,14 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
 
     // Auto-select smart category
     const extLower = ext.toLowerCase();
-    if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(extLower)) {
-      setCategory('DESIGN');
-    } else if (['pdf', 'doc', 'docx', 'txt', 'md'].includes(extLower)) {
-      setCategory('DOCUMENTATION');
-    } else if (['xls', 'xlsx', 'csv'].includes(extLower)) {
-      setCategory('RESEARCH');
-    } else if (['ppt', 'pptx'].includes(extLower)) {
-      setCategory('CLIENT_REFERENCE');
+    if (["png", "jpg", "jpeg", "webp", "svg", "gif"].includes(extLower)) {
+      setCategory("DESIGN");
+    } else if (["pdf", "doc", "docx", "txt", "md"].includes(extLower)) {
+      setCategory("DOCUMENTATION");
+    } else if (["xls", "xlsx", "csv"].includes(extLower)) {
+      setCategory("RESEARCH");
+    } else if (["ppt", "pptx"].includes(extLower)) {
+      setCategory("CLIENT_REFERENCE");
     }
   };
 
@@ -139,33 +141,33 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
   };
 
   const handleReset = () => {
-    setTitle('');
+    setTitle("");
     setSelectedFile(null);
     setErrorMsg(null);
-    setCategory('DOCUMENTATION');
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    setCategory("DOCUMENTATION");
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedProjectId) {
-      setErrorMsg('Please select a project workspace.');
+      setErrorMsg("Please select a project workspace.");
       return;
     }
 
-    if (mode === 'file' && !selectedFile) {
-      setErrorMsg('Please choose a file to upload (PDF, Docs, or Image).');
+    if (mode === "file" && !selectedFile) {
+      setErrorMsg("Please choose a file to upload (PDF, Docs, or Image).");
       return;
     }
 
     setErrorMsg(null);
     const formData = new FormData(e.currentTarget);
-    formData.set('mode', mode);
-    formData.set('title', title);
-    formData.set('category', category);
+    formData.set("mode", mode);
+    formData.set("title", title);
+    formData.set("category", category);
 
-    if (mode === 'file' && selectedFile) {
-      formData.set('file', selectedFile);
+    if (mode === "file" && selectedFile) {
+      formData.set("file", selectedFile);
     }
 
     startTransition(async () => {
@@ -190,7 +192,7 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
       <DialogTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#5B5FEF] hover:bg-[#4C50D8] text-white rounded-[6px] text-[13px] font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-primary hover:bg-primary-hover text-white rounded-[6px] text-[13px] font-semibold transition-colors"
         >
           <Plus className="size-4" />
           Add Resource
@@ -198,45 +200,46 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
       </DialogTrigger>
       <DialogContent className="sm:max-w-[540px] rounded-[10px] p-6 max-h-[92vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#101828]">
-            <UploadCloud className="size-5 text-[#5B5FEF]" />
+          <DialogTitle className="flex items-center gap-2 text-[17px] font-semibold text-foreground">
+            <UploadCloud className="size-5 text-primary" />
             Add Knowledge Resource
           </DialogTitle>
-          <DialogDescription className="text-[13px] text-[#475467]">
-            Upload files (PDF, DOCX, Images, Spreadsheets) or bookmark external web links.
+          <DialogDescription className="text-[13px] text-text-secondary">
+            Upload files (PDF, DOCX, Images, Spreadsheets) or bookmark external
+            web links.
           </DialogDescription>
         </DialogHeader>
 
         {/* Source Mode Toggle (File vs Link) */}
-        <div className="flex items-center p-1 bg-[#F2F4F7] rounded-lg mt-3">
+        <div className="flex items-center p-1 bg-surface-hover rounded-lg mt-3">
           <button
             type="button"
             onClick={() => {
-              setMode('file');
+              setMode("file");
               setErrorMsg(null);
             }}
             className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-2 transition-all ${
-              mode === 'file'
-                ? 'bg-white text-[#101828] shadow-xs'
-                : 'text-[#475467] hover:text-[#101828]'
+              mode === "file"
+                ? "bg-surface text-foreground shadow-xs"
+                : "text-text-secondary hover:text-foreground"
             }`}
           >
-            <UploadCloud className="size-4 text-[#5B5FEF]" />
+            <UploadCloud className="size-4 text-primary" />
             Upload File (PDF, Docs, Image)
           </button>
           <button
             type="button"
             onClick={() => {
-              setMode('url');
+              setMode("url");
               setErrorMsg(null);
             }}
             className={`flex-1 py-1.5 text-xs font-semibold rounded-md flex items-center justify-center gap-2 transition-all ${
-              mode === 'url'
-                ? 'bg-white text-[#101828] shadow-xs'
-                : 'text-[#475467] hover:text-[#101828]'
+              mode === "url"
+                ? "bg-surface text-foreground shadow-xs"
+                : "text-text-secondary hover:text-foreground"
             }`}
           >
-            <LinkIcon className="size-3.5 text-[#5B5FEF]" />
+            <LinkIcon className="size-3.5 text-primary" />
             External Link
           </button>
         </div>
@@ -251,7 +254,10 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
 
           {/* Project Selection */}
           <div className="space-y-1.5">
-            <Label htmlFor="projectSelect" className="text-[12px] font-semibold text-[#101828]">
+            <Label
+              htmlFor="projectSelect"
+              className="text-[12px] font-semibold text-foreground"
+            >
               Project Workspace <span className="text-[#DC2626]">*</span>
             </Label>
             <select
@@ -260,7 +266,7 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
               onChange={(e) => setSelectedProjectId(e.target.value)}
               required
               disabled={isPending}
-              className="w-full h-9 rounded-[6px] border border-[#D0D5DD] bg-white px-3 text-[13px] text-[#101828] focus:outline-none focus:ring-1 focus:ring-[#5B5FEF]"
+              className="w-full h-9 rounded-[6px] border border-border-subtle bg-surface px-3 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               {projects.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -271,9 +277,9 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
           </div>
 
           {/* FILE UPLOAD MODE */}
-          {mode === 'file' ? (
+          {mode === "file" ? (
             <div className="space-y-2">
-              <Label className="text-[12px] font-semibold text-[#101828]">
+              <Label className="text-[12px] font-semibold text-foreground">
                 Select or Drop File <span className="text-[#DC2626]">*</span>
               </Label>
 
@@ -298,34 +304,37 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
                   onClick={() => fileInputRef.current?.click()}
                   className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
                     isDragging
-                      ? 'border-[#5B5FEF] bg-[#EEF2FF]'
-                      : 'border-[#D0D5DD] bg-[#F9FAFB] hover:bg-[#F2F4F7]'
+                      ? "border-primary bg-[#EEF2FF]"
+                      : "border-border-subtle bg-background hover:bg-surface-hover"
                   }`}
                 >
-                  <div className="w-10 h-10 rounded-full bg-white shadow-xs border border-[#E4E7EC] flex items-center justify-center mx-auto mb-2 text-[#5B5FEF]">
+                  <div className="w-10 h-10 rounded-full bg-surface shadow-xs border border-border flex items-center justify-center mx-auto mb-2 text-primary">
                     <UploadCloud className="size-5" />
                   </div>
-                  <p className="text-xs font-semibold text-[#101828]">
-                    Click to upload <span className="font-normal text-[#667085]">or drag and drop</span>
+                  <p className="text-xs font-semibold text-foreground">
+                    Click to upload{" "}
+                    <span className="font-normal text-text-muted">
+                      or drag and drop
+                    </span>
                   </p>
-                  <p className="text-[11px] text-[#667085] mt-1">
+                  <p className="text-[11px] text-text-muted mt-1">
                     PDF, DOC, DOCX, PNG, JPG, XLSX, PPTX, or ZIP (max 30MB)
                   </p>
                 </div>
               ) : (
-                <div className="flex items-center justify-between p-3 rounded-lg border border-[#D0D5DD] bg-white">
+                <div className="flex items-center justify-between p-3 rounded-lg border border-border-subtle bg-surface">
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-lg bg-[#F9FAFB] border border-[#E4E7EC] flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-background border border-border flex items-center justify-center shrink-0">
                       {getFileIcon(selectedFile.name)}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-semibold text-[#101828] truncate block">
+                        <span className="text-xs font-semibold text-foreground truncate block">
                           {selectedFile.name}
                         </span>
                         <CheckCircle2 className="size-3.5 text-emerald-600 shrink-0" />
                       </div>
-                      <span className="text-[11px] text-[#667085]">
+                      <span className="text-[11px] text-text-muted">
                         {formatFileSize(selectedFile.size)}
                       </span>
                     </div>
@@ -335,7 +344,7 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
                       type="button"
                       disabled={isPending}
                       onClick={() => fileInputRef.current?.click()}
-                      className="text-xs text-[#5B5FEF] hover:underline px-2 py-1"
+                      className="text-xs text-primary hover:underline px-2 py-1"
                     >
                       Change
                     </button>
@@ -344,9 +353,10 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
                       disabled={isPending}
                       onClick={() => {
                         setSelectedFile(null);
-                        if (fileInputRef.current) fileInputRef.current.value = '';
+                        if (fileInputRef.current)
+                          fileInputRef.current.value = "";
                       }}
-                      className="p-1 text-[#667085] hover:text-[#DC2626] rounded transition-colors"
+                      className="p-1 text-text-muted hover:text-[#DC2626] rounded transition-colors"
                       title="Remove file"
                     >
                       <X className="size-4" />
@@ -358,14 +368,17 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
           ) : (
             /* URL MODE */
             <div className="space-y-1.5">
-              <Label htmlFor="url" className="text-[12px] font-semibold text-[#101828]">
+              <Label
+                htmlFor="url"
+                className="text-[12px] font-semibold text-foreground"
+              >
                 Destination URL <span className="text-[#DC2626]">*</span>
               </Label>
               <Input
                 id="url"
                 name="url"
                 type="url"
-                required={mode === 'url'}
+                required={mode === "url"}
                 disabled={isPending}
                 placeholder="https://github.com/... or https://docs..."
                 className="h-9 text-[13px]"
@@ -375,7 +388,10 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
 
           {/* Title */}
           <div className="space-y-1.5">
-            <Label htmlFor="title" className="text-[12px] font-semibold text-[#101828]">
+            <Label
+              htmlFor="title"
+              className="text-[12px] font-semibold text-foreground"
+            >
               Resource Title <span className="text-[#DC2626]">*</span>
             </Label>
             <Input
@@ -392,7 +408,10 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
 
           {/* Category */}
           <div className="space-y-1.5">
-            <Label htmlFor="category" className="text-[12px] font-semibold text-[#101828]">
+            <Label
+              htmlFor="category"
+              className="text-[12px] font-semibold text-foreground"
+            >
               Category <span className="text-[#DC2626]">*</span>
             </Label>
             <select
@@ -402,7 +421,7 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
               disabled={isPending}
               value={category}
               onChange={(e) => setCategory(e.target.value as ResourceCategory)}
-              className="w-full h-9 rounded-[6px] border border-[#D0D5DD] bg-white px-3 text-[13px] text-[#101828] focus:outline-none focus:ring-1 focus:ring-[#5B5FEF]"
+              className="w-full h-9 rounded-[6px] border border-border-subtle bg-surface px-3 text-[13px] text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               {CATEGORIES.map((c) => (
                 <option key={c.value} value={c.value}>
@@ -414,8 +433,12 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
 
           {/* Description */}
           <div className="space-y-1.5">
-            <Label htmlFor="description" className="text-[12px] font-semibold text-[#101828]">
-              Description <span className="text-[#667085] font-normal">(Optional)</span>
+            <Label
+              htmlFor="description"
+              className="text-[12px] font-semibold text-foreground"
+            >
+              Description{" "}
+              <span className="text-text-muted font-normal">(Optional)</span>
             </Label>
             <textarea
               id="description"
@@ -423,14 +446,20 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
               rows={2}
               disabled={isPending}
               placeholder="Brief context on how this asset is used..."
-              className="w-full rounded-[6px] border border-[#D0D5DD] bg-white p-2.5 text-[13px] text-[#101828] placeholder-[#98A2B3] focus:outline-none focus:ring-1 focus:ring-[#5B5FEF]"
+              className="w-full rounded-[6px] border border-border-subtle bg-surface p-2.5 text-[13px] text-foreground placeholder-[#98A2B3] focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
           {/* Tags */}
           <div className="space-y-1.5">
-            <Label htmlFor="tags" className="text-[12px] font-semibold text-[#101828]">
-              Tags <span className="text-[#667085] font-normal">(Comma-separated)</span>
+            <Label
+              htmlFor="tags"
+              className="text-[12px] font-semibold text-foreground"
+            >
+              Tags{" "}
+              <span className="text-text-muted font-normal">
+                (Comma-separated)
+              </span>
             </Label>
             <Input
               id="tags"
@@ -442,7 +471,7 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
           </div>
 
           {/* Dialog Actions */}
-          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#E4E7EC]">
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-border">
             <button
               type="button"
               onClick={() => {
@@ -450,22 +479,22 @@ export function WorkspaceAddResourceDialog({ projects }: WorkspaceAddResourceDia
                 setOpen(false);
               }}
               disabled={isPending}
-              className="px-3.5 py-1.5 text-[13px] font-medium text-[#475467] hover:bg-[#F2F4F7] rounded-[6px] transition-colors"
+              className="px-3.5 py-1.5 text-[13px] font-medium text-text-secondary hover:bg-surface-hover rounded-[6px] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isPending}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#5B5FEF] hover:bg-[#4C50D8] text-white rounded-[6px] text-[13px] font-semibold transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-primary hover:bg-primary-hover text-white rounded-[6px] text-[13px] font-semibold transition-colors disabled:opacity-50"
             >
               {isPending ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  {mode === 'file' ? 'Uploading...' : 'Saving...'}
+                  {mode === "file" ? "Uploading..." : "Saving..."}
                 </>
               ) : (
-                'Add Resource'
+                "Add Resource"
               )}
             </button>
           </div>

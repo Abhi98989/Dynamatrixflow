@@ -132,9 +132,10 @@ export default async function ActivityPage({ params }: Props) {
       return (
         <Link
           href={taskHref}
-          className="font-medium text-[#5B5FEF] hover:text-[#4C50D8] hover:underline"
+          className="font-medium text-primary hover:text-[#4C50D8] hover:underline"
         >
-          {taskCode ? `[${taskCode}]` : "task"}{taskTitle ? ` ${taskTitle}` : ""}
+          {taskCode ? `[${taskCode}]` : "task"}
+          {taskTitle ? ` ${taskTitle}` : ""}
         </Link>
       );
     };
@@ -143,7 +144,9 @@ export default async function ActivityPage({ params }: Props) {
       case "TASK_COMMENT_CREATED":
       case "CREATED_COMMENT": {
         const commentPreview =
-          (typeof meta.commentPreview === "string" ? meta.commentPreview : null) ||
+          (typeof meta.commentPreview === "string"
+            ? meta.commentPreview
+            : null) ||
           (typeof meta.commentId === "string"
             ? commentMap.get(meta.commentId)
             : null) ||
@@ -151,16 +154,14 @@ export default async function ActivityPage({ params }: Props) {
 
         return {
           icon: MessageSquare,
-          iconColor: "text-[#5B5FEF]",
+          iconColor: "text-primary",
           iconBg: "bg-[#EEF4FF]",
-          description: (
-            <span>
-              commented on {renderTaskLink()}
-            </span>
-          ),
+          description: <span>commented on {renderTaskLink()}</span>,
           extra: commentPreview ? (
-            <div className="mt-1.5 pl-3 border-l-2 border-[#D0D5DD] text-[12px] text-[#475467] bg-[#F9FAFB] py-1 px-2.5 rounded-r">
-              <p className="line-clamp-2 italic font-normal">&ldquo;{commentPreview}&rdquo;</p>
+            <div className="mt-1.5 pl-3 border-l-2 border-border-subtle text-[12px] text-text-secondary bg-background py-1 px-2.5 rounded-r">
+              <p className="line-clamp-2 italic font-normal">
+                &ldquo;{commentPreview}&rdquo;
+              </p>
             </div>
           ) : null,
         };
@@ -172,11 +173,7 @@ export default async function ActivityPage({ params }: Props) {
           icon: CheckSquare,
           iconColor: "text-[#2563EB]",
           iconBg: "bg-[#EFF8FF]",
-          description: (
-            <span>
-              created task {renderTaskLink()}
-            </span>
-          ),
+          description: <span>created task {renderTaskLink()}</span>,
         };
 
       case "TASK_STATUS_CHANGED":
@@ -187,18 +184,14 @@ export default async function ActivityPage({ params }: Props) {
           icon: ArrowRight,
           iconColor: "text-[#F79009]",
           iconBg: "bg-[#FFFAEB]",
-          description: (
-            <span>
-              updated status of {renderTaskLink()}
-            </span>
-          ),
+          description: <span>updated status of {renderTaskLink()}</span>,
           extra:
             oldStatus && newStatus ? (
               <div className="flex items-center gap-1.5 mt-1 text-[11px]">
-                <span className="px-2 py-0.5 rounded bg-[#F2F4F7] text-[#475467] font-medium">
+                <span className="px-2 py-0.5 rounded bg-surface-hover text-text-secondary font-medium">
                   {formatEnum(String(oldStatus))}
                 </span>
-                <span className="text-[#98A2B3]">→</span>
+                <span className="text-text-muted">→</span>
                 <span className="px-2 py-0.5 rounded bg-[#EFF8FF] text-[#175CD3] font-semibold">
                   {formatEnum(String(newStatus))}
                 </span>
@@ -216,7 +209,13 @@ export default async function ActivityPage({ params }: Props) {
             <span>
               reassigned {renderTaskLink()}
               {typeof meta.newAssigneeName === "string" ? (
-                <> to <span className="font-semibold text-[#101828]">{meta.newAssigneeName}</span></>
+                <>
+                  {" "}
+                  to{" "}
+                  <span className="font-semibold text-foreground">
+                    {meta.newAssigneeName}
+                  </span>
+                </>
               ) : null}
             </span>
           ),
@@ -228,13 +227,9 @@ export default async function ActivityPage({ params }: Props) {
           icon: Send,
           iconColor: "text-[#7C3AED]",
           iconBg: "bg-[#F9F5FF]",
-          description: (
-            <span>
-              submitted {renderTaskLink()} for review
-            </span>
-          ),
+          description: <span>submitted {renderTaskLink()} for review</span>,
           extra: meta.note ? (
-            <p className="mt-1 text-[12px] text-[#475467] bg-[#F9FAFB] border border-[#EAECF0] py-1 px-2.5 rounded">
+            <p className="mt-1 text-[12px] text-text-secondary bg-background border border-[#EAECF0] py-1 px-2.5 rounded">
               Note: &ldquo;{String(meta.note)}&rdquo;
             </p>
           ) : null,
@@ -246,11 +241,7 @@ export default async function ActivityPage({ params }: Props) {
           icon: CheckCircle2,
           iconColor: "text-[#12B76A]",
           iconBg: "bg-[#ECFDF3]",
-          description: (
-            <span>
-              approved task {renderTaskLink()}
-            </span>
-          ),
+          description: <span>approved task {renderTaskLink()}</span>,
         };
 
       case "TASK_CHANGES_REQUESTED":
@@ -258,13 +249,9 @@ export default async function ActivityPage({ params }: Props) {
           icon: AlertTriangle,
           iconColor: "text-[#F04438]",
           iconBg: "bg-[#FEF3F2]",
-          description: (
-            <span>
-              requested changes on {renderTaskLink()}
-            </span>
-          ),
+          description: <span>requested changes on {renderTaskLink()}</span>,
           extra: meta.note ? (
-            <p className="mt-1 text-[12px] text-[#475467] bg-[#F9FAFB] border border-[#EAECF0] py-1 px-2.5 rounded">
+            <p className="mt-1 text-[12px] text-text-secondary bg-background border border-[#EAECF0] py-1 px-2.5 rounded">
               Feedback: &ldquo;{String(meta.note)}&rdquo;
             </p>
           ) : null,
@@ -273,13 +260,9 @@ export default async function ActivityPage({ params }: Props) {
       case "TASK_REOPENED":
         return {
           icon: RotateCcw,
-          iconColor: "text-[#667085]",
-          iconBg: "bg-[#F2F4F7]",
-          description: (
-            <span>
-              reopened {renderTaskLink()}
-            </span>
-          ),
+          iconColor: "text-text-muted",
+          iconBg: "bg-surface-hover",
+          description: <span>reopened {renderTaskLink()}</span>,
         };
 
       case "GUEST_ACCESS_GRANTED":
@@ -290,11 +273,11 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               granted guest access to{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 {String(meta.name || meta.email || "a guest user")}
               </span>
               {meta.email && meta.name ? (
-                <span className="text-[#667085] ml-1 font-normal">
+                <span className="text-text-muted ml-1 font-normal">
                   ({String(meta.email)})
                 </span>
               ) : null}
@@ -310,7 +293,7 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               revoked guest access for{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 {String(meta.name || meta.email || "a guest user")}
               </span>
             </span>
@@ -326,14 +309,15 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               added{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 {String(meta.targetUserName || meta.memberName || "a member")}
               </span>{" "}
               to the project
               {meta.projectRole ? (
                 <>
-                  {" "}as{" "}
-                  <span className="px-1.5 py-0.5 rounded bg-[#F2F4F7] text-[11px] font-medium text-[#344054]">
+                  {" "}
+                  as{" "}
+                  <span className="px-1.5 py-0.5 rounded bg-surface-hover text-[11px] font-medium text-[#344054]">
                     {formatEnum(String(meta.projectRole))}
                   </span>
                 </>
@@ -351,7 +335,7 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               removed{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 {String(meta.targetUserName || meta.memberName || "a member")}
               </span>{" "}
               from the project
@@ -367,11 +351,11 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               updated{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 {String(meta.targetUserName || "member")}
               </span>
               &apos;s role to{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 {formatEnum(String(meta.projectRole || meta.newRole || ""))}
               </span>
             </span>
@@ -387,7 +371,7 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               added resource{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 &ldquo;{String(meta.title || "link")}&rdquo;
               </span>
             </span>
@@ -403,7 +387,7 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               updated resource{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 &ldquo;{String(meta.title || "link")}&rdquo;
               </span>
             </span>
@@ -419,7 +403,7 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               archived resource{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 &ldquo;{String(meta.title || "link")}&rdquo;
               </span>
             </span>
@@ -429,12 +413,12 @@ export default async function ActivityPage({ params }: Props) {
       case "MILESTONE_CREATED":
         return {
           icon: Flag,
-          iconColor: "text-[#5B5FEF]",
+          iconColor: "text-primary",
           iconBg: "bg-[#EEF4FF]",
           description: (
             <span>
               created milestone{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 &ldquo;{String(meta.name || meta.title || "milestone")}&rdquo;
               </span>
             </span>
@@ -444,12 +428,12 @@ export default async function ActivityPage({ params }: Props) {
       case "MILESTONE_UPDATED":
         return {
           icon: Flag,
-          iconColor: "text-[#5B5FEF]",
+          iconColor: "text-primary",
           iconBg: "bg-[#EEF4FF]",
           description: (
             <span>
               updated milestone{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 &ldquo;{String(meta.name || meta.title || "milestone")}&rdquo;
               </span>
             </span>
@@ -464,7 +448,7 @@ export default async function ActivityPage({ params }: Props) {
           description: (
             <span>
               archived milestone{" "}
-              <span className="font-semibold text-[#101828]">
+              <span className="font-semibold text-foreground">
                 &ldquo;{String(meta.name || meta.title || "milestone")}&rdquo;
               </span>
             </span>
@@ -483,8 +467,8 @@ export default async function ActivityPage({ params }: Props) {
       case "PROJECT_UPDATED":
         return {
           icon: FolderKanban,
-          iconColor: "text-[#667085]",
-          iconBg: "bg-[#F2F4F7]",
+          iconColor: "text-text-muted",
+          iconBg: "bg-surface-hover",
           description: <span>updated project settings</span>,
         };
 
@@ -499,8 +483,8 @@ export default async function ActivityPage({ params }: Props) {
       default:
         return {
           icon: Activity,
-          iconColor: "text-[#667085]",
-          iconBg: "bg-[#F2F4F7]",
+          iconColor: "text-text-muted",
+          iconBg: "bg-surface-hover",
           description: (
             <span>{log.action.replace(/_/g, " ").toLowerCase()}</span>
           ),
@@ -511,24 +495,26 @@ export default async function ActivityPage({ params }: Props) {
   return (
     <div className="space-y-4">
       <div>
-        <h2 className="text-[16px] font-semibold text-[#101828]">Activity</h2>
-        <p className="text-[12px] text-[#667085] mt-0.5">
+        <h2 className="text-[16px] font-semibold text-foreground">Activity</h2>
+        <p className="text-[12px] text-text-muted mt-0.5">
           Recent actions and changes on this project
         </p>
       </div>
 
       {logs.length === 0 ? (
-        <div className="bg-white rounded-lg border border-[#E4E7EC] py-16 text-center">
-          <p className="text-[13px] text-[#667085]">No activity recorded yet.</p>
+        <div className="bg-surface rounded-lg border border-border py-16 text-center">
+          <p className="text-[13px] text-text-muted">
+            No activity recorded yet.
+          </p>
         </div>
       ) : (
         <div className="space-y-6">
           {Object.entries(grouped).map(([date, entries]) => (
             <div key={date}>
-              <h3 className="text-[11px] font-bold text-[#98A2B3] uppercase tracking-wider mb-3">
+              <h3 className="text-[11px] font-bold text-text-muted uppercase tracking-wider mb-3">
                 {date}
               </h3>
-              <div className="bg-white rounded-lg border border-[#E4E7EC] divide-y divide-[#F2F4F7]">
+              <div className="bg-surface rounded-lg border border-border divide-y divide-[#F2F4F7]">
                 {entries.map((log) => {
                   const details = renderActionContent(log);
                   const Icon = details.icon;
@@ -536,11 +522,11 @@ export default async function ActivityPage({ params }: Props) {
                   return (
                     <div
                       key={log.id}
-                      className="flex items-start gap-3 p-3.5 hover:bg-[#F9FAFB]/60 transition-colors"
+                      className="flex items-start gap-3 p-3.5 hover:bg-background/60 transition-colors"
                     >
                       {/* Avatar with role/action icon badge */}
                       <div className="relative shrink-0 mt-0.5">
-                        <div className="w-8 h-8 rounded-full bg-[#F2F4F7] text-[#344054] flex items-center justify-center text-[10px] font-bold border border-[#EAECF0]">
+                        <div className="w-8 h-8 rounded-full bg-surface-hover text-[#344054] flex items-center justify-center text-[10px] font-bold border border-[#EAECF0]">
                           {getInitials(log.actor?.name)}
                         </div>
                         <div
@@ -553,7 +539,7 @@ export default async function ActivityPage({ params }: Props) {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="text-[13px] text-[#344054] leading-snug">
-                          <span className="font-semibold text-[#101828]">
+                          <span className="font-semibold text-foreground">
                             {log.actor?.name || "System"}
                           </span>{" "}
                           {details.description}
@@ -562,7 +548,7 @@ export default async function ActivityPage({ params }: Props) {
                       </div>
 
                       {/* Timestamp */}
-                      <span className="text-[11px] text-[#98A2B3] shrink-0 font-medium whitespace-nowrap pl-2">
+                      <span className="text-[11px] text-text-muted shrink-0 font-medium whitespace-nowrap pl-2">
                         {new Date(log.createdAt).toLocaleTimeString("en-US", {
                           hour: "numeric",
                           minute: "2-digit",
@@ -579,4 +565,3 @@ export default async function ActivityPage({ params }: Props) {
     </div>
   );
 }
-

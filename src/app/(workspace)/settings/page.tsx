@@ -1,11 +1,12 @@
-import { Metadata } from 'next';
-import { requireActiveUser } from '@/server/auth/authorization';
-import { db } from '@/server/db/client';
-import { WorkspaceSettingsView } from '@/features/settings/workspace-settings-view';
+import { Metadata } from "next";
+import { requireActiveUser } from "@/server/auth/authorization";
+import { db } from "@/server/db/client";
+import { WorkspaceSettingsView } from "@/features/settings/workspace-settings-view";
 
 export const metadata: Metadata = {
-  title: 'Workspace Settings | Dynamatrix Flow',
-  description: 'Manage workspace configuration, notification rules, display density, and security policies.',
+  title: "Workspace Settings | Dynamatrix Flow",
+  description:
+    "Manage workspace configuration, notification rules, display density, and security policies.",
 };
 
 export default async function SettingsPage() {

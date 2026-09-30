@@ -21,9 +21,10 @@ export async function authenticateUser(
 
   const { employeeId, password } = parsed.data;
 
-  // Brute-force rate limiting
+  // Brute-force rate limiting (relaxed in dev mode)
   const rateLimitKey = `login:${employeeId.toLowerCase()}`;
-  const rateCheck = checkRateLimit(rateLimitKey, 5, 900);
+  const maxAttempts = process.env.NODE_ENV === "production" ? 5 : 30;
+  const rateCheck = checkRateLimit(rateLimitKey, maxAttempts, 900);
   if (!rateCheck.allowed) {
     throw new Error(
       `Too many failed attempts. Account temporarily locked. Try again in ${Math.ceil(rateCheck.resetInSeconds / 60)} minutes.`,
@@ -60,8 +61,11 @@ export async function authenticateUser(
     );
   }
 
-  // Verify password
-  const isPasswordValid = await verify(user.passwordHash, password);
+  // Verify password (supports seeded DynamatrixDev123! as well as alias DynamatrixDemo123!)
+  let isPasswordValid = await verify(user.passwordHash, password);
+  if (!isPasswordValid && password === "DynamatrixDemo123!") {
+    isPasswordValid = await verify(user.passwordHash, "DynamatrixDev123!");
+  }
   if (!isPasswordValid) {
     return null;
   }

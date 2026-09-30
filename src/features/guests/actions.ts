@@ -2,7 +2,10 @@
 
 import { z } from "zod";
 import { db } from "@/server/db/client";
-import { requireActiveUser, canManageProject } from "@/server/auth/authorization";
+import {
+  requireActiveUser,
+  canManageProject,
+} from "@/server/auth/authorization";
 import { generateNextGuestId } from "./id-generator";
 import { generateTemporaryPassword } from "@/features/employees/credential-generator";
 import { hash } from "@node-rs/argon2";
@@ -11,9 +14,17 @@ import { revalidatePath } from "next/cache";
 
 const createGuestSchema = z.object({
   name: z.string().min(2, "Guest name must be at least 2 characters").trim(),
-  email: z.string().email("Valid guest email address is required").trim().toLowerCase(),
+  email: z
+    .string()
+    .email("Valid guest email address is required")
+    .trim()
+    .toLowerCase(),
   projectId: z.string().min(1, "Project is required"),
-  password: z.string().min(6, "Password must be at least 6 characters").optional().or(z.literal("")),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .optional()
+    .or(z.literal("")),
 });
 
 export interface CreateGuestResult {
@@ -32,7 +43,7 @@ export interface CreateGuestResult {
 
 export async function createGuestAction(
   _prevState: CreateGuestResult | undefined,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreateGuestResult> {
   const currentUser = await requireActiveUser();
 
@@ -56,7 +67,8 @@ export async function createGuestAction(
   const hasManageRights = await canManageProject(currentUser.id, projectId);
   if (!hasManageRights) {
     return {
-      error: "You do not have permission to generate guest credentials for this project.",
+      error:
+        "You do not have permission to generate guest credentials for this project.",
     };
   }
 
@@ -139,7 +151,9 @@ export async function createGuestAction(
 
   // Generate unique sequential Guest ID (GST-001, etc.)
   const guestId = await generateNextGuestId();
-  const rawPassword = password ? password.trim() : generateTemporaryPassword(10);
+  const rawPassword = password
+    ? password.trim()
+    : generateTemporaryPassword(10);
   const passwordHash = await hash(rawPassword);
 
   const newGuest = await db.$transaction(async (tx) => {

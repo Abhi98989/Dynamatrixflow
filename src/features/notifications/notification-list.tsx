@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useMemo, useTransition } from 'react';
-import Link from 'next/link';
+import * as React from "react";
+import { useState, useMemo, useTransition } from "react";
+import Link from "next/link";
 import {
   Bell,
   Check,
@@ -17,14 +17,14 @@ import {
   Search,
   X,
   ArrowUpRight,
-} from 'lucide-react';
-import { NotificationType } from '@prisma/client';
+} from "lucide-react";
+import { NotificationType } from "@prisma/client";
 import {
   markNotificationReadAction,
   markAllNotificationsReadAction,
   deleteNotificationAction,
   clearAllReadNotificationsAction,
-} from './actions';
+} from "./actions";
 
 export interface NotificationItem {
   id: string;
@@ -42,12 +42,15 @@ interface NotificationListProps {
   initialNotifications: NotificationItem[];
 }
 
-type NotificationFilterTab = 'ALL' | 'UNREAD' | 'TASKS' | 'DEADLINES' | 'PROJECTS';
+type NotificationFilterTab =
+  "ALL" | "UNREAD" | "TASKS" | "DEADLINES" | "PROJECTS";
 
-export function NotificationList({ initialNotifications }: NotificationListProps) {
+export function NotificationList({
+  initialNotifications,
+}: NotificationListProps) {
   const [notifications, setNotifications] = useState(initialNotifications);
-  const [activeTab, setActiveTab] = useState<NotificationFilterTab>('ALL');
-  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<NotificationFilterTab>("ALL");
+  const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();
 
   // Metric stats
@@ -56,14 +59,14 @@ export function NotificationList({ initialNotifications }: NotificationListProps
     const unread = notifications.filter((n) => !n.isRead).length;
     const tasks = notifications.filter(
       (n) =>
-        n.type === 'TASK_ASSIGNED' ||
-        n.type === 'TASK_REASSIGNED' ||
-        n.type === 'TASK_REVIEW_REQUESTED' ||
-        n.type === 'TASK_REVIEWED' ||
-        n.type === 'TASK_COMMENT'
+        n.type === "TASK_ASSIGNED" ||
+        n.type === "TASK_REASSIGNED" ||
+        n.type === "TASK_REVIEW_REQUESTED" ||
+        n.type === "TASK_REVIEWED" ||
+        n.type === "TASK_COMMENT",
     ).length;
     const deadlines = notifications.filter(
-      (n) => n.type === 'TASK_DUE_SOON' || n.type === 'TASK_OVERDUE'
+      (n) => n.type === "TASK_DUE_SOON" || n.type === "TASK_OVERDUE",
     ).length;
 
     return { total, unread, tasks, deadlines };
@@ -72,7 +75,7 @@ export function NotificationList({ initialNotifications }: NotificationListProps
   // Actions
   const handleMarkRead = (id: string) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
     );
     startTransition(async () => {
       await markNotificationReadAction(id);
@@ -94,7 +97,8 @@ export function NotificationList({ initialNotifications }: NotificationListProps
   };
 
   const handleClearAllRead = () => {
-    if (!confirm('Are you sure you want to clear all read notifications?')) return;
+    if (!confirm("Are you sure you want to clear all read notifications?"))
+      return;
     setNotifications((prev) => prev.filter((n) => !n.isRead));
     startTransition(async () => {
       await clearAllReadNotificationsAction();
@@ -105,29 +109,29 @@ export function NotificationList({ initialNotifications }: NotificationListProps
   const filteredNotifications = useMemo(() => {
     return notifications.filter((n) => {
       // Tab filter
-      if (activeTab === 'UNREAD' && n.isRead) return false;
+      if (activeTab === "UNREAD" && n.isRead) return false;
       if (
-        activeTab === 'TASKS' &&
-        n.type !== 'TASK_ASSIGNED' &&
-        n.type !== 'TASK_REASSIGNED' &&
-        n.type !== 'TASK_REVIEW_REQUESTED' &&
-        n.type !== 'TASK_REVIEWED' &&
-        n.type !== 'TASK_COMMENT'
+        activeTab === "TASKS" &&
+        n.type !== "TASK_ASSIGNED" &&
+        n.type !== "TASK_REASSIGNED" &&
+        n.type !== "TASK_REVIEW_REQUESTED" &&
+        n.type !== "TASK_REVIEWED" &&
+        n.type !== "TASK_COMMENT"
       ) {
         return false;
       }
       if (
-        activeTab === 'DEADLINES' &&
-        n.type !== 'TASK_DUE_SOON' &&
-        n.type !== 'TASK_OVERDUE'
+        activeTab === "DEADLINES" &&
+        n.type !== "TASK_DUE_SOON" &&
+        n.type !== "TASK_OVERDUE"
       ) {
         return false;
       }
       if (
-        activeTab === 'PROJECTS' &&
-        n.type !== 'PROJECT_ASSIGNED' &&
-        n.type !== 'PROJECT_UPDATE' &&
-        n.type !== 'RESOURCE_ADDED'
+        activeTab === "PROJECTS" &&
+        n.type !== "PROJECT_ASSIGNED" &&
+        n.type !== "PROJECT_UPDATE" &&
+        n.type !== "RESOURCE_ADDED"
       ) {
         return false;
       }
@@ -146,58 +150,58 @@ export function NotificationList({ initialNotifications }: NotificationListProps
 
   const getIcon = (type: NotificationType) => {
     switch (type) {
-      case 'PROJECT_ASSIGNED':
-      case 'PROJECT_UPDATE':
+      case "PROJECT_ASSIGNED":
+      case "PROJECT_UPDATE":
         return <FolderKanban className="size-4 text-[#2563EB]" />;
-      case 'TASK_ASSIGNED':
-      case 'TASK_REASSIGNED':
-      case 'TASK_REVIEWED':
+      case "TASK_ASSIGNED":
+      case "TASK_REASSIGNED":
+      case "TASK_REVIEWED":
         return <CheckSquare className="size-4 text-[#16A34A]" />;
-      case 'TASK_REVIEW_REQUESTED':
+      case "TASK_REVIEW_REQUESTED":
         return <AlertCircle className="size-4 text-[#EA580C]" />;
-      case 'TASK_DUE_SOON':
-      case 'TASK_OVERDUE':
+      case "TASK_DUE_SOON":
+      case "TASK_OVERDUE":
         return <Clock className="size-4 text-[#DC2626]" />;
-      case 'TASK_COMMENT':
+      case "TASK_COMMENT":
         return <MessageSquare className="size-4 text-[#7C3AED]" />;
-      case 'RESOURCE_ADDED':
+      case "RESOURCE_ADDED":
         return <BookOpen className="size-4 text-[#0891B2]" />;
       default:
-        return <Bell className="size-4 text-[#667085]" />;
+        return <Bell className="size-4 text-text-muted" />;
     }
   };
 
   const getIconBg = (type: NotificationType) => {
     switch (type) {
-      case 'PROJECT_ASSIGNED':
-      case 'PROJECT_UPDATE':
-        return 'bg-[#EFF6FF] border-[#BFDBFE]';
-      case 'TASK_ASSIGNED':
-      case 'TASK_REASSIGNED':
-      case 'TASK_REVIEWED':
-        return 'bg-[#F0FDF4] border-[#BBF7D0]';
-      case 'TASK_REVIEW_REQUESTED':
-        return 'bg-[#FFF7ED] border-[#FED7AA]';
-      case 'TASK_DUE_SOON':
-      case 'TASK_OVERDUE':
-        return 'bg-[#FEF2F2] border-[#FECACA]';
-      case 'TASK_COMMENT':
-        return 'bg-[#F5F3FF] border-[#DDD6FE]';
-      case 'RESOURCE_ADDED':
-        return 'bg-[#ECFEFF] border-[#A5F3FC]';
+      case "PROJECT_ASSIGNED":
+      case "PROJECT_UPDATE":
+        return "bg-[#EFF6FF] border-[#BFDBFE]";
+      case "TASK_ASSIGNED":
+      case "TASK_REASSIGNED":
+      case "TASK_REVIEWED":
+        return "bg-[#F0FDF4] border-[#BBF7D0]";
+      case "TASK_REVIEW_REQUESTED":
+        return "bg-[#FFF7ED] border-[#FED7AA]";
+      case "TASK_DUE_SOON":
+      case "TASK_OVERDUE":
+        return "bg-[#FEF2F2] border-[#FECACA]";
+      case "TASK_COMMENT":
+        return "bg-[#F5F3FF] border-[#DDD6FE]";
+      case "RESOURCE_ADDED":
+        return "bg-[#ECFEFF] border-[#A5F3FC]";
       default:
-        return 'bg-[#F2F4F7] border-[#E4E7EC]';
+        return "bg-surface-hover border-border";
     }
   };
 
   const getLink = (notif: NotificationItem) => {
-    if (notif.projectId && notif.entityType === 'Task' && notif.entityId) {
+    if (notif.projectId && notif.entityType === "Task" && notif.entityId) {
       return `/projects/${notif.projectId}/tasks/${notif.entityId}`;
     }
-    if (notif.projectId && notif.entityType === 'Project') {
+    if (notif.projectId && notif.entityType === "Project") {
       return `/projects/${notif.projectId}`;
     }
-    if (notif.projectId && notif.entityType === 'RESOURCE') {
+    if (notif.projectId && notif.entityType === "RESOURCE") {
       return `/projects/${notif.projectId}/resources`;
     }
     if (notif.projectId) {
@@ -214,151 +218,159 @@ export function NotificationList({ initialNotifications }: NotificationListProps
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffMins < 1) return 'Just now';
+    if (diffMins < 1) return "Just now";
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays === 1) return 'Yesterday';
+    if (diffDays === 1) return "Yesterday";
     if (diffDays < 7) return `${diffDays}d ago`;
 
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     });
   };
 
   return (
     <div className="space-y-6">
-      {/* 1. Attention Metrics Strip (§9: 4 stat cards, zero resting shadow) */}
+      {/* 1. Attention Metrics Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Notifications */}
         <button
           type="button"
-          onClick={() => setActiveTab('ALL')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            activeTab === 'ALL' && !search
-              ? 'ring-1 ring-[#5B5FEF] border-[#D0D5DD] bg-white'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+          onClick={() => setActiveTab("ALL")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            activeTab === "ALL" && !search
+              ? "ring-2 ring-primary border-primary bg-surface"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
-              <Bell className="size-3.5 text-[#5B5FEF]" />
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+              <Bell className="size-3.5 text-primary" />
               Total Alerts
             </span>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[#101828]">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               {metrics.total}
             </span>
-            <span className="text-[11px] text-[#667085]">logged</span>
+            <span className="text-[11px] text-text-muted font-medium">logged</span>
           </div>
         </button>
 
         {/* Unread Alerts */}
         <button
           type="button"
-          onClick={() => setActiveTab(activeTab === 'UNREAD' ? 'ALL' : 'UNREAD')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            activeTab === 'UNREAD'
-              ? 'ring-2 ring-[#5B5FEF] border-[#5B5FEF] bg-[#EFF6FF]'
+          onClick={() =>
+            setActiveTab(activeTab === "UNREAD" ? "ALL" : "UNREAD")
+          }
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            activeTab === "UNREAD"
+              ? "ring-2 ring-primary border-primary bg-surface"
               : metrics.unread > 0
-              ? 'bg-[#EFF6FF]/40 border-[#BFDBFE] hover:bg-[#EFF6FF]/70'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+                ? "bg-[#EFF6FF]/40 border-[#BFDBFE] hover:bg-[#EFF6FF]/70"
+                : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
-              <Check className="size-3.5 text-[#5B5FEF]" />
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+              <Check className="size-3.5 text-primary" />
               Unread
             </span>
-            {metrics.unread > 0 && <span className="w-2 h-2 rounded-full bg-[#5B5FEF]" />}
+            {metrics.unread > 0 && (
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            )}
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
+          <div className="mt-2.5 flex items-baseline gap-2">
             <span
-              className={`text-[22px] sm:text-[24px] font-bold tracking-tight ${
-                metrics.unread > 0 ? 'text-[#5B5FEF]' : 'text-[#101828]'
+              className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+                metrics.unread > 0 ? "text-primary" : "text-foreground"
               }`}
             >
               {metrics.unread}
             </span>
-            <span className="text-[11px] text-[#667085]">pending review</span>
+            <span className="text-[11px] text-text-muted font-medium">pending</span>
           </div>
         </button>
 
         {/* Deliverables / Tasks */}
         <button
           type="button"
-          onClick={() => setActiveTab('TASKS')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            activeTab === 'TASKS'
-              ? 'ring-2 ring-[#16A34A] border-[#16A34A] bg-[#F0FDF4]/50'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+          onClick={() => setActiveTab("TASKS")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            activeTab === "TASKS"
+              ? "ring-2 ring-[#16A34A] border-[#16A34A] bg-surface"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-[#16A34A]/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
               <CheckSquare className="size-3.5 text-[#16A34A]" />
-              Deliverables & Reviews
+              Deliverables
             </span>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[#101828]">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               {metrics.tasks}
             </span>
-            <span className="text-[11px] text-[#667085]">work items</span>
+            <span className="text-[11px] text-text-muted font-medium">tasks</span>
           </div>
         </button>
 
         {/* Deadlines & Overdue */}
         <button
           type="button"
-          onClick={() => setActiveTab('DEADLINES')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            activeTab === 'DEADLINES'
-              ? 'ring-2 ring-[#DC2626] border-[#DC2626] bg-[#FEF2F2]/60'
+          onClick={() => setActiveTab("DEADLINES")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            activeTab === "DEADLINES"
+              ? "ring-2 ring-[#DC2626] border-[#DC2626] bg-surface"
               : metrics.deadlines > 0
-              ? 'bg-[#FEF2F2]/30 border-[#FECACA] hover:bg-[#FEF2F2]/60'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+                ? "bg-[#FEF2F2]/30 border-[#FECACA] hover:bg-[#FEF2F2]/60"
+                : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-[#DC2626]/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
-              <Clock className={`size-3.5 ${metrics.deadlines > 0 ? 'text-[#DC2626]' : 'text-[#98A2B3]'}`} />
-              Deadline Reminders
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+              <Clock
+                className={`size-3.5 ${metrics.deadlines > 0 ? "text-[#DC2626]" : "text-text-muted"}`}
+              />
+              Deadlines
             </span>
-            {metrics.deadlines > 0 && <span className="w-2 h-2 rounded-full bg-[#DC2626]" />}
+            {metrics.deadlines > 0 && (
+              <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
+            )}
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
+          <div className="mt-2.5 flex items-baseline gap-2">
             <span
-              className={`text-[22px] sm:text-[24px] font-bold tracking-tight ${
-                metrics.deadlines > 0 ? 'text-[#DC2626]' : 'text-[#101828]'
+              className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+                metrics.deadlines > 0 ? "text-[#DC2626]" : "text-foreground"
               }`}
             >
               {metrics.deadlines}
             </span>
-            <span className="text-[11px] text-[#667085]">time-critical</span>
+            <span className="text-[11px] text-text-muted font-medium">critical</span>
           </div>
         </button>
       </div>
 
       {/* 2. Search & Filter Bar */}
-      <div className="bg-white border border-[#E4E7EC] rounded-[8px] p-3 sm:p-3.5 space-y-3">
+      <div className="bg-surface border border-border rounded-[8px] p-3 sm:p-3.5 space-y-3">
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-3 top-2.5 size-4 text-[#98A2B3]" />
+            <Search className="absolute left-3 top-2.5 size-4 text-text-muted" />
             <input
               type="text"
               placeholder="Search notifications..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9 pl-9 pr-8 rounded-[6px] border border-[#D0D5DD] bg-white text-[13px] text-[#101828] placeholder-[#98A2B3] focus:outline-none focus:ring-1 focus:ring-[#5B5FEF] focus:border-[#5B5FEF]"
+              className="w-full h-9 pl-9 pr-8 rounded-[6px] border border-border-subtle bg-surface text-[13px] text-foreground placeholder-[#98A2B3] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
             />
             {search && (
               <button
                 type="button"
-                onClick={() => setSearch('')}
-                className="absolute right-2.5 top-2.5 text-[#98A2B3] hover:text-[#475467]"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-2.5 text-text-muted hover:text-text-secondary"
               >
                 <X className="size-4" />
               </button>
@@ -372,9 +384,9 @@ export function NotificationList({ initialNotifications }: NotificationListProps
                 type="button"
                 onClick={handleMarkAllRead}
                 disabled={isPending}
-                className="h-9 px-3 rounded-[6px] border border-[#D0D5DD] bg-white text-[12px] font-semibold text-[#475467] hover:bg-[#F9FAFC] transition-colors flex items-center gap-1.5"
+                className="h-9 px-3 rounded-[6px] border border-border-subtle bg-surface text-[12px] font-semibold text-text-secondary hover:bg-surface-hover transition-colors flex items-center gap-1.5"
               >
-                <CheckCheck className="size-3.5 text-[#5B5FEF]" />
+                <CheckCheck className="size-3.5 text-primary" />
                 Mark all read
               </button>
             )}
@@ -384,7 +396,7 @@ export function NotificationList({ initialNotifications }: NotificationListProps
                 type="button"
                 onClick={handleClearAllRead}
                 disabled={isPending}
-                className="h-9 px-3 rounded-[6px] border border-[#D0D5DD] bg-white text-[12px] font-semibold text-[#DC2626] hover:bg-red-50 hover:border-[#FECACA] transition-colors flex items-center gap-1.5"
+                className="h-9 px-3 rounded-[6px] border border-border-subtle bg-surface text-[12px] font-semibold text-[#DC2626] hover:bg-red-50 hover:border-[#FECACA] transition-colors flex items-center gap-1.5"
               >
                 <Trash2 className="size-3.5" />
                 Clear read
@@ -394,13 +406,13 @@ export function NotificationList({ initialNotifications }: NotificationListProps
         </div>
 
         {/* Tab Filters */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 border-t border-[#EEF1F5]">
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-1 border-t border-border-subtle">
           {[
-            { id: 'ALL', label: `All (${notifications.length})` },
-            { id: 'UNREAD', label: `Unread (${metrics.unread})` },
-            { id: 'TASKS', label: `Tasks & Reviews (${metrics.tasks})` },
-            { id: 'DEADLINES', label: `Deadlines (${metrics.deadlines})` },
-            { id: 'PROJECTS', label: 'Projects & Hub' },
+            { id: "ALL", label: `All (${notifications.length})` },
+            { id: "UNREAD", label: `Unread (${metrics.unread})` },
+            { id: "TASKS", label: `Tasks & Reviews (${metrics.tasks})` },
+            { id: "DEADLINES", label: `Deadlines (${metrics.deadlines})` },
+            { id: "PROJECTS", label: "Projects & Hub" },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -408,8 +420,8 @@ export function NotificationList({ initialNotifications }: NotificationListProps
               onClick={() => setActiveTab(tab.id as NotificationFilterTab)}
               className={`h-7 px-2.5 rounded-[4px] text-[11px] font-semibold whitespace-nowrap transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-[#101828] text-white'
-                  : 'text-[#475467] hover:bg-[#F2F4F7]'
+                  ? "bg-[#101828] text-white"
+                  : "text-text-secondary hover:bg-surface-hover"
               }`}
             >
               {tab.label}
@@ -419,16 +431,18 @@ export function NotificationList({ initialNotifications }: NotificationListProps
       </div>
 
       {/* 3. Notifications List */}
-      <div className="bg-white border border-[#E4E7EC] rounded-[8px] overflow-hidden">
+      <div className="bg-surface border border-border rounded-[8px] overflow-hidden">
         {filteredNotifications.length === 0 ? (
           <div className="py-16 px-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-[#F2F4F7] text-[#667085] mx-auto flex items-center justify-center mb-3">
-              <Bell className="size-6 text-[#98A2B3]" />
+            <div className="w-12 h-12 rounded-full bg-surface-hover text-text-muted mx-auto flex items-center justify-center mb-3">
+              <Bell className="size-6 text-text-muted" />
             </div>
-            <h3 className="text-[15px] font-semibold text-[#101828]">No notifications</h3>
-            <p className="text-[13px] text-[#667085] mt-1 max-w-sm mx-auto">
-              {search || activeTab !== 'ALL'
-                ? 'No alerts match your current filter criteria.'
+            <h3 className="text-[15px] font-semibold text-foreground">
+              No notifications
+            </h3>
+            <p className="text-[13px] text-text-muted mt-1 max-w-sm mx-auto">
+              {search || activeTab !== "ALL"
+                ? "No alerts match your current filter criteria."
                 : "You're all caught up! There are no unread notifications at this time."}
             </p>
           </div>
@@ -440,15 +454,15 @@ export function NotificationList({ initialNotifications }: NotificationListProps
               return (
                 <div
                   key={notif.id}
-                  className={`p-3.5 sm:px-4 sm:py-3 flex items-start justify-between gap-3.5 hover:bg-[#F9FAFC] transition-colors ${
-                    !notif.isRead ? 'bg-[#F9FAFC]/70' : 'bg-white'
+                  className={`p-3.5 sm:px-4 sm:py-3 flex items-start justify-between gap-3.5 hover:bg-surface-hover transition-colors ${
+                    !notif.isRead ? "bg-surface-hover/70" : "bg-white"
                   }`}
                 >
                   {/* Left: Icon & Content */}
                   <div className="flex items-start gap-3 min-w-0 flex-1">
                     <div
                       className={`p-2 rounded-[6px] border shrink-0 mt-0.5 ${getIconBg(
-                        notif.type
+                        notif.type,
                       )}`}
                     >
                       {getIcon(notif.type)}
@@ -458,28 +472,30 @@ export function NotificationList({ initialNotifications }: NotificationListProps
                       <div className="flex items-center gap-2">
                         <h4
                           className={`text-[13px] ${
-                            !notif.isRead ? 'font-bold text-[#101828]' : 'font-medium text-[#475467]'
+                            !notif.isRead
+                              ? "font-bold text-foreground"
+                              : "font-medium text-text-secondary"
                           }`}
                         >
                           {notif.title}
                         </h4>
                         {!notif.isRead && (
-                          <span className="size-1.5 rounded-full bg-[#5B5FEF]" />
+                          <span className="size-1.5 rounded-full bg-primary" />
                         )}
                       </div>
 
-                      <p className="text-[12px] text-[#475467] mt-0.5 leading-relaxed">
+                      <p className="text-[12px] text-text-secondary mt-0.5 leading-relaxed">
                         {notif.message}
                       </p>
 
-                      <div className="mt-1 flex items-center gap-3 text-[11px] text-[#98A2B3]">
+                      <div className="mt-1 flex items-center gap-3 text-[11px] text-text-muted">
                         <span>{formatTimestamp(notif.createdAt)}</span>
                         {link && (
                           <>
                             <span>•</span>
                             <Link
                               href={link}
-                              className="text-[#5B5FEF] font-semibold hover:underline flex items-center gap-0.5"
+                              className="text-primary font-semibold hover:underline flex items-center gap-0.5"
                             >
                               View item
                               <ArrowUpRight className="size-3" />
@@ -496,7 +512,7 @@ export function NotificationList({ initialNotifications }: NotificationListProps
                       <button
                         type="button"
                         onClick={() => handleMarkRead(notif.id)}
-                        className="p-1 rounded-[4px] border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#5B5FEF] hover:bg-[#EFF6FF] transition-colors"
+                        className="p-1 rounded-[4px] border border-border-subtle bg-surface text-text-secondary hover:text-primary hover:bg-[#EFF6FF] transition-colors"
                         title="Mark as read"
                       >
                         <Check className="size-3.5" />
@@ -506,7 +522,7 @@ export function NotificationList({ initialNotifications }: NotificationListProps
                     <button
                       type="button"
                       onClick={() => handleDelete(notif.id)}
-                      className="p-1 rounded-[4px] border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors"
+                      className="p-1 rounded-[4px] border border-border-subtle bg-surface text-text-secondary hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors"
                       title="Delete notification"
                     >
                       <Trash2 className="size-3.5" />

@@ -1,20 +1,16 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-import { db } from '@/server/db/client';
-import { requireActiveUser } from '@/server/auth/authorization';
-import { Card } from '@/components/ui/card';
-import { ReviewActionBanner } from '@/features/reviews/review-action-banner';
-import {
-  ClipboardCheck,
-  CheckCircle2,
-  ArrowRight,
-  Layers,
-} from 'lucide-react';
-import { TaskStatus, Priority, SystemRole } from '@prisma/client';
+import { Metadata } from "next";
+import Link from "next/link";
+import { db } from "@/server/db/client";
+import { requireActiveUser } from "@/server/auth/authorization";
+import { Card } from "@/components/ui/card";
+import { ReviewActionBanner } from "@/features/reviews/review-action-banner";
+import { ClipboardCheck, CheckCircle2, ArrowRight, Layers } from "lucide-react";
+import { TaskStatus, Priority, SystemRole } from "@prisma/client";
 
 export const metadata: Metadata = {
-  title: 'Review Queue | Dynamatrix Flow',
-  description: 'Project Lead verification pipeline for pending technical deliverables.',
+  title: "Review Queue | Dynamatrix Flow",
+  description:
+    "Project Lead verification pipeline for pending technical deliverables.",
 };
 
 export default async function ReviewQueuePage() {
@@ -33,7 +29,11 @@ export default async function ReviewQueuePage() {
           : {
               OR: [
                 { projectLeadId: currentUser.id },
-                { members: { some: { userId: currentUser.id, removedAt: null } } },
+                {
+                  members: {
+                    some: { userId: currentUser.id, removedAt: null },
+                  },
+                },
               ],
             }),
       },
@@ -76,7 +76,7 @@ export default async function ReviewQueuePage() {
       },
     },
     orderBy: {
-      submittedForReviewAt: 'asc',
+      submittedForReviewAt: "asc",
     },
   });
 
@@ -131,7 +131,8 @@ export default async function ReviewQueuePage() {
                 </span>
               </div>
               <p className="text-xs text-text-secondary mt-0.5">
-                Inspect, verify, approve, or request changes on completed deliverables.
+                Inspect, verify, approve, or request changes on completed
+                deliverables.
               </p>
             </div>
           </div>
@@ -141,7 +142,9 @@ export default async function ReviewQueuePage() {
       {/* Overview Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Card className="p-4">
-          <p className="text-xs font-medium text-text-muted">Awaiting Decision</p>
+          <p className="text-xs font-medium text-text-muted">
+            Awaiting Decision
+          </p>
           <p className="text-2xl font-bold text-text-primary mt-1">
             {tasksInReview.length}
           </p>
@@ -151,7 +154,9 @@ export default async function ReviewQueuePage() {
         </Card>
 
         <Card className="p-4">
-          <p className="text-xs font-medium text-text-muted">Projects Impacted</p>
+          <p className="text-xs font-medium text-text-muted">
+            Projects Impacted
+          </p>
           <p className="text-2xl font-bold text-text-primary mt-1">
             {uniqueProjectIds.size}
           </p>
@@ -166,19 +171,23 @@ export default async function ReviewQueuePage() {
             {tasksInReview.length === 0 ? (
               <>
                 <CheckCircle2 className="size-5 text-emerald-600" />
-                <span className="text-sm font-bold text-emerald-700">Clear</span>
+                <span className="text-sm font-bold text-emerald-700">
+                  Clear
+                </span>
               </>
             ) : (
               <>
                 <span className="size-2.5 rounded-full bg-purple-600 animate-pulse" />
-                <span className="text-sm font-bold text-primary">Reviews Required</span>
+                <span className="text-sm font-bold text-primary">
+                  Reviews Required
+                </span>
               </>
             )}
           </div>
           <p className="text-[11px] text-text-muted mt-0.5">
             {tasksInReview.length === 0
-              ? 'No pending reviews across projects'
-              : 'Prompt review ensures unblocked sprints'}
+              ? "No pending reviews across projects"
+              : "Prompt review ensures unblocked sprints"}
           </p>
         </Card>
       </div>
@@ -193,7 +202,8 @@ export default async function ReviewQueuePage() {
             Review Queue is Clear
           </h3>
           <p className="mt-1 text-xs text-text-muted max-w-sm mx-auto">
-            All submitted deliverables have been reviewed. Team members will appear here as soon as they submit deliverables for approval.
+            All submitted deliverables have been reviewed. Team members will
+            appear here as soon as they submit deliverables for approval.
           </p>
         </Card>
       ) : (
@@ -202,10 +212,15 @@ export default async function ReviewQueuePage() {
             const isLeadOrAdmin =
               isAdmin || task.project.projectLeadId === currentUser.id;
             const isAssignee = task.assigneeId === currentUser.id;
-            const completedSubtasks = task.subtasks.filter((s) => s.isCompleted).length;
+            const completedSubtasks = task.subtasks.filter(
+              (s) => s.isCompleted,
+            ).length;
 
             return (
-              <Card key={task.id} className="p-5 border-purple-200/80 bg-surface shadow-xs">
+              <Card
+                key={task.id}
+                className="p-5 border-purple-200/80 bg-surface shadow-xs"
+              >
                 <div className="space-y-4">
                   {/* Top Row: Project & Code badges, Title & Details Link */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
@@ -222,8 +237,8 @@ export default async function ReviewQueuePage() {
                       {getPriorityBadge(task.priority)}
                       {task.milestone && (
                         <span className="inline-flex items-center gap-1 rounded bg-purple-50 px-2 py-0.5 text-xs text-primary border border-purple-200">
-                          <Layers className="size-3" />
-                          [{task.milestone.milestoneCode}] {task.milestone.name}
+                          <Layers className="size-3" />[
+                          {task.milestone.milestoneCode}] {task.milestone.name}
                         </span>
                       )}
                     </div>
@@ -246,7 +261,7 @@ export default async function ReviewQueuePage() {
                         {task.title}
                       </Link>
                       <p className="text-xs text-text-secondary line-clamp-2 leading-relaxed">
-                        {task.description || 'No description provided.'}
+                        {task.description || "No description provided."}
                       </p>
                     </div>
 
@@ -263,12 +278,15 @@ export default async function ReviewQueuePage() {
                                 {task.assignee.name}
                               </p>
                               <p className="text-text-muted text-[11px]">
-                                {task.assignee.position || 'Contributor'} · {task.assignee.employeeId}
+                                {task.assignee.position || "Contributor"} ·{" "}
+                                {task.assignee.employeeId}
                               </p>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-text-muted italic mt-0.5">Unassigned</p>
+                          <p className="text-text-muted italic mt-0.5">
+                            Unassigned
+                          </p>
                         )}
                       </div>
 
@@ -283,11 +301,13 @@ export default async function ReviewQueuePage() {
                         <div className="flex items-center justify-between text-text-muted">
                           <span>Submitted</span>
                           <span className="font-medium text-text-primary">
-                            {new Date(task.submittedForReviewAt).toLocaleDateString("en-US", {
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
+                            {new Date(
+                              task.submittedForReviewAt,
+                            ).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
                             })}
                           </span>
                         </div>

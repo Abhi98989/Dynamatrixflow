@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { createTaskAction } from './actions';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import { createTaskAction } from "./actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -13,9 +13,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Plus, CheckSquare, AlertCircle, Loader2 } from 'lucide-react';
-import { Priority, TaskStatus } from '@prisma/client';
+} from "@/components/ui/dialog";
+import { Plus, CheckSquare, AlertCircle, Loader2 } from "lucide-react";
+import { Priority, TaskStatus } from "@prisma/client";
 
 interface CreateTaskDialogProps {
   projectId: string;
@@ -35,7 +35,11 @@ interface CreateTaskDialogProps {
   }[];
 }
 
-export function CreateTaskDialog({ projectId, members, milestones = [] }: CreateTaskDialogProps) {
+export function CreateTaskDialog({
+  projectId,
+  members,
+  milestones = [],
+}: CreateTaskDialogProps) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -44,7 +48,7 @@ export function CreateTaskDialog({ projectId, members, milestones = [] }: Create
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.currentTarget);
-    formData.append('projectId', projectId);
+    formData.append("projectId", projectId);
 
     startTransition(async () => {
       const res = await createTaskAction(undefined, formData);
@@ -67,10 +71,13 @@ export function CreateTaskDialog({ projectId, members, milestones = [] }: Create
         <DialogHeader>
           <div className="flex items-center gap-2 text-primary pb-1">
             <CheckSquare className="size-5" />
-            <DialogTitle className="text-lg font-bold">Create Project Task</DialogTitle>
+            <DialogTitle className="text-lg font-bold">
+              Create Project Task
+            </DialogTitle>
           </div>
           <DialogDescription>
-            Define a deliverable, specify timelines, and assign active project contributors.
+            Define a deliverable, specify timelines, and assign active project
+            contributors.
           </DialogDescription>
         </DialogHeader>
 
@@ -179,12 +186,22 @@ export function CreateTaskDialog({ projectId, members, milestones = [] }: Create
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <Label htmlFor="task-startDate">Start Date</Label>
-              <Input id="task-startDate" name="startDate" type="date" disabled={isPending} />
+              <Input
+                id="task-startDate"
+                name="startDate"
+                type="date"
+                disabled={isPending}
+              />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="task-dueDate">Due Date</Label>
-              <Input id="task-dueDate" name="dueDate" type="date" disabled={isPending} />
+              <Input
+                id="task-dueDate"
+                name="dueDate"
+                type="date"
+                disabled={isPending}
+              />
             </div>
           </div>
 
@@ -203,7 +220,7 @@ export function CreateTaskDialog({ projectId, members, milestones = [] }: Create
                   <Loader2 className="mr-2 size-4 animate-spin" /> Creating...
                 </>
               ) : (
-                'Create Task'
+                "Create Task"
               )}
             </Button>
           </div>

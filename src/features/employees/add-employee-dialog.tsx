@@ -46,7 +46,10 @@ export function AddEmployeeDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="h-9 px-3.5 font-semibold bg-[#5B5FEF] hover:bg-[#4C50D8] text-white rounded-[6px]">
+        <Button
+          size="sm"
+          className="h-9 px-3.5 font-semibold bg-primary hover:bg-primary-hover text-white rounded-[6px]"
+        >
           <Plus className="mr-1.5 size-4" /> Add Employee
         </Button>
       </DialogTrigger>

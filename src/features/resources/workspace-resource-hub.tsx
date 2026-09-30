@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useMemo, useTransition } from 'react';
-import Link from 'next/link';
+import * as React from "react";
+import { useState, useMemo, useTransition } from "react";
+import Link from "next/link";
 import {
   Search,
   ExternalLink,
@@ -24,10 +24,10 @@ import {
   LayoutGrid,
   List as ListIcon,
   Download,
-} from 'lucide-react';
-import { ResourceCategory } from '@prisma/client';
-import { archiveResourceAction } from './actions';
-import { WorkspaceAddResourceDialog } from './workspace-add-resource-dialog';
+} from "lucide-react";
+import { ResourceCategory } from "@prisma/client";
+import { archiveResourceAction } from "./actions";
+import { WorkspaceAddResourceDialog } from "./workspace-add-resource-dialog";
 
 export interface ResourceItem {
   id: string;
@@ -69,91 +69,97 @@ interface WorkspaceResourceHubProps {
 
 const CATEGORY_META: Record<
   ResourceCategory,
-  { label: string; icon: React.ElementType; badgeBg: string; badgeFg: string; border: string }
+  {
+    label: string;
+    icon: React.ElementType;
+    badgeBg: string;
+    badgeFg: string;
+    border: string;
+  }
 > = {
   DOCUMENTATION: {
-    label: 'Documentation',
+    label: "Documentation",
     icon: FileText,
-    badgeBg: 'bg-[#F0FDF4]',
-    badgeFg: 'text-[#15803D]',
-    border: 'border-[#BBF7D0]',
+    badgeBg: "bg-[#F0FDF4]",
+    badgeFg: "text-[#15803D]",
+    border: "border-[#BBF7D0]",
   },
   DEVELOPMENT: {
-    label: 'Development',
+    label: "Development",
     icon: Code,
-    badgeBg: 'bg-[#F5F3FF]',
-    badgeFg: 'text-[#7C3AED]',
-    border: 'border-[#DDD6FE]',
+    badgeBg: "bg-[#F5F3FF]",
+    badgeFg: "text-[#7C3AED]",
+    border: "border-[#DDD6FE]",
   },
   API: {
-    label: 'API Reference',
+    label: "API Reference",
     icon: Server,
-    badgeBg: 'bg-[#FFFBEB]',
-    badgeFg: 'text-[#B45309]',
-    border: 'border-[#FDE68A]',
+    badgeBg: "bg-[#FFFBEB]",
+    badgeFg: "text-[#B45309]",
+    border: "border-[#FDE68A]",
   },
   RESEARCH: {
-    label: 'Research',
+    label: "Research",
     icon: BookOpen,
-    badgeBg: 'bg-[#EFF6FF]',
-    badgeFg: 'text-[#2563EB]',
-    border: 'border-[#BFDBFE]',
+    badgeBg: "bg-[#EFF6FF]",
+    badgeFg: "text-[#2563EB]",
+    border: "border-[#BFDBFE]",
   },
   DESIGN: {
-    label: 'Design',
+    label: "Design",
     icon: PenTool,
-    badgeBg: 'bg-[#FDF2F8]',
-    badgeFg: 'text-[#DB2777]',
-    border: 'border-[#FBCFE8]',
+    badgeBg: "bg-[#FDF2F8]",
+    badgeFg: "text-[#DB2777]",
+    border: "border-[#FBCFE8]",
   },
   CLIENT_REFERENCE: {
-    label: 'Client Reference',
+    label: "Client Reference",
     icon: Users,
-    badgeBg: 'bg-[#F1F5F9]',
-    badgeFg: 'text-[#475467]',
-    border: 'border-[#E2E8F0]',
+    badgeBg: "bg-[#F1F5F9]",
+    badgeFg: "text-text-secondary",
+    border: "border-[#E2E8F0]",
   },
   COMPETITOR: {
-    label: 'Competitor',
+    label: "Competitor",
     icon: Monitor,
-    badgeBg: 'bg-[#FEF2F2]',
-    badgeFg: 'text-[#DC2626]',
-    border: 'border-[#FECACA]',
+    badgeBg: "bg-[#FEF2F2]",
+    badgeFg: "text-[#DC2626]",
+    border: "border-[#FECACA]",
   },
   MEETING: {
-    label: 'Meeting',
+    label: "Meeting",
     icon: Video,
-    badgeBg: 'bg-[#F0FDF4]',
-    badgeFg: 'text-[#16A34A]',
-    border: 'border-[#BBF7D0]',
+    badgeBg: "bg-[#F0FDF4]",
+    badgeFg: "text-[#16A34A]",
+    border: "border-[#BBF7D0]",
   },
   TUTORIAL: {
-    label: 'Tutorial',
+    label: "Tutorial",
     icon: BookOpen,
-    badgeBg: 'bg-[#EFF6FF]',
-    badgeFg: 'text-[#0284C7]',
-    border: 'border-[#BAE6FD]',
+    badgeBg: "bg-[#EFF6FF]",
+    badgeFg: "text-[#0284C7]",
+    border: "border-[#BAE6FD]",
   },
   OTHER: {
-    label: 'Other',
+    label: "Other",
     icon: LinkIcon,
-    badgeBg: 'bg-[#F2F4F7]',
-    badgeFg: 'text-[#667085]',
-    border: 'border-[#E4E7EC]',
+    badgeBg: "bg-surface-hover",
+    badgeFg: "text-text-muted",
+    border: "border-border",
   },
 };
 
 const CATEGORY_ORDER: ResourceCategory[] = [
-  'DOCUMENTATION',
-  'DEVELOPMENT',
-  'API',
-  'RESEARCH',
-  'DESIGN',
-  'CLIENT_REFERENCE',
-  'COMPETITOR',
-  'MEETING',
-  'TUTORIAL',
-  'OTHER',
+  "DOCUMENTATION",
+  "DEVELOPMENT",
+  "API",
+  "RESEARCH",
+  "DESIGN",
+  "CLIENT_REFERENCE",
+  "COMPETITOR",
+  "MEETING",
+  "TUTORIAL",
+  "OTHER",
 ];
 
 export function WorkspaceResourceHub({
@@ -162,11 +168,13 @@ export function WorkspaceResourceHub({
   currentUserId,
   isAdmin,
 }: WorkspaceResourceHubProps) {
-  const [search, setSearch] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('ALL');
-  const [viewMode, setViewMode] = useState<'LIST' | 'GRID'>('LIST');
-  const [sortBy, setSortBy] = useState<'NEWEST' | 'OLDEST' | 'TITLE_AZ' | 'CATEGORY'>('NEWEST');
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [selectedProjectId, setSelectedProjectId] = useState<string>("ALL");
+  const [viewMode, setViewMode] = useState<"LIST" | "GRID">("LIST");
+  const [sortBy, setSortBy] = useState<
+    "NEWEST" | "OLDEST" | "TITLE_AZ" | "CATEGORY"
+  >("NEWEST");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
@@ -174,13 +182,13 @@ export function WorkspaceResourceHub({
   const metrics = useMemo(() => {
     const total = resources.length;
     const docs = resources.filter(
-      (r) => r.category === 'DOCUMENTATION' || r.category === 'TUTORIAL'
+      (r) => r.category === "DOCUMENTATION" || r.category === "TUTORIAL",
     ).length;
     const devApi = resources.filter(
-      (r) => r.category === 'DEVELOPMENT' || r.category === 'API'
+      (r) => r.category === "DEVELOPMENT" || r.category === "API",
     ).length;
     const designResearch = resources.filter(
-      (r) => r.category === 'DESIGN' || r.category === 'RESEARCH'
+      (r) => r.category === "DESIGN" || r.category === "RESEARCH",
     ).length;
 
     return { total, docs, devApi, designResearch };
@@ -202,7 +210,7 @@ export function WorkspaceResourceHub({
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
-      console.error('Failed to copy', err);
+      console.error("Failed to copy", err);
     }
   };
 
@@ -218,12 +226,12 @@ export function WorkspaceResourceHub({
   const filteredResources = useMemo(() => {
     let list = resources.filter((r) => {
       // Category filter
-      if (selectedCategory !== 'ALL' && r.category !== selectedCategory) {
+      if (selectedCategory !== "ALL" && r.category !== selectedCategory) {
         return false;
       }
 
       // Project filter
-      if (selectedProjectId !== 'ALL' && r.projectId !== selectedProjectId) {
+      if (selectedProjectId !== "ALL" && r.projectId !== selectedProjectId) {
         return false;
       }
 
@@ -244,7 +252,14 @@ export function WorkspaceResourceHub({
           matchesHost = r.url.toLowerCase().includes(q);
         }
 
-        if (!matchesTitle && !matchesDesc && !matchesTags && !matchesProject && !matchesAddedBy && !matchesHost) {
+        if (
+          !matchesTitle &&
+          !matchesDesc &&
+          !matchesTags &&
+          !matchesProject &&
+          !matchesAddedBy &&
+          !matchesHost
+        ) {
           return false;
         }
       }
@@ -255,13 +270,17 @@ export function WorkspaceResourceHub({
     // Sorting
     list = [...list].sort((a, b) => {
       switch (sortBy) {
-        case 'NEWEST':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'OLDEST':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case 'TITLE_AZ':
+        case "NEWEST":
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        case "OLDEST":
+          return (
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+          );
+        case "TITLE_AZ":
           return a.title.localeCompare(b.title);
-        case 'CATEGORY':
+        case "CATEGORY":
           return a.category.localeCompare(b.category);
         default:
           return 0;
@@ -272,71 +291,122 @@ export function WorkspaceResourceHub({
   }, [resources, search, selectedCategory, selectedProjectId, sortBy]);
 
   const hasActiveFilters =
-    search.trim() !== '' ||
-    selectedCategory !== 'ALL' ||
-    selectedProjectId !== 'ALL' ||
-    sortBy !== 'NEWEST';
+    search.trim() !== "" ||
+    selectedCategory !== "ALL" ||
+    selectedProjectId !== "ALL" ||
+    sortBy !== "NEWEST";
 
   const resetFilters = () => {
-    setSearch('');
-    setSelectedCategory('ALL');
-    setSelectedProjectId('ALL');
-    setSortBy('NEWEST');
+    setSearch("");
+    setSelectedCategory("ALL");
+    setSelectedProjectId("ALL");
+    setSortBy("NEWEST");
   };
 
   const getResourceBadge = (urlStr: string) => {
-    const isUpload = urlStr.startsWith('/api/uploads/') || urlStr.startsWith('/uploads/');
-    const ext = (urlStr.split('?')[0] || '').split('.').pop()?.toLowerCase();
-    if (isUpload || ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'webp', 'svg', 'zip'].includes(ext || '')) {
-      if (ext === 'pdf') {
-        return { label: 'PDF Document', isFile: true, color: 'text-red-700 bg-red-50 border-red-200' };
+    const isUpload =
+      urlStr.startsWith("/api/uploads/") || urlStr.startsWith("/uploads/");
+    const ext = (urlStr.split("?")[0] || "").split(".").pop()?.toLowerCase();
+    if (
+      isUpload ||
+      [
+        "pdf",
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "ppt",
+        "pptx",
+        "png",
+        "jpg",
+        "jpeg",
+        "webp",
+        "svg",
+        "zip",
+      ].includes(ext || "")
+    ) {
+      if (ext === "pdf") {
+        return {
+          label: "PDF Document",
+          isFile: true,
+          color: "text-red-700 bg-red-50 border-red-200",
+        };
       }
-      if (['doc', 'docx'].includes(ext || '')) {
-        return { label: 'Word Document', isFile: true, color: 'text-blue-700 bg-blue-50 border-blue-200' };
+      if (["doc", "docx"].includes(ext || "")) {
+        return {
+          label: "Word Document",
+          isFile: true,
+          color: "text-blue-700 bg-blue-50 border-blue-200",
+        };
       }
-      if (['xls', 'xlsx', 'csv'].includes(ext || '')) {
-        return { label: 'Spreadsheet', isFile: true, color: 'text-emerald-700 bg-emerald-50 border-emerald-200' };
+      if (["xls", "xlsx", "csv"].includes(ext || "")) {
+        return {
+          label: "Spreadsheet",
+          isFile: true,
+          color: "text-emerald-700 bg-emerald-50 border-emerald-200",
+        };
       }
-      if (['png', 'jpg', 'jpeg', 'webp', 'svg', 'gif'].includes(ext || '')) {
-        return { label: 'Image Asset', isFile: true, color: 'text-purple-700 bg-purple-50 border-purple-200' };
+      if (["png", "jpg", "jpeg", "webp", "svg", "gif"].includes(ext || "")) {
+        return {
+          label: "Image Asset",
+          isFile: true,
+          color: "text-purple-700 bg-purple-50 border-purple-200",
+        };
       }
-      if (['zip', 'rar', 'tar', 'gz'].includes(ext || '')) {
-        return { label: 'Archive File', isFile: true, color: 'text-amber-700 bg-amber-50 border-amber-200' };
+      if (["zip", "rar", "tar", "gz"].includes(ext || "")) {
+        return {
+          label: "Archive File",
+          isFile: true,
+          color: "text-amber-700 bg-amber-50 border-amber-200",
+        };
       }
-      return { label: `${(ext || 'FILE').toUpperCase()} File`, isFile: true, color: 'text-slate-700 bg-slate-100 border-slate-200' };
+      return {
+        label: `${(ext || "FILE").toUpperCase()} File`,
+        isFile: true,
+        color: "text-slate-700 bg-slate-100 border-slate-200",
+      };
     }
     try {
-      return { label: new URL(urlStr).hostname.replace(/^www\./, ''), isFile: false, color: 'text-[#667085] bg-[#F2F4F7] border-[#E4E7EC]' };
+      return {
+        label: new URL(urlStr).hostname.replace(/^www\./, ""),
+        isFile: false,
+        color: "text-text-muted bg-surface-hover border-border",
+      };
     } catch {
-      return { label: 'Web Link', isFile: false, color: 'text-[#667085] bg-[#F2F4F7] border-[#E4E7EC]' };
+      return {
+        label: "Web Link",
+        isFile: false,
+        color: "text-text-muted bg-surface-hover border-border",
+      };
     }
   };
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
+    return d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   return (
     <div className="space-y-6">
       {/* 1. Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E4E7EC] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-[#101828] flex items-center gap-2">
-              <BookOpen className="size-5 text-[#5B5FEF]" />
+            <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-foreground flex items-center gap-2">
+              <BookOpen className="size-5 text-primary" />
               Knowledge Hub & Resources
             </h1>
             <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE]">
-              {resources.length} {resources.length === 1 ? 'Asset' : 'Assets'}
+              {resources.length} {resources.length === 1 ? "Asset" : "Assets"}
             </span>
           </div>
-          <p className="mt-1 text-[13px] text-[#475467]">
-            Centralized operational library for architectural guides, API specs, research reports, and technical documentation.
+          <p className="mt-1 text-[13px] text-text-secondary">
+            Centralized operational library for architectural guides, API specs,
+            research reports, and technical documentation.
           </p>
         </div>
 
@@ -348,119 +418,121 @@ export function WorkspaceResourceHub({
         )}
       </div>
 
-      {/* 2. Attention Metrics Strip (§9: 4 stat cards, zero resting shadow) */}
+      {/* 2. Attention Metrics Strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Assets */}
         <button
           type="button"
-          onClick={() => setSelectedCategory('ALL')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            selectedCategory === 'ALL' && !hasActiveFilters
-              ? 'ring-1 ring-[#5B5FEF] border-[#D0D5DD] bg-white'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+          onClick={() => setSelectedCategory("ALL")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            selectedCategory === "ALL" && !hasActiveFilters
+              ? "ring-2 ring-primary border-primary bg-surface"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
-              <Layers className="size-3.5 text-[#5B5FEF]" />
-              Total Knowledge Assets
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+              <Layers className="size-3.5 text-primary" />
+              Total Assets
             </span>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[#101828]">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               {metrics.total}
             </span>
-            <span className="text-[11px] text-[#667085]">cataloged</span>
+            <span className="text-[11px] text-text-muted font-medium">cataloged</span>
           </div>
         </button>
 
         {/* Documentation & Specs */}
         <button
           type="button"
-          onClick={() => setSelectedCategory('DOCUMENTATION')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            selectedCategory === 'DOCUMENTATION'
-              ? 'ring-2 ring-[#15803D] border-[#15803D] bg-[#F0FDF4]/50'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+          onClick={() => setSelectedCategory("DOCUMENTATION")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            selectedCategory === "DOCUMENTATION"
+              ? "ring-2 ring-[#15803D] border-[#15803D] bg-surface"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-[#15803D]/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
               <FileText className="size-3.5 text-[#15803D]" />
-              Docs & Tutorials
+              Docs & Guides
             </span>
             <span className="w-2 h-2 rounded-full bg-[#15803D]" />
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[#15803D]">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#15803D]">
               {metrics.docs}
             </span>
-            <span className="text-[11px] text-[#667085]">guides & specs</span>
+            <span className="text-[11px] text-text-muted font-medium">specs</span>
           </div>
         </button>
 
         {/* Development & APIs */}
         <button
           type="button"
-          onClick={() => setSelectedCategory('API')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            selectedCategory === 'API' || selectedCategory === 'DEVELOPMENT'
-              ? 'ring-2 ring-[#7C3AED] border-[#7C3AED] bg-[#F5F3FF]'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+          onClick={() => setSelectedCategory("API")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            selectedCategory === "API" || selectedCategory === "DEVELOPMENT"
+              ? "ring-2 ring-primary border-primary bg-surface"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
-              <Server className="size-3.5 text-[#7C3AED]" />
-              Dev & API References
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+              <Server className="size-3.5 text-primary" />
+              Dev & APIs
             </span>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[#101828]">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               {metrics.devApi}
             </span>
-            <span className="text-[11px] text-[#667085]">endpoints & repos</span>
+            <span className="text-[11px] text-text-muted font-medium">endpoints</span>
           </div>
         </button>
 
         {/* Design & Research */}
         <button
           type="button"
-          onClick={() => setSelectedCategory('DESIGN')}
-          className={`p-3.5 sm:p-4 rounded-[8px] border text-left transition-all ${
-            selectedCategory === 'DESIGN' || selectedCategory === 'RESEARCH'
-              ? 'ring-2 ring-[#2563EB] border-[#2563EB] bg-[#EFF6FF]'
-              : 'bg-white border-[#E4E7EC] hover:bg-[#F9FAFC]'
+          onClick={() => setSelectedCategory("DESIGN")}
+          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+            selectedCategory === "DESIGN" || selectedCategory === "RESEARCH"
+              ? "ring-2 ring-primary border-primary bg-surface"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-semibold text-[#475467] flex items-center gap-1.5">
-              <PenTool className="size-3.5 text-[#2563EB]" />
+            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+              <PenTool className="size-3.5 text-primary" />
               Design & Research
             </span>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-[22px] sm:text-[24px] font-bold tracking-tight text-[#101828]">
+          <div className="mt-2.5 flex items-baseline gap-2">
+            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               {metrics.designResearch}
             </span>
-            <span className="text-[11px] text-[#667085]">assets & insights</span>
+            <span className="text-[11px] text-text-muted font-medium">insights</span>
           </div>
         </button>
       </div>
 
       {/* 3. Category Filter Tabs (§13 Specification) */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-[#E4E7EC] touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 border-b border-border touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <button
           type="button"
-          onClick={() => setSelectedCategory('ALL')}
+          onClick={() => setSelectedCategory("ALL")}
           className={`h-8 px-3 rounded-[6px] text-[12px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
-            selectedCategory === 'ALL'
-              ? 'bg-[#101828] text-white'
-              : 'text-[#475467] hover:bg-[#F2F4F7]'
+            selectedCategory === "ALL"
+              ? "bg-[#101828] text-white"
+              : "text-text-secondary hover:bg-surface-hover"
           }`}
         >
           <span>All Resources</span>
-          <span className={`px-1.5 py-0.2 rounded text-[10px] ${selectedCategory === 'ALL' ? 'bg-white/20 text-white' : 'bg-[#E4E7EC] text-[#475467]'}`}>
+          <span
+            className={`px-1.5 py-0.2 rounded text-[10px] ${selectedCategory === "ALL" ? "bg-surface/20 text-white" : "bg-[#E4E7EC] text-text-secondary"}`}
+          >
             {categoryCounts.ALL}
           </span>
         </button>
@@ -477,15 +549,17 @@ export function WorkspaceResourceHub({
               onClick={() => setSelectedCategory(catKey)}
               className={`h-8 px-3 rounded-[6px] text-[12px] font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 ${
                 isSelected
-                  ? 'bg-[#5B5FEF] text-white'
-                  : 'text-[#475467] hover:bg-[#F2F4F7]'
+                  ? "bg-primary text-white"
+                  : "text-text-secondary hover:bg-surface-hover"
               }`}
             >
               <span>{meta.label}</span>
               {count > 0 && (
                 <span
                   className={`px-1.5 py-0.2 rounded text-[10px] ${
-                    isSelected ? 'bg-white/20 text-white' : 'bg-[#E4E7EC] text-[#475467]'
+                    isSelected
+                      ? "bg-surface/20 text-white"
+                      : "bg-[#E4E7EC] text-text-secondary"
                   }`}
                 >
                   {count}
@@ -497,23 +571,23 @@ export function WorkspaceResourceHub({
       </div>
 
       {/* 4. Search & Controls Toolbar */}
-      <div className="bg-white border border-[#E4E7EC] rounded-[8px] p-3 sm:p-3.5 space-y-3">
+      <div className="bg-surface border border-border rounded-[8px] p-3 sm:p-3.5 space-y-3">
         <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center justify-between">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
-            <Search className="absolute left-3 top-2.5 size-4 text-[#98A2B3]" />
+            <Search className="absolute left-3 top-2.5 size-4 text-text-muted" />
             <input
               type="text"
               placeholder="Search by title, domain, description, tags, project, or author..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9 pl-9 pr-8 rounded-[6px] border border-[#D0D5DD] bg-white text-[13px] text-[#101828] placeholder-[#98A2B3] focus:outline-none focus:ring-1 focus:ring-[#5B5FEF] focus:border-[#5B5FEF]"
+              className="w-full h-9 pl-9 pr-8 rounded-[6px] border border-border-subtle bg-surface text-[13px] text-foreground placeholder-[#98A2B3] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
             />
             {search && (
               <button
                 type="button"
-                onClick={() => setSearch('')}
-                className="absolute right-2.5 top-2.5 text-[#98A2B3] hover:text-[#475467]"
+                onClick={() => setSearch("")}
+                className="absolute right-2.5 top-2.5 text-text-muted hover:text-text-secondary"
               >
                 <X className="size-4" />
               </button>
@@ -527,7 +601,7 @@ export function WorkspaceResourceHub({
               <select
                 value={selectedProjectId}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
-                className="h-9 px-2.5 rounded-[6px] border border-[#D0D5DD] bg-white text-[12px] font-medium text-[#475467] focus:outline-none focus:ring-1 focus:ring-[#5B5FEF]"
+                className="h-9 px-2.5 rounded-[6px] border border-border-subtle bg-surface text-[12px] font-medium text-text-secondary focus:outline-none focus:ring-1 focus:ring-primary"
                 aria-label="Filter by project"
               >
                 <option value="ALL">All Projects</option>
@@ -542,8 +616,13 @@ export function WorkspaceResourceHub({
             {/* Sort Dropdown */}
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as 'NEWEST' | 'OLDEST' | 'TITLE_AZ' | 'CATEGORY')}
-              className="h-9 px-2.5 rounded-[6px] border border-[#D0D5DD] bg-white text-[12px] font-medium text-[#475467] focus:outline-none focus:ring-1 focus:ring-[#5B5FEF]"
+              onChange={(e) =>
+                setSortBy(
+                  e.target.value as
+                    "NEWEST" | "OLDEST" | "TITLE_AZ" | "CATEGORY",
+                )
+              }
+              className="h-9 px-2.5 rounded-[6px] border border-border-subtle bg-surface text-[12px] font-medium text-text-secondary focus:outline-none focus:ring-1 focus:ring-primary"
               aria-label="Sort resources"
             >
               <option value="NEWEST">Newest First</option>
@@ -553,12 +632,14 @@ export function WorkspaceResourceHub({
             </select>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center rounded-[6px] border border-[#D0D5DD] p-0.5 bg-white">
+            <div className="flex items-center rounded-[6px] border border-border-subtle p-0.5 bg-surface">
               <button
                 type="button"
-                onClick={() => setViewMode('LIST')}
+                onClick={() => setViewMode("LIST")}
                 className={`p-1.5 rounded-[4px] transition-colors ${
-                  viewMode === 'LIST' ? 'bg-[#101828] text-white' : 'text-[#667085] hover:bg-[#F2F4F7]'
+                  viewMode === "LIST"
+                    ? "bg-[#101828] text-white"
+                    : "text-text-muted hover:bg-surface-hover"
                 }`}
                 title="List View"
               >
@@ -566,9 +647,11 @@ export function WorkspaceResourceHub({
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode('GRID')}
+                onClick={() => setViewMode("GRID")}
                 className={`p-1.5 rounded-[4px] transition-colors ${
-                  viewMode === 'GRID' ? 'bg-[#101828] text-white' : 'text-[#667085] hover:bg-[#F2F4F7]'
+                  viewMode === "GRID"
+                    ? "bg-[#101828] text-white"
+                    : "text-text-muted hover:bg-surface-hover"
                 }`}
                 title="Grid View"
               >
@@ -593,32 +676,34 @@ export function WorkspaceResourceHub({
 
       {/* 5. Resources Display (List / Grid) */}
       {filteredResources.length === 0 ? (
-        <div className="bg-white border border-[#E4E7EC] rounded-[8px] py-16 px-6 text-center">
-          <div className="w-12 h-12 rounded-full bg-[#F2F4F7] text-[#5B5FEF] mx-auto flex items-center justify-center mb-3">
-            <BookOpen className="size-6 text-[#667085]" />
+        <div className="bg-surface border border-[rgba(220,227,240,0.9)] shadow-clay rounded-[24px] py-16 px-6 text-center max-w-lg mx-auto my-8">
+          <div className="size-16 rounded-2xl bg-[#F8FAFF] border border-[rgba(220,227,240,0.8)] shadow-clay-inset mx-auto flex items-center justify-center mb-4 text-primary">
+            <BookOpen className="size-7 text-primary" />
           </div>
-          <h3 className="text-[15px] font-semibold text-[#101828]">No resources found</h3>
-          <p className="text-[13px] text-[#667085] mt-1 max-w-sm mx-auto">
+          <h3 className="text-lg font-bold text-foreground mb-1">
+            No resources found
+          </h3>
+          <p className="text-[13px] text-text-secondary mt-1 max-w-sm mx-auto mb-6">
             {hasActiveFilters
-              ? 'No knowledge assets match your search query or filters. Try adjusting your search criteria.'
-              : 'There are no documentation or reference links currently recorded in the knowledge hub.'}
+              ? "No knowledge assets match your search query or filters. Try adjusting your search criteria."
+              : "There are no documentation or reference links currently recorded in the knowledge hub."}
           </p>
           {hasActiveFilters && (
             <button
               type="button"
               onClick={resetFilters}
-              className="mt-4 inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#5B5FEF] text-white rounded-[6px] text-[12px] font-semibold hover:bg-[#4C50D8]"
+              className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-semibold shadow-sm hover:bg-primary-hover active:scale-95 transition-all cursor-pointer"
             >
               Clear Filters
             </button>
           )}
         </div>
-      ) : viewMode === 'LIST' ? (
+      ) : viewMode === "LIST" ? (
         /* Compact List View (§13: Prefer a compact list over cards whenever a list scans faster) */
-        <div className="bg-white border border-[#E4E7EC] rounded-[8px] overflow-hidden">
+        <div className="bg-surface border border-border rounded-[8px] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm border-collapse">
-              <thead className="border-b border-[#E4E7EC] bg-[#F9FAFB] text-[11px] uppercase tracking-wider font-semibold text-[#475467]">
+              <thead className="border-b border-border bg-background text-[11px] uppercase tracking-wider font-semibold text-text-secondary">
                 <tr>
                   <th scope="col" className="px-4 py-3 min-w-[280px]">
                     Resource & Description
@@ -632,20 +717,28 @@ export function WorkspaceResourceHub({
                   <th scope="col" className="px-4 py-3 min-w-[140px]">
                     Added By / Date
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right min-w-[110px]">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-right min-w-[110px]"
+                  >
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#EEF1F5]">
                 {filteredResources.map((res) => {
-                  const meta = CATEGORY_META[res.category] || CATEGORY_META.OTHER;
+                  const meta =
+                    CATEGORY_META[res.category] || CATEGORY_META.OTHER;
                   const Icon = meta.icon;
                   const badge = getResourceBadge(res.url);
-                  const canArchive = isAdmin || res.addedBy.id === currentUserId;
+                  const canArchive =
+                    isAdmin || res.addedBy.id === currentUserId;
 
                   return (
-                    <tr key={res.id} className="hover:bg-[#F9FAFC] transition-colors group">
+                    <tr
+                      key={res.id}
+                      className="hover:bg-surface-hover transition-colors group"
+                    >
                       {/* Title, URL & Description */}
                       <td className="px-4 py-3">
                         <div className="space-y-1">
@@ -654,22 +747,24 @@ export function WorkspaceResourceHub({
                               href={res.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="font-semibold text-[13px] text-[#101828] hover:text-[#5B5FEF] hover:underline flex items-center gap-1.5"
+                              className="font-semibold text-[13px] text-foreground hover:text-primary hover:underline flex items-center gap-1.5"
                             >
                               {res.title}
                               {badge.isFile ? (
-                                <Download className="size-3 text-[#5B5FEF]" />
+                                <Download className="size-3 text-primary" />
                               ) : (
-                                <ExternalLink className="size-3 text-[#98A2B3]" />
+                                <ExternalLink className="size-3 text-text-muted" />
                               )}
                             </a>
-                            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${badge.color}`}>
+                            <span
+                              className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${badge.color}`}
+                            >
                               {badge.label}
                             </span>
                           </div>
 
                           {res.description && (
-                            <p className="text-[12px] text-[#475467] line-clamp-1">
+                            <p className="text-[12px] text-text-secondary line-clamp-1">
                               {res.description}
                             </p>
                           )}
@@ -679,7 +774,7 @@ export function WorkspaceResourceHub({
                               {res.tags.map((t) => (
                                 <span
                                   key={t}
-                                  className="text-[10px] text-[#667085] bg-[#F9FAFC] px-1.5 py-0.2 rounded border border-[#EEF1F5]"
+                                  className="text-[10px] text-text-muted bg-surface-hover px-1.5 py-0.2 rounded border border-border-subtle"
                                 >
                                   #{t}
                                 </span>
@@ -704,13 +799,13 @@ export function WorkspaceResourceHub({
                         <div className="space-y-0.5">
                           <Link
                             href={`/projects/${res.projectId}`}
-                            className="inline-flex items-center gap-1 text-[12px] font-medium text-[#5B5FEF] hover:underline"
+                            className="inline-flex items-center gap-1 text-[12px] font-medium text-primary hover:underline"
                           >
                             <FolderKanban className="size-3" />
                             {res.project.name}
                           </Link>
                           {res.relatedTask && (
-                            <div className="text-[10px] text-[#667085]">
+                            <div className="text-[10px] text-text-muted">
                               Task: {res.relatedTask.taskCode}
                             </div>
                           )}
@@ -719,10 +814,10 @@ export function WorkspaceResourceHub({
 
                       {/* Added By & Date */}
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-[12px] font-medium text-[#101828]">
+                        <div className="text-[12px] font-medium text-foreground">
                           {res.addedBy.name}
                         </div>
-                        <div className="text-[10px] text-[#667085]">
+                        <div className="text-[10px] text-text-muted">
                           {formatDate(res.createdAt)}
                         </div>
                       </td>
@@ -734,8 +829,10 @@ export function WorkspaceResourceHub({
                           <button
                             type="button"
                             onClick={() => handleCopyUrl(res.id, res.url)}
-                            className="inline-flex items-center justify-center size-7 rounded-[4px] border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#101828] hover:bg-[#F9FAFC] transition-colors"
-                            title={copiedId === res.id ? 'Copied URL!' : 'Copy link'}
+                            className="inline-flex items-center justify-center size-7 rounded-[4px] border border-border-subtle bg-surface text-text-secondary hover:text-foreground hover:bg-surface-hover transition-colors"
+                            title={
+                              copiedId === res.id ? "Copied URL!" : "Copy link"
+                            }
                           >
                             {copiedId === res.id ? (
                               <Check className="size-3.5 text-[#16A34A]" />
@@ -750,8 +847,12 @@ export function WorkspaceResourceHub({
                             target="_blank"
                             rel="noopener noreferrer"
                             download={badge.isFile ? true : undefined}
-                            className="inline-flex items-center justify-center size-7 rounded-[4px] border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#5B5FEF] hover:bg-[#EFF6FF] hover:border-[#BFDBFE] transition-colors"
-                            title={badge.isFile ? "Download / View file" : "Open link"}
+                            className="inline-flex items-center justify-center size-7 rounded-[4px] border border-border-subtle bg-surface text-text-secondary hover:text-primary hover:bg-[#EFF6FF] hover:border-[#BFDBFE] transition-colors"
+                            title={
+                              badge.isFile
+                                ? "Download / View file"
+                                : "Open link"
+                            }
                           >
                             {badge.isFile ? (
                               <Download className="size-3.5" />
@@ -764,8 +865,10 @@ export function WorkspaceResourceHub({
                           {canArchive && (
                             <button
                               type="button"
-                              onClick={() => handleArchive(res.id, res.projectId, res.title)}
-                              className="inline-flex items-center justify-center size-7 rounded-[4px] border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#DC2626] hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
+                              onClick={() =>
+                                handleArchive(res.id, res.projectId, res.title)
+                              }
+                              className="inline-flex items-center justify-center size-7 rounded-[4px] border border-border-subtle bg-surface text-text-secondary hover:text-[#DC2626] hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
                               title="Archive resource"
                             >
                               <Trash2 className="size-3.5" />
@@ -792,7 +895,7 @@ export function WorkspaceResourceHub({
             return (
               <div
                 key={res.id}
-                className="bg-white border border-[#E4E7EC] rounded-[8px] p-4 flex flex-col justify-between hover:border-[#D0D5DD] transition-all"
+                className="bg-surface border border-border rounded-[8px] p-4 flex flex-col justify-between hover:border-border-subtle transition-all"
               >
                 <div className="space-y-2.5">
                   <div className="flex items-start justify-between gap-2">
@@ -802,7 +905,9 @@ export function WorkspaceResourceHub({
                       <Icon className="size-3" />
                       {meta.label}
                     </span>
-                    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${badge.color}`}>
+                    <span
+                      className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${badge.color}`}
+                    >
                       {badge.label}
                     </span>
                   </div>
@@ -812,14 +917,16 @@ export function WorkspaceResourceHub({
                       href={res.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="font-semibold text-[14px] text-[#101828] hover:text-[#5B5FEF] hover:underline line-clamp-1 flex items-center gap-1.5"
+                      className="font-semibold text-[14px] text-foreground hover:text-primary hover:underline line-clamp-1 flex items-center gap-1.5"
                       title={res.title}
                     >
                       {res.title}
-                      {badge.isFile && <Download className="size-3 text-[#5B5FEF] shrink-0" />}
+                      {badge.isFile && (
+                        <Download className="size-3 text-primary shrink-0" />
+                      )}
                     </a>
                     {res.description && (
-                      <p className="mt-1 text-[12px] text-[#475467] line-clamp-2">
+                      <p className="mt-1 text-[12px] text-text-secondary line-clamp-2">
                         {res.description}
                       </p>
                     )}
@@ -830,7 +937,7 @@ export function WorkspaceResourceHub({
                       {res.tags.map((t) => (
                         <span
                           key={t}
-                          className="text-[10px] text-[#667085] bg-[#F9FAFC] px-1.5 py-0.2 rounded border border-[#EEF1F5]"
+                          className="text-[10px] text-text-muted bg-surface-hover px-1.5 py-0.2 rounded border border-border-subtle"
                         >
                           #{t}
                         </span>
@@ -839,15 +946,15 @@ export function WorkspaceResourceHub({
                   )}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-[#EEF1F5] flex items-center justify-between">
+                <div className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between">
                   <div className="min-w-0">
                     <Link
                       href={`/projects/${res.projectId}`}
-                      className="text-[11px] font-semibold text-[#5B5FEF] hover:underline truncate block"
+                      className="text-[11px] font-semibold text-primary hover:underline truncate block"
                     >
                       {res.project.name}
                     </Link>
-                    <div className="text-[10px] text-[#667085]">
+                    <div className="text-[10px] text-text-muted">
                       {res.addedBy.name} • {formatDate(res.createdAt)}
                     </div>
                   </div>
@@ -856,8 +963,8 @@ export function WorkspaceResourceHub({
                     <button
                       type="button"
                       onClick={() => handleCopyUrl(res.id, res.url)}
-                      className="p-1.5 rounded border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#101828] hover:bg-[#F9FAFC]"
-                      title={copiedId === res.id ? 'Copied!' : 'Copy link'}
+                      className="p-1.5 rounded border border-border-subtle bg-surface text-text-secondary hover:text-foreground hover:bg-surface-hover"
+                      title={copiedId === res.id ? "Copied!" : "Copy link"}
                     >
                       {copiedId === res.id ? (
                         <Check className="size-3.5 text-[#16A34A]" />
@@ -870,16 +977,24 @@ export function WorkspaceResourceHub({
                       target="_blank"
                       rel="noopener noreferrer"
                       download={badge.isFile ? true : undefined}
-                      className="p-1.5 rounded border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#5B5FEF] hover:bg-[#EFF6FF]"
-                      title={badge.isFile ? "Download / View file" : "Open link"}
+                      className="p-1.5 rounded border border-border-subtle bg-surface text-text-secondary hover:text-primary hover:bg-[#EFF6FF]"
+                      title={
+                        badge.isFile ? "Download / View file" : "Open link"
+                      }
                     >
-                      {badge.isFile ? <Download className="size-3.5" /> : <ExternalLink className="size-3.5" />}
+                      {badge.isFile ? (
+                        <Download className="size-3.5" />
+                      ) : (
+                        <ExternalLink className="size-3.5" />
+                      )}
                     </a>
                     {canArchive && (
                       <button
                         type="button"
-                        onClick={() => handleArchive(res.id, res.projectId, res.title)}
-                        className="p-1.5 rounded border border-[#D0D5DD] bg-white text-[#475467] hover:text-[#DC2626] hover:bg-[#FEF2F2]"
+                        onClick={() =>
+                          handleArchive(res.id, res.projectId, res.title)
+                        }
+                        className="p-1.5 rounded border border-border-subtle bg-surface text-text-secondary hover:text-[#DC2626] hover:bg-[#FEF2F2]"
                         title="Archive resource"
                       >
                         <Trash2 className="size-3.5" />

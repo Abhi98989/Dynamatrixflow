@@ -1,23 +1,28 @@
-'use server';
+"use server";
 
-import { z } from 'zod';
-import { db } from '@/server/db/client';
-import { requireActiveUser } from '@/server/auth/authorization';
-import {
-  TaskStatus,
-  NotificationType,
-  SystemRole,
-} from '@prisma/client';
-import { revalidatePath } from 'next/cache';
+import { z } from "zod";
+import { db } from "@/server/db/client";
+import { requireActiveUser } from "@/server/auth/authorization";
+import { TaskStatus, NotificationType, SystemRole } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const requestChangesSchema = z.object({
   taskId: z.string().min(1),
-  feedback: z.string().min(3, 'Feedback must be at least 3 characters long').trim(),
+  feedback: z
+    .string()
+    .min(3, "Feedback must be at least 3 characters long")
+    .trim(),
 });
 
 const reopenTaskSchema = z.object({
   taskId: z.string().min(1),
-  reopenReason: z.string().min(5, 'A clear reason of at least 5 characters is required to reopen a completed deliverable').trim(),
+  reopenReason: z
+    .string()
+    .min(
+      5,
+      "A clear reason of at least 5 characters is required to reopen a completed deliverable",
+    )
+    .trim(),
 });
 
 /**
@@ -41,24 +46,32 @@ export async function submitForReviewAction(taskId: string, note?: string) {
       },
     });
 
-    if (!task) return { error: 'Task not found or archived.' };
+    if (!task) return { error: "Task not found or archived." };
 
     const isAdmin = user.systemRole === SystemRole.ADMIN;
     const isLead = task.project.projectLeadId === user.id;
     const isAssignee = task.assigneeId === user.id;
 
     if (!isAdmin && !isLead && !isAssignee) {
-      return { error: 'You do not have permission to submit this deliverable for review.' };
+      return {
+        error:
+          "You do not have permission to submit this deliverable for review.",
+      };
     }
 
-    if (task.status === TaskStatus.COMPLETED || task.status === TaskStatus.CANCELLED) {
-      return { error: `Cannot submit a ${task.status.toLowerCase()} task for review.` };
+    if (
+      task.status === TaskStatus.COMPLETED ||
+      task.status === TaskStatus.CANCELLED
+    ) {
+      return {
+        error: `Cannot submit a ${task.status.toLowerCase()} task for review.`,
+      };
     }
 
     const previousStatus = task.status;
     const submissionNote = note?.trim()
       ? `Submitted for review: ${note.trim()}`
-      : 'Submitted for review by assignee.';
+      : "Submitted for review by assignee.";
 
     await db.$transaction(async (tx) => {
       // 1. Update task status
@@ -93,7 +106,7 @@ export async function submitForReviewAction(taskId: string, note?: string) {
             title: `Review Requested: [${task.taskCode}]`,
             message: `${user.name} submitted "${task.title}" for review.`,
             projectId: task.project.id,
-            entityType: 'TASK',
+            entityType: "TASK",
             entityId: task.id,
           },
         });
@@ -104,8 +117,8 @@ export async function submitForReviewAction(taskId: string, note?: string) {
         data: {
           actorId: user.id,
           projectId: task.project.id,
-          action: 'TASK_SUBMITTED_FOR_REVIEW',
-          entityType: 'TASK',
+          action: "TASK_SUBMITTED_FOR_REVIEW",
+          entityType: "TASK",
           entityId: task.id,
           metadata: {
             taskCode: task.taskCode,
@@ -119,12 +132,15 @@ export async function submitForReviewAction(taskId: string, note?: string) {
 
     revalidatePath(`/projects/${task.project.id}/tasks/${taskId}`);
     revalidatePath(`/projects/${task.project.id}/tasks`);
-    revalidatePath('/review');
-    revalidatePath('/my-tasks');
+    revalidatePath("/review");
+    revalidatePath("/my-tasks");
     return { success: true };
   } catch (error) {
-    console.error('submitForReviewAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to submit for review.' };
+    console.error("submitForReviewAction error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to submit for review.",
+    };
   }
 }
 
@@ -132,7 +148,10 @@ export async function submitForReviewAction(taskId: string, note?: string) {
  * Approve task review -> Set status to COMPLETED.
  * Allowed for: Project Lead of project, Admin. (Assignee cannot approve their own deliverable).
  */
-export async function approveTaskReviewAction(taskId: string, reviewNote?: string) {
+export async function approveTaskReviewAction(
+  taskId: string,
+  reviewNote?: string,
+) {
   try {
     const user = await requireActiveUser();
 
@@ -149,22 +168,27 @@ export async function approveTaskReviewAction(taskId: string, reviewNote?: strin
       },
     });
 
-    if (!task) return { error: 'Task not found or archived.' };
+    if (!task) return { error: "Task not found or archived." };
 
     const isAdmin = user.systemRole === SystemRole.ADMIN;
     const isLead = task.project.projectLeadId === user.id;
 
     if (!isAdmin && !isLead) {
-      return { error: 'Only Project Leads or Administrators can approve deliverable reviews.' };
+      return {
+        error:
+          "Only Project Leads or Administrators can approve deliverable reviews.",
+      };
     }
 
     if (task.status !== TaskStatus.IN_REVIEW) {
-      return { error: `Task is not pending review (current status: ${task.status}).` };
+      return {
+        error: `Task is not pending review (current status: ${task.status}).`,
+      };
     }
 
     const approvalNote = reviewNote?.trim()
       ? `Review Approved: ${reviewNote.trim()}`
-      : 'Deliverable approved by Project Lead.';
+      : "Deliverable approved by Project Lead.";
 
     await db.$transaction(async (tx) => {
       // 1. Mark task completed
@@ -199,7 +223,7 @@ export async function approveTaskReviewAction(taskId: string, reviewNote?: strin
             title: `Deliverable Approved: [${task.taskCode}]`,
             message: `Your deliverable "${task.title}" has been approved by ${user.name}.`,
             projectId: task.project.id,
-            entityType: 'TASK',
+            entityType: "TASK",
             entityId: task.id,
           },
         });
@@ -210,8 +234,8 @@ export async function approveTaskReviewAction(taskId: string, reviewNote?: strin
         data: {
           actorId: user.id,
           projectId: task.project.id,
-          action: 'TASK_REVIEW_APPROVED',
-          entityType: 'TASK',
+          action: "TASK_REVIEW_APPROVED",
+          entityType: "TASK",
           entityId: task.id,
           metadata: {
             taskCode: task.taskCode,
@@ -224,12 +248,15 @@ export async function approveTaskReviewAction(taskId: string, reviewNote?: strin
 
     revalidatePath(`/projects/${task.project.id}/tasks/${taskId}`);
     revalidatePath(`/projects/${task.project.id}/tasks`);
-    revalidatePath('/review');
-    revalidatePath('/my-tasks');
+    revalidatePath("/review");
+    revalidatePath("/my-tasks");
     return { success: true };
   } catch (error) {
-    console.error('approveTaskReviewAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to approve review.' };
+    console.error("approveTaskReviewAction error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to approve review.",
+    };
   }
 }
 
@@ -242,7 +269,7 @@ export async function requestChangesAction(taskId: string, feedback: string) {
     const user = await requireActiveUser();
     const validated = requestChangesSchema.safeParse({ taskId, feedback });
     if (!validated.success) {
-      return { error: validated.error.issues[0]?.message || 'Invalid input.' };
+      return { error: validated.error.issues[0]?.message || "Invalid input." };
     }
 
     const task = await db.task.findUnique({
@@ -258,17 +285,21 @@ export async function requestChangesAction(taskId: string, feedback: string) {
       },
     });
 
-    if (!task) return { error: 'Task not found or archived.' };
+    if (!task) return { error: "Task not found or archived." };
 
     const isAdmin = user.systemRole === SystemRole.ADMIN;
     const isLead = task.project.projectLeadId === user.id;
 
     if (!isAdmin && !isLead) {
-      return { error: 'Only Project Leads or Administrators can request changes.' };
+      return {
+        error: "Only Project Leads or Administrators can request changes.",
+      };
     }
 
     if (task.status !== TaskStatus.IN_REVIEW) {
-      return { error: `Task is not pending review (current status: ${task.status}).` };
+      return {
+        error: `Task is not pending review (current status: ${task.status}).`,
+      };
     }
 
     const cleanFeedback = validated.data.feedback;
@@ -315,7 +346,7 @@ export async function requestChangesAction(taskId: string, feedback: string) {
             title: `Changes Requested: [${task.taskCode}]`,
             message: `${user.name} requested changes on "${task.title}": ${cleanFeedback.slice(0, 120)}`,
             projectId: task.project.id,
-            entityType: 'TASK',
+            entityType: "TASK",
             entityId: task.id,
           },
         });
@@ -326,8 +357,8 @@ export async function requestChangesAction(taskId: string, feedback: string) {
         data: {
           actorId: user.id,
           projectId: task.project.id,
-          action: 'TASK_CHANGES_REQUESTED',
-          entityType: 'TASK',
+          action: "TASK_CHANGES_REQUESTED",
+          entityType: "TASK",
           entityId: task.id,
           metadata: {
             taskCode: task.taskCode,
@@ -340,12 +371,15 @@ export async function requestChangesAction(taskId: string, feedback: string) {
 
     revalidatePath(`/projects/${task.project.id}/tasks/${taskId}`);
     revalidatePath(`/projects/${task.project.id}/tasks`);
-    revalidatePath('/review');
-    revalidatePath('/my-tasks');
+    revalidatePath("/review");
+    revalidatePath("/my-tasks");
     return { success: true };
   } catch (error) {
-    console.error('requestChangesAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to request changes.' };
+    console.error("requestChangesAction error:", error);
+    return {
+      error:
+        error instanceof Error ? error.message : "Failed to request changes.",
+    };
   }
 }
 
@@ -358,7 +392,7 @@ export async function reopenTaskAction(taskId: string, reopenReason: string) {
     const user = await requireActiveUser();
     const validated = reopenTaskSchema.safeParse({ taskId, reopenReason });
     if (!validated.success) {
-      return { error: validated.error.issues[0]?.message || 'Invalid input.' };
+      return { error: validated.error.issues[0]?.message || "Invalid input." };
     }
 
     const task = await db.task.findUnique({
@@ -374,17 +408,22 @@ export async function reopenTaskAction(taskId: string, reopenReason: string) {
       },
     });
 
-    if (!task) return { error: 'Task not found or archived.' };
+    if (!task) return { error: "Task not found or archived." };
 
     const isAdmin = user.systemRole === SystemRole.ADMIN;
     const isLead = task.project.projectLeadId === user.id;
 
     if (!isAdmin && !isLead) {
-      return { error: 'Only Project Leads or Administrators can reopen completed deliverables.' };
+      return {
+        error:
+          "Only Project Leads or Administrators can reopen completed deliverables.",
+      };
     }
 
     if (task.status !== TaskStatus.COMPLETED) {
-      return { error: `Only completed deliverables can be reopened (current status: ${task.status}).` };
+      return {
+        error: `Only completed deliverables can be reopened (current status: ${task.status}).`,
+      };
     }
 
     const cleanReason = validated.data.reopenReason;
@@ -431,7 +470,7 @@ export async function reopenTaskAction(taskId: string, reopenReason: string) {
             title: `Deliverable Reopened: [${task.taskCode}]`,
             message: `${task.taskCode} was reopened by ${user.name}: ${cleanReason.slice(0, 120)}`,
             projectId: task.project.id,
-            entityType: 'TASK',
+            entityType: "TASK",
             entityId: task.id,
           },
         });
@@ -442,8 +481,8 @@ export async function reopenTaskAction(taskId: string, reopenReason: string) {
         data: {
           actorId: user.id,
           projectId: task.project.id,
-          action: 'TASK_REOPENED',
-          entityType: 'TASK',
+          action: "TASK_REOPENED",
+          entityType: "TASK",
           entityId: task.id,
           metadata: {
             taskCode: task.taskCode,
@@ -456,11 +495,13 @@ export async function reopenTaskAction(taskId: string, reopenReason: string) {
 
     revalidatePath(`/projects/${task.project.id}/tasks/${taskId}`);
     revalidatePath(`/projects/${task.project.id}/tasks`);
-    revalidatePath('/review');
-    revalidatePath('/my-tasks');
+    revalidatePath("/review");
+    revalidatePath("/my-tasks");
     return { success: true };
   } catch (error) {
-    console.error('reopenTaskAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to reopen task.' };
+    console.error("reopenTaskAction error:", error);
+    return {
+      error: error instanceof Error ? error.message : "Failed to reopen task.",
+    };
   }
 }

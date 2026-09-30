@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useTransition } from 'react';
-import { updateMilestoneAction, archiveMilestoneAction } from './actions';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import * as React from "react";
+import { useState, useTransition } from "react";
+import { updateMilestoneAction, archiveMilestoneAction } from "./actions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Settings2, AlertCircle, Loader2, Trash2 } from 'lucide-react';
-import { MilestoneStatus } from '@prisma/client';
+} from "@/components/ui/dialog";
+import { Settings2, AlertCircle, Loader2, Trash2 } from "lucide-react";
+import { MilestoneStatus } from "@prisma/client";
 
 interface EditMilestoneDialogProps {
   milestone: {
@@ -43,7 +43,7 @@ export function EditMilestoneDialog({
     e.preventDefault();
     setError(null);
     const formData = new FormData(e.currentTarget);
-    formData.append('id', milestone.id);
+    formData.append("id", milestone.id);
 
     startTransition(async () => {
       const res = await updateMilestoneAction(undefined, formData);
@@ -56,7 +56,11 @@ export function EditMilestoneDialog({
   };
 
   const handleArchive = () => {
-    if (!window.confirm(`Are you sure you want to archive milestone ${milestone.milestoneCode}?`)) {
+    if (
+      !window.confirm(
+        `Are you sure you want to archive milestone ${milestone.milestoneCode}?`,
+      )
+    ) {
       return;
     }
     setError(null);
@@ -71,8 +75,8 @@ export function EditMilestoneDialog({
   };
 
   const formatDateForInput = (d: Date | null) => {
-    if (!d) return '';
-    return new Date(d).toISOString().split('T')[0];
+    if (!d) return "";
+    return new Date(d).toISOString().split("T")[0];
   };
 
   return (
@@ -117,7 +121,7 @@ export function EditMilestoneDialog({
             <textarea
               id="edit-milestone-desc"
               name="description"
-              defaultValue={milestone.description || ''}
+              defaultValue={milestone.description || ""}
               rows={2}
               className="flex w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary shadow-xs focus-visible:border-primary focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:opacity-50"
               disabled={isPending}
@@ -190,7 +194,7 @@ export function EditMilestoneDialog({
                     <Loader2 className="mr-2 size-4 animate-spin" /> Saving...
                   </>
                 ) : (
-                  'Save Changes'
+                  "Save Changes"
                 )}
               </Button>
             </div>

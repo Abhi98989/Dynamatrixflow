@@ -1,8 +1,8 @@
-'use server';
+"use server";
 
-import { db } from '@/server/db/client';
-import { requireActiveUser } from '@/server/auth/authorization';
-import { revalidatePath } from 'next/cache';
+import { db } from "@/server/db/client";
+import { requireActiveUser } from "@/server/auth/authorization";
+import { revalidatePath } from "next/cache";
 
 export async function getUnreadNotificationCountAction() {
   try {
@@ -15,8 +15,8 @@ export async function getUnreadNotificationCountAction() {
     });
     return { count };
   } catch (error: unknown) {
-    console.error('Failed to get notification count:', error);
-    return { error: 'Failed to fetch count', count: 0 };
+    console.error("Failed to get notification count:", error);
+    return { error: "Failed to fetch count", count: 0 };
   }
 }
 
@@ -34,11 +34,11 @@ export async function markNotificationReadAction(notificationId: string) {
         readAt: new Date(),
       },
     });
-    revalidatePath('/notifications');
+    revalidatePath("/notifications");
     return { success: true };
   } catch (error: unknown) {
-    console.error('Failed to mark notification read:', error);
-    return { error: 'Failed to update notification' };
+    console.error("Failed to mark notification read:", error);
+    return { error: "Failed to update notification" };
   }
 }
 
@@ -55,11 +55,11 @@ export async function markAllNotificationsReadAction() {
         readAt: new Date(),
       },
     });
-    revalidatePath('/notifications');
+    revalidatePath("/notifications");
     return { success: true };
   } catch (error: unknown) {
-    console.error('Failed to mark all read:', error);
-    return { error: 'Failed to update notifications' };
+    console.error("Failed to mark all read:", error);
+    return { error: "Failed to update notifications" };
   }
 }
 
@@ -68,13 +68,13 @@ export async function getRecentNotificationsAction() {
     const currentUser = await requireActiveUser();
     const notifications = await db.notification.findMany({
       where: { userId: currentUser.id },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 5,
     });
     return { notifications };
   } catch (error: unknown) {
-    console.error('Failed to get recent notifications:', error);
-    return { error: 'Failed to fetch', notifications: [] };
+    console.error("Failed to get recent notifications:", error);
+    return { error: "Failed to fetch", notifications: [] };
   }
 }
 
@@ -87,11 +87,11 @@ export async function deleteNotificationAction(notificationId: string) {
         userId: currentUser.id,
       },
     });
-    revalidatePath('/notifications');
+    revalidatePath("/notifications");
     return { success: true };
   } catch (error: unknown) {
-    console.error('Failed to delete notification:', error);
-    return { error: 'Failed to delete notification' };
+    console.error("Failed to delete notification:", error);
+    return { error: "Failed to delete notification" };
   }
 }
 
@@ -104,10 +104,10 @@ export async function clearAllReadNotificationsAction() {
         isRead: true,
       },
     });
-    revalidatePath('/notifications');
+    revalidatePath("/notifications");
     return { success: true };
   } catch (error: unknown) {
-    console.error('Failed to clear read notifications:', error);
-    return { error: 'Failed to clear notifications' };
+    console.error("Failed to clear read notifications:", error);
+    return { error: "Failed to clear notifications" };
   }
 }

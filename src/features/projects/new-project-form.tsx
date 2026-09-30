@@ -4,7 +4,14 @@ import * as React from "react";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Save, AlertCircle, Loader2, Sparkles, FolderPlus } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  AlertCircle,
+  Loader2,
+  Sparkles,
+  FolderPlus,
+} from "lucide-react";
 import { Priority, ProjectStatus, SystemRole } from "@prisma/client";
 import { createProjectAction } from "./actions";
 
@@ -22,10 +29,7 @@ interface NewProjectFormProps {
   currentUserRole: SystemRole;
 }
 
-export function NewProjectForm({
-  leads,
-  currentUserId,
-}: NewProjectFormProps) {
+export function NewProjectForm({ leads, currentUserId }: NewProjectFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -84,14 +88,15 @@ export function NewProjectForm({
             <FolderPlus className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-[11px] font-bold text-[#5B5FEF] uppercase tracking-wider block mb-0.5">
+            <span className="text-[11px] font-bold text-primary uppercase tracking-wider block mb-0.5">
               Create New Project
             </span>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
               Project Initialization
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Initialize a scoped client or internal workspace with dedicated lead and tracking.
+              Initialize a scoped client or internal workspace with dedicated
+              lead and tracking.
             </p>
           </div>
         </div>
@@ -100,7 +105,7 @@ export function NewProjectForm({
       {/* Main Form */}
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-xl border border-slate-200 p-5 sm:p-7 space-y-6"
+        className="bg-surface rounded-[24px] border border-[rgba(220,227,240,0.9)] shadow-clay p-6 sm:p-8 space-y-6"
       >
         {/* Error Banner */}
         {error && (
@@ -110,7 +115,8 @@ export function NewProjectForm({
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0 text-red-600" />
             <div className="flex-1 leading-relaxed">
-              <span className="font-semibold">Unable to create project:</span> {error}
+              <span className="font-semibold">Unable to create project:</span>{" "}
+              {error}
             </div>
           </div>
         )}
@@ -138,7 +144,7 @@ export function NewProjectForm({
                 required
                 disabled={isPending}
                 placeholder="e.g. Core API Gateway v3.0"
-                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm text-slate-900 disabled:opacity-60"
+                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-slate-900 disabled:opacity-60"
               />
             </div>
 
@@ -186,10 +192,14 @@ export function NewProjectForm({
                       value={prefix}
                       disabled={isPending}
                       onChange={(e) =>
-                        setPrefix(e.target.value.replace(/[^a-zA-Z0-9]/g, "").toUpperCase())
+                        setPrefix(
+                          e.target.value
+                            .replace(/[^a-zA-Z0-9]/g, "")
+                            .toUpperCase(),
+                        )
                       }
                       placeholder="e.g. CORE"
-                      className="w-full h-10 px-3 font-mono rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm uppercase text-slate-900 disabled:opacity-60"
+                      className="w-full h-10 px-3 font-mono rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm uppercase text-slate-900 disabled:opacity-60"
                     />
                     <Sparkles className="absolute right-3 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
                   </div>
@@ -211,14 +221,17 @@ export function NewProjectForm({
                     disabled={isPending}
                     onChange={(e) =>
                       setCustomCode(
-                        e.target.value.replace(/[^a-zA-Z0-9-]/g, "").toUpperCase()
+                        e.target.value
+                          .replace(/[^a-zA-Z0-9-]/g, "")
+                          .toUpperCase(),
                       )
                     }
                     placeholder="e.g. DF-EXP-001 or PROJ-882"
-                    className="w-full h-10 px-3 font-mono rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm uppercase text-slate-900 disabled:opacity-60"
+                    className="w-full h-10 px-3 font-mono rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm uppercase text-slate-900 disabled:opacity-60"
                   />
                   <p className="text-[11px] text-slate-500 mt-1">
-                    Uppercase alphanumeric with hyphens. Must be globally unique.
+                    Uppercase alphanumeric with hyphens. Must be globally
+                    unique.
                   </p>
                 </div>
               )}
@@ -237,7 +250,7 @@ export function NewProjectForm({
                 type="text"
                 disabled={isPending}
                 placeholder="e.g. Internal Infrastructure or Acme Corp"
-                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm text-slate-900 disabled:opacity-60"
+                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-slate-900 disabled:opacity-60"
               />
             </div>
 
@@ -254,7 +267,7 @@ export function NewProjectForm({
                 rows={3}
                 disabled={isPending}
                 placeholder="Brief summary of requirements, deliverables, and goals..."
-                className="w-full p-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm text-slate-900 resize-none disabled:opacity-60"
+                className="w-full p-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-slate-900 resize-none disabled:opacity-60"
               />
             </div>
           </div>
@@ -286,11 +299,12 @@ export function NewProjectForm({
                   ""
                 }
                 disabled={isPending}
-                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm bg-white text-slate-900 disabled:opacity-60"
+                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-surface text-slate-900 disabled:opacity-60"
               >
                 {leads.map((l) => (
                   <option key={l.id} value={l.id}>
-                    {l.name} ({l.employeeId}) {l.position ? `— ${l.position}` : ""}{" "}
+                    {l.name} ({l.employeeId}){" "}
+                    {l.position ? `— ${l.position}` : ""}{" "}
                     {l.id === currentUserId ? "(You)" : ""}
                   </option>
                 ))}
@@ -309,7 +323,7 @@ export function NewProjectForm({
                 name="status"
                 defaultValue={ProjectStatus.PLANNING}
                 disabled={isPending}
-                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm bg-white text-slate-900 disabled:opacity-60"
+                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-surface text-slate-900 disabled:opacity-60"
               >
                 <option value={ProjectStatus.PLANNING}>Planning</option>
                 <option value={ProjectStatus.ACTIVE}>Active</option>
@@ -329,7 +343,7 @@ export function NewProjectForm({
                 name="priority"
                 defaultValue={Priority.MEDIUM}
                 disabled={isPending}
-                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm bg-white text-slate-900 disabled:opacity-60"
+                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm bg-surface text-slate-900 disabled:opacity-60"
               >
                 <option value={Priority.LOW}>Low</option>
                 <option value={Priority.MEDIUM}>Medium</option>
@@ -352,7 +366,7 @@ export function NewProjectForm({
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 disabled={isPending}
-                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm text-slate-900 disabled:opacity-60"
+                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-slate-900 disabled:opacity-60"
               />
             </div>
 
@@ -370,7 +384,7 @@ export function NewProjectForm({
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
                 disabled={isPending}
-                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-[#5B5FEF] focus:ring-1 focus:ring-[#5B5FEF] text-sm text-slate-900 disabled:opacity-60"
+                className="w-full h-10 px-3 rounded-md border border-slate-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm text-slate-900 disabled:opacity-60"
               />
             </div>
           </div>
@@ -380,14 +394,14 @@ export function NewProjectForm({
         <div className="pt-4 flex items-center justify-end gap-3 border-t border-slate-100">
           <Link
             href="/projects"
-            className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 rounded-md transition-colors"
+            className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors"
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={isPending}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#5B5FEF] text-white rounded-md text-sm font-semibold hover:bg-[#4C50D8] active:bg-[#4145C2] transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold shadow-[0_4px_14px_rgba(30,58,138,0.35)] hover:bg-primary-hover active:translate-y-[1px] transition-all disabled:opacity-50 cursor-pointer"
           >
             {isPending ? (
               <>

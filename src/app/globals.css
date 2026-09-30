@@ -2,71 +2,91 @@
 @import "tw-animate-css";
 
 :root {
-  /* Executive Precision Palette */
-  --brand-purple: #4F46E5;
-  --brand-blue: #3b82f6;
-  --brand-cyan: #06b6d4;
-  --brand-green: #10B981;
-  --background: #F8FAFC;
-  --foreground: #0F172A;
-  --surface: #FFFFFF;
-  --surface-secondary: #F8FAFC;
-  --primary: #4F46E5;
-  --primary-hover: #4338CA;
-  --primary-active: #3730A3;
-  --primary-foreground: #FFFFFF;
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #94A3B8;
-  --text-disabled: #CBD5E1;
-  --text-inverse: #FFFFFF;
-  --border: #E2E8F0;
-  --border-subtle: #F1F5F9;
-  --border-strong: #CBD5E1;
-  --border-focus: #4F46E5;
-  --sidebar: #0F172A;
-  --sidebar-secondary: #1E293B;
-  --sidebar-text: #94A3B8;
-  --sidebar-text-active: #FFFFFF;
-  --sidebar-hover: #1E293B;
-  --sidebar-active: rgba(79, 70, 229, 0.16);
-  --sidebar-indicator: #4F46E5;
-  --success: #10B981;
-  --success-bg: #ECFDF5;
-  --success-border: #6EE7B7;
-  --warning: #F59E0B;
-  --warning-bg: #FFFBEB;
-  --warning-border: #FCD34D;
-  --danger: #EF4444;
-  --danger-bg: #FEF2F2;
-  --danger-border: #FCA5A5;
-  --info: #3B82F6;
-  --info-bg: #EFF6FF;
-  --info-border: #BFDBFE;
-  --status-todo: #475569;
-  --status-todo-bg: #F8FAFC;
+  /* Dynamatrix Flow - Black + White + Cobalt Blue Clay Theme */
+  --cobalt-deep: #1e3a8a;
+  --cobalt-hover: #1a3278;
+  --cobalt-active: #14285f;
+  --cobalt-soft: #e8eeff;
+
+  --black-primary: #0a0c10;
+  --black-secondary: #151922;
+  --charcoal: #222834;
+
+  --white: #ffffff;
+  --off-white: #f7f8fc;
+  --soft-white: #f1f4fa;
+
+  --text-primary: #0b1220;
+  --text-secondary: #475467;
+  --text-muted: #667085;
+  --text-disabled: #98a2b3;
+
+  --border: #dce3f0;
+  --border-subtle: #e9eef6;
+  --border-strong: #c9d4e5;
+
+  --background: var(--off-white);
+  --foreground: var(--text-primary);
+  --surface: var(--white);
+  --surface-secondary: var(--soft-white);
+
+  --primary: var(--cobalt-deep);
+  --primary-hover: var(--cobalt-hover);
+  --primary-active: var(--cobalt-active);
+  --primary-foreground: var(--white);
+
+  --border-focus: var(--cobalt-deep);
+
+  --sidebar: var(--black-primary);
+  --sidebar-secondary: var(--sidebar-surface);
+  --sidebar-surface: #11141b;
+  --sidebar-hover: #171b24;
+  --sidebar-text: #aab2c3;
+  --sidebar-text-active: #ffffff;
+  --sidebar-active: rgba(30, 58, 138, 0.22);
+  --sidebar-indicator: #2f5bdb;
+
+  --success: #15803d;
+  --success-bg: #f0fdf4;
+  --success-border: #86efac;
+  --warning: #b45309;
+  --warning-bg: #fffbeb;
+  --warning-border: #fcd34d;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --danger-border: #fca5a5;
+  --info: var(--cobalt-deep);
+  --info-bg: var(--cobalt-soft);
+  --info-border: #bfdbfe;
+
+  --status-todo: var(--text-secondary);
+  --status-todo-bg: var(--soft-white);
   --status-in-progress: var(--info);
   --status-in-progress-bg: var(--info-bg);
   --status-blocked: var(--danger);
   --status-blocked-bg: var(--danger-bg);
-  --status-in-review: #8B5CF6;
-  --status-in-review-bg: #F5F3FF;
+  --status-in-review: #7e22ce;
+  --status-in-review-bg: #faf5ff;
   --status-completed: var(--success);
   --status-completed-bg: var(--success-bg);
-  --status-cancelled: #94A3B8;
-  --status-cancelled-bg: #F1F5F9;
+  --status-cancelled: var(--text-muted);
+  --status-cancelled-bg: var(--border-subtle);
+
   --priority-critical: var(--danger);
-  --priority-high: #EA580C;
+  --priority-high: #ea580c;
   --priority-medium: var(--warning);
-  --priority-low: #64748B;
-  --project-planning: #64748B;
+  --priority-low: var(--text-muted);
+
+  --project-planning: var(--text-muted);
   --project-active: var(--info);
   --project-on-hold: var(--warning);
   --project-completed: var(--success);
   --project-cancelled: var(--danger);
   --project-archived: var(--text-secondary);
-  --progress-track: #E2E8F0;
-  --table-header: #F8FAFC;
+
+  --progress-track: var(--border);
+  --table-header: var(--white);
+
   --card: var(--surface);
   --card-foreground: var(--foreground);
   --popover: var(--surface);
@@ -78,26 +98,43 @@
   --accent: var(--surface-secondary);
   --accent-foreground: var(--foreground);
   --destructive: var(--danger);
-  --destructive-foreground: var(--text-inverse);
+  --destructive-foreground: var(--white);
+
   --input: var(--border-strong);
   --ring: var(--border-focus);
-  --radius: 4px;
-  --shadow-card: none;
-  --shadow-dropdown: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
-  --shadow-dialog: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+
+  --radius: 16px;
+
+  --shadow-card: 0 4px 12px rgba(15, 23, 42, 0.03);
+  --shadow-dropdown:
+    0 10px 25px -5px rgba(15, 23, 42, 0.08),
+    0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-dialog:
+    14px 14px 35px rgba(15, 23, 42, 0.16),
+    -12px -12px 30px rgba(255, 255, 255, 0.95),
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+  --shadow-clay:
+    10px 10px 24px rgba(15, 23, 42, 0.08),
+    -8px -8px 18px rgba(255, 255, 255, 0.92);
+  --shadow-clay-inset:
+    inset 4px 4px 10px rgba(15, 23, 42, 0.06),
+    inset -4px -4px 10px rgba(255, 255, 255, 0.95);
 }
 
 @theme inline {
   --font-sans: "Inter Variable", "Segoe UI", sans-serif;
-  --font-heading: "Geist Sans", "Segoe UI", sans-serif;
+  --font-heading: "Inter Variable", "Geist Sans", sans-serif;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
   --color-surface-secondary: var(--surface-secondary);
+
   --color-primary: var(--primary);
   --color-primary-hover: var(--primary-hover);
   --color-primary-active: var(--primary-active);
   --color-primary-foreground: var(--primary-foreground);
+
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -109,40 +146,50 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
   --color-sidebar: var(--sidebar);
   --color-sidebar-secondary: var(--sidebar-secondary);
   --color-sidebar-text: var(--sidebar-text);
   --color-sidebar-text-active: var(--sidebar-text-active);
   --color-sidebar-hover: var(--sidebar-hover);
   --color-sidebar-active: var(--sidebar-active);
+
   --color-info: var(--info);
   --color-info-bg: var(--info-bg);
   --color-success: var(--success);
   --color-success-bg: var(--success-bg);
   --color-review: var(--status-in-review);
   --color-review-bg: var(--status-in-review-bg);
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 6px;
-  --radius-xl: 8px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
   --text-page: 26px;
   --text-page--line-height: 32px;
   --text-section: 19px;
   --text-section--line-height: 26px;
   --text-small: 13px;
   --text-small--line-height: 18px;
+
   --shadow-card: var(--shadow-card);
   --shadow-dropdown: var(--shadow-dropdown);
   --shadow-dialog: var(--shadow-dialog);
+  --shadow-clay: var(--shadow-clay);
+  --shadow-clay-inset: var(--shadow-clay-inset);
 }
 
 @layer utilities {
   .hide-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
   .hide-scrollbar::-webkit-scrollbar {
     display: none;

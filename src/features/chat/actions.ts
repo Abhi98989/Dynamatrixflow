@@ -1,9 +1,9 @@
-'use server';
+"use server";
 
-import { db } from '@/server/db/client';
-import { requireActiveUser, canViewProject } from '@/server/auth/authorization';
-import { revalidatePath } from 'next/cache';
-import { NotificationType } from '@prisma/client';
+import { db } from "@/server/db/client";
+import { requireActiveUser, canViewProject } from "@/server/auth/authorization";
+import { revalidatePath } from "next/cache";
+import { NotificationType } from "@prisma/client";
 
 export interface SendMessageInput {
   projectId: string;
@@ -22,12 +22,12 @@ export async function sendProjectMessageAction({
     const user = await requireActiveUser();
     const hasAccess = await canViewProject(user.id, projectId);
     if (!hasAccess) {
-      return { error: 'You do not have access to this project.' };
+      return { error: "You do not have access to this project." };
     }
 
     const trimmed = content.trim();
     if (!trimmed) {
-      return { error: 'Message cannot be empty.' };
+      return { error: "Message cannot be empty." };
     }
 
     const project = await db.project.findUnique({
@@ -35,15 +35,17 @@ export async function sendProjectMessageAction({
       select: { id: true, name: true },
     });
     if (!project) {
-      return { error: 'Project not found.' };
+      return { error: "Project not found." };
     }
 
     // Auto-detect any @mentions if not explicitly passed
     const finalMentions = [...mentionedUserIds];
-    if (finalMentions.length === 0 && trimmed.includes('@')) {
+    if (finalMentions.length === 0 && trimmed.includes("@")) {
       const projectMembers = await db.projectMember.findMany({
         where: { projectId, removedAt: null },
-        include: { user: { select: { id: true, name: true, employeeId: true } } },
+        include: {
+          user: { select: { id: true, name: true, employeeId: true } },
+        },
       });
 
       for (const member of projectMembers) {
@@ -71,7 +73,13 @@ export async function sendProjectMessageAction({
       },
       include: {
         user: {
-          select: { id: true, name: true, employeeId: true, position: true, avatarUrl: true },
+          select: {
+            id: true,
+            name: true,
+            employeeId: true,
+            position: true,
+            avatarUrl: true,
+          },
         },
         replyTo: {
           select: {
@@ -93,7 +101,7 @@ export async function sendProjectMessageAction({
           title: `Mentioned in ${project.name}`,
           message: `${user.name}: "${trimmed.slice(0, 90)}"`,
           projectId,
-          entityType: 'PROJECT_MESSAGE',
+          entityType: "PROJECT_MESSAGE",
           entityId: message.id,
         }));
 
@@ -108,8 +116,10 @@ export async function sendProjectMessageAction({
     revalidatePath(`/projects/${projectId}`);
     return { success: true, message };
   } catch (error) {
-    console.error('sendProjectMessageAction error:', error);
-    return { error: error instanceof Error ? error.message : 'Failed to send message.' };
+    console.error("sendProjectMessageAction error:", error);
+    return {
+      error: error instanceof Error ? error.message : "Failed to send message.",
+    };
   }
 }
 
@@ -118,14 +128,20 @@ export async function getProjectMessagesAction(projectId: string, take = 100) {
     const user = await requireActiveUser();
     const hasAccess = await canViewProject(user.id, projectId);
     if (!hasAccess) {
-      return { error: 'Unauthorized', messages: [] };
+      return { error: "Unauthorized", messages: [] };
     }
 
     const messages = await db.projectMessage.findMany({
       where: { projectId, deletedAt: null },
       include: {
         user: {
-          select: { id: true, name: true, employeeId: true, position: true, avatarUrl: true },
+          select: {
+            id: true,
+            name: true,
+            employeeId: true,
+            position: true,
+            avatarUrl: true,
+          },
         },
         replyTo: {
           select: {
@@ -135,18 +151,21 @@ export async function getProjectMessagesAction(projectId: string, take = 100) {
           },
         },
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
       take,
     });
 
     return { success: true, messages };
   } catch (error) {
-    console.error('getProjectMessagesAction error:', error);
-    return { error: 'Failed to fetch messages.', messages: [] };
+    console.error("getProjectMessagesAction error:", error);
+    return { error: "Failed to fetch messages.", messages: [] };
   }
 }
 
-export async function deleteProjectMessageAction(projectId: string, messageId: string) {
+export async function deleteProjectMessageAction(
+  projectId: string,
+  messageId: string,
+) {
   try {
     const user = await requireActiveUser();
     const message = await db.projectMessage.findUnique({
@@ -155,15 +174,15 @@ export async function deleteProjectMessageAction(projectId: string, messageId: s
     });
 
     if (!message || message.projectId !== projectId) {
-      return { error: 'Message not found.' };
+      return { error: "Message not found." };
     }
 
-    const isAdmin = (user.systemRole as string) === 'ADMIN';
+    const isAdmin = (user.systemRole as string) === "ADMIN";
     const isLead = message.project.projectLeadId === user.id;
     const isAuthor = message.userId === user.id;
 
     if (!isAuthor && !isLead && !isAdmin) {
-      return { error: 'You do not have permission to delete this message.' };
+      return { error: "You do not have permission to delete this message." };
     }
 
     await db.projectMessage.update({
@@ -174,17 +193,20 @@ export async function deleteProjectMessageAction(projectId: string, messageId: s
     revalidatePath(`/projects/${projectId}/chat`);
     return { success: true };
   } catch (error) {
-    console.error('deleteProjectMessageAction error:', error);
-    return { error: 'Failed to delete message.' };
+    console.error("deleteProjectMessageAction error:", error);
+    return { error: "Failed to delete message." };
   }
 }
 
-export async function togglePinProjectMessageAction(projectId: string, messageId: string) {
+export async function togglePinProjectMessageAction(
+  projectId: string,
+  messageId: string,
+) {
   try {
     const user = await requireActiveUser();
     const hasAccess = await canViewProject(user.id, projectId);
     if (!hasAccess) {
-      return { error: 'Unauthorized.' };
+      return { error: "Unauthorized." };
     }
 
     const message = await db.projectMessage.findUnique({
@@ -192,7 +214,7 @@ export async function togglePinProjectMessageAction(projectId: string, messageId
     });
 
     if (!message || message.projectId !== projectId) {
-      return { error: 'Message not found.' };
+      return { error: "Message not found." };
     }
 
     const updated = await db.projectMessage.update({
@@ -203,7 +225,7 @@ export async function togglePinProjectMessageAction(projectId: string, messageId
     revalidatePath(`/projects/${projectId}/chat`);
     return { success: true, isPinned: updated.isPinned };
   } catch (error) {
-    console.error('togglePinProjectMessageAction error:', error);
-    return { error: 'Failed to pin message.' };
+    console.error("togglePinProjectMessageAction error:", error);
+    return { error: "Failed to pin message." };
   }
 }

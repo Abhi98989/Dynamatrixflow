@@ -1,16 +1,16 @@
-import { Metadata } from 'next';
-import { db } from '@/server/db/client';
-import { requireActiveUser } from '@/server/auth/authorization';
-import { SystemRole } from '@prisma/client';
+import { Metadata } from "next";
+import { db } from "@/server/db/client";
+import { requireActiveUser } from "@/server/auth/authorization";
+import { SystemRole } from "@prisma/client";
 import {
   WorkspaceResourceHub,
   ResourceItem,
-} from '@/features/resources/workspace-resource-hub';
+} from "@/features/resources/workspace-resource-hub";
 
 export const metadata: Metadata = {
-  title: 'Knowledge Hub & Resources | Dynamatrix Flow',
+  title: "Knowledge Hub & Resources | Dynamatrix Flow",
   description:
-    'Centralized repository for documentation, architecture blueprints, API specifications, and research assets.',
+    "Centralized repository for documentation, architecture blueprints, API specifications, and research assets.",
 };
 
 export default async function ResourcesPage() {
@@ -35,7 +35,7 @@ export default async function ResourcesPage() {
       name: true,
       projectCode: true,
     },
-    orderBy: { name: 'asc' },
+    orderBy: { name: "asc" },
   });
 
   const accessibleProjectIds = accessibleProjects.map((p) => p.id);
@@ -51,7 +51,7 @@ export default async function ResourcesPage() {
       addedBy: { select: { id: true, name: true } },
       relatedTask: { select: { id: true, taskCode: true, title: true } },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 
   // Serialize to JSON-safe format

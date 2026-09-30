@@ -36,7 +36,7 @@ export default function ErrorPage({
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
         <Button
           onClick={() => reset()}
-          className="flex items-center gap-2 bg-[#5B5FEF] text-white hover:bg-[#4C50D8]"
+          className="flex items-center gap-2 bg-primary text-white hover:bg-primary-hover"
         >
           <RefreshCw className="w-4 h-4" /> Try again
         </Button>

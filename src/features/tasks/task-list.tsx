@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState, useMemo } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { TaskStatusDropdown } from './task-status-dropdown';
-import { TaskDrawer } from './task-drawer';
+import * as React from "react";
+import { useState, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { TaskStatusDropdown } from "./task-status-dropdown";
+import { TaskDrawer } from "./task-drawer";
 import {
   Search,
   Filter,
@@ -16,9 +16,9 @@ import {
   ArrowRight,
   Target,
   Sparkles,
-} from 'lucide-react';
-import { TaskStatus, Priority } from '@prisma/client';
-import { toggleTaskPointerAction, setTaskHighlightAction } from './actions';
+} from "lucide-react";
+import { TaskStatus, Priority } from "@prisma/client";
+import { toggleTaskPointerAction, setTaskHighlightAction } from "./actions";
 
 export interface TaskListItem {
   id: string;
@@ -64,13 +64,26 @@ export function TaskList({
 }: TaskListProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(searchParams.get('task') || null);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(
+    searchParams.get("task") || null,
+  );
 
-  const [search, setSearch] = useState(searchParams.get('q') || '');
-  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'ALL');
-  const [priorityFilter, setPriorityFilter] = useState(searchParams.get('priority') || 'ALL');
-  const [highlightFilter, setHighlightFilter] = useState('ALL');
-  const [quickFilter, setQuickFilter] = useState<'ALL' | 'IN_PROGRESS' | 'IN_REVIEW' | 'OVERDUE' | 'CRITICAL_HIGH' | 'COMPLETED'>('ALL');
+  const [search, setSearch] = useState(searchParams.get("q") || "");
+  const [statusFilter, setStatusFilter] = useState(
+    searchParams.get("status") || "ALL",
+  );
+  const [priorityFilter, setPriorityFilter] = useState(
+    searchParams.get("priority") || "ALL",
+  );
+  const [highlightFilter, setHighlightFilter] = useState("ALL");
+  const [quickFilter, setQuickFilter] = useState<
+    | "ALL"
+    | "IN_PROGRESS"
+    | "IN_REVIEW"
+    | "OVERDUE"
+    | "CRITICAL_HIGH"
+    | "COMPLETED"
+  >("ALL");
 
   const pointedTask = useMemo(() => tasks.find((t) => t.isPointed), [tasks]);
 
@@ -81,7 +94,11 @@ export function TaskList({
     router.refresh();
   };
 
-  const handleSetHighlight = async (taskId: string, color: string | null, e: React.MouseEvent) => {
+  const handleSetHighlight = async (
+    taskId: string,
+    color: string | null,
+    e: React.MouseEvent,
+  ) => {
     e.stopPropagation();
     e.preventDefault();
     await setTaskHighlightAction(taskId, color);
@@ -90,7 +107,8 @@ export function TaskList({
 
   const isOverdue = (dueDate: Date | null, status: TaskStatus) => {
     if (!dueDate) return false;
-    if (status === TaskStatus.COMPLETED || status === TaskStatus.CANCELLED) return false;
+    if (status === TaskStatus.COMPLETED || status === TaskStatus.CANCELLED)
+      return false;
     return new Date(dueDate) < new Date();
   };
 
@@ -104,31 +122,46 @@ export function TaskList({
         (t.assignee && t.assignee.name.toLowerCase().includes(q)) ||
         (t.project && t.project.name.toLowerCase().includes(q));
 
-      const matchesStatus = statusFilter === 'ALL' || t.status === statusFilter;
-      const matchesPriority = priorityFilter === 'ALL' || t.priority === priorityFilter;
+      const matchesStatus = statusFilter === "ALL" || t.status === statusFilter;
+      const matchesPriority =
+        priorityFilter === "ALL" || t.priority === priorityFilter;
       const matchesHighlight =
-        highlightFilter === 'ALL'
+        highlightFilter === "ALL"
           ? true
-          : highlightFilter === 'HIGHLIGHTED'
+          : highlightFilter === "HIGHLIGHTED"
             ? Boolean(t.highlightColor)
             : t.highlightColor === highlightFilter;
 
       let matchesQuick = true;
-      if (quickFilter === 'IN_PROGRESS') {
+      if (quickFilter === "IN_PROGRESS") {
         matchesQuick = t.status === TaskStatus.IN_PROGRESS;
-      } else if (quickFilter === 'IN_REVIEW') {
+      } else if (quickFilter === "IN_REVIEW") {
         matchesQuick = t.status === TaskStatus.IN_REVIEW;
-      } else if (quickFilter === 'OVERDUE') {
+      } else if (quickFilter === "OVERDUE") {
         matchesQuick = isOverdue(t.dueDate, t.status);
-      } else if (quickFilter === 'CRITICAL_HIGH') {
-        matchesQuick = t.priority === Priority.CRITICAL || t.priority === Priority.HIGH;
-      } else if (quickFilter === 'COMPLETED') {
+      } else if (quickFilter === "CRITICAL_HIGH") {
+        matchesQuick =
+          t.priority === Priority.CRITICAL || t.priority === Priority.HIGH;
+      } else if (quickFilter === "COMPLETED") {
         matchesQuick = t.status === TaskStatus.COMPLETED;
       }
 
-      return matchesSearch && matchesStatus && matchesPriority && matchesQuick && matchesHighlight;
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPriority &&
+        matchesQuick &&
+        matchesHighlight
+      );
     });
-  }, [tasks, search, statusFilter, priorityFilter, quickFilter, highlightFilter]);
+  }, [
+    tasks,
+    search,
+    statusFilter,
+    priorityFilter,
+    quickFilter,
+    highlightFilter,
+  ]);
 
   const getPriorityBadge = (priority: Priority) => {
     switch (priority) {
@@ -163,45 +196,83 @@ export function TaskList({
     <div className="space-y-3">
       {/* Quick Filter Chips */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
-        {([
-          { id: 'ALL', label: 'All Tasks', count: tasks.length },
-          { id: 'IN_PROGRESS', label: 'In Progress', count: tasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length },
-          { id: 'IN_REVIEW', label: 'Pending Review', count: tasks.filter(t => t.status === TaskStatus.IN_REVIEW).length },
-          { id: 'OVERDUE', label: 'Overdue', count: tasks.filter(t => isOverdue(t.dueDate, t.status)).length, alert: true },
-          { id: 'CRITICAL_HIGH', label: 'Critical & High', count: tasks.filter(t => t.priority === Priority.CRITICAL || t.priority === Priority.HIGH).length },
-          { id: 'COMPLETED', label: 'Completed', count: tasks.filter(t => t.status === TaskStatus.COMPLETED).length },
-        ] as Array<{
-          id: 'ALL' | 'IN_PROGRESS' | 'IN_REVIEW' | 'OVERDUE' | 'CRITICAL_HIGH' | 'COMPLETED';
-          label: string;
-          count: number;
-          alert?: boolean;
-        }>).map((chip) => {
+        {(
+          [
+            { id: "ALL", label: "All Tasks", count: tasks.length },
+            {
+              id: "IN_PROGRESS",
+              label: "In Progress",
+              count: tasks.filter((t) => t.status === TaskStatus.IN_PROGRESS)
+                .length,
+            },
+            {
+              id: "IN_REVIEW",
+              label: "Pending Review",
+              count: tasks.filter((t) => t.status === TaskStatus.IN_REVIEW)
+                .length,
+            },
+            {
+              id: "OVERDUE",
+              label: "Overdue",
+              count: tasks.filter((t) => isOverdue(t.dueDate, t.status)).length,
+              alert: true,
+            },
+            {
+              id: "CRITICAL_HIGH",
+              label: "Critical & High",
+              count: tasks.filter(
+                (t) =>
+                  t.priority === Priority.CRITICAL ||
+                  t.priority === Priority.HIGH,
+              ).length,
+            },
+            {
+              id: "COMPLETED",
+              label: "Completed",
+              count: tasks.filter((t) => t.status === TaskStatus.COMPLETED)
+                .length,
+            },
+          ] as Array<{
+            id:
+              | "ALL"
+              | "IN_PROGRESS"
+              | "IN_REVIEW"
+              | "OVERDUE"
+              | "CRITICAL_HIGH"
+              | "COMPLETED";
+            label: string;
+            count: number;
+            alert?: boolean;
+          }>
+        ).map((chip) => {
           const isActive = quickFilter === chip.id;
           return (
             <button
               key={chip.id}
               onClick={() => {
                 setQuickFilter(chip.id);
-                if (chip.id !== 'ALL') {
-                  setStatusFilter('ALL');
+                if (chip.id !== "ALL") {
+                  setStatusFilter("ALL");
                 }
               }}
               className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-colors flex items-center gap-1.5 cursor-pointer ${
                 isActive
-                  ? 'bg-[#5B5FEF] text-white shadow-xs'
+                  ? "bg-primary text-white shadow-xs"
                   : chip.alert && chip.count > 0
-                  ? 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
-                  : 'bg-white text-text-secondary border border-border hover:bg-surface hover:text-text-primary'
+                    ? "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                    : "bg-surface text-text-secondary border border-border hover:bg-surface-hover hover:text-foreground"
               }`}
             >
               <span>{chip.label}</span>
-              <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
-                isActive
-                  ? 'bg-white/20 text-white'
-                  : chip.alert && chip.count > 0
-                  ? 'bg-red-200 text-red-800'
-                  : 'bg-slate-100 text-slate-600'
-              }`}>
+              <span
+                className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                  isActive
+                    ? "bg-white/20 text-white"
+                    : chip.alert && chip.count > 0
+                      ? "bg-red-200 text-red-800"
+                      : "bg-slate-100 text-slate-600"
+                }`}
+              >
                 {chip.count}
               </span>
             </button>
@@ -211,24 +282,24 @@ export function TaskList({
 
       {/* Active Team Pointer Banner */}
       {pointedTask && (
-        <div className="bg-gradient-to-r from-[#EEF4FF] via-white to-[#EEF4FF] border border-[#C7D7FE] rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        <div className="bg-surface border border-border rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-clay-inset">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="size-8 rounded-lg bg-[#5B5FEF] text-white flex items-center justify-center shrink-0 font-bold shadow-xs">
+            <span className="size-8 rounded-lg bg-primary text-white flex items-center justify-center shrink-0 font-bold shadow-xs">
               <Target className="size-4 animate-pulse" />
             </span>
             <div className="truncate">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#5B5FEF] bg-[#5B5FEF]/10 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded">
                   Active Team Pointer
                 </span>
-                <span className="font-mono text-[12px] font-bold text-[#101828]">
+                <span className="font-mono text-[12px] font-bold text-foreground">
                   {pointedTask.taskCode}
                 </span>
               </div>
-              <p className="text-[13px] font-medium text-[#344054] truncate mt-0.5">
+              <p className="text-[13px] font-medium text-text-secondary truncate mt-0.5">
                 {pointedTask.title}
                 {pointedTask.assignee && (
-                  <span className="text-[#667085] ml-2 text-[12px]">
+                  <span className="text-text-muted ml-2 text-[12px]">
                     • Assigned to {pointedTask.assignee.name}
                   </span>
                 )}
@@ -241,13 +312,13 @@ export function TaskList({
                 navigator.clipboard.writeText(`[${pointedTask.taskCode}]`);
                 alert(`Copied pointer [${pointedTask.taskCode}] to clipboard!`);
               }}
-              className="text-[11px] font-semibold text-[#475467] hover:text-[#101828] bg-white border border-[#D0D5DD] px-2.5 py-1 rounded-md transition-colors"
+              className="text-[11px] font-semibold text-text-secondary hover:text-foreground bg-surface border border-border px-2.5 py-1 rounded-md transition-colors"
             >
               Copy Pointer Link
             </button>
             <button
               onClick={() => setSelectedTaskId(pointedTask.id)}
-              className="text-[11px] font-semibold text-white bg-[#5B5FEF] hover:bg-[#4C50D8] px-3 py-1 rounded-md transition-colors shadow-xs"
+              className="text-[11px] font-semibold text-white bg-primary hover:bg-primary-hover px-3 py-1 rounded-md transition-colors shadow-xs"
             >
               Jump to Task
             </button>
@@ -277,7 +348,7 @@ export function TaskList({
             value={statusFilter}
             onChange={(e) => {
               setStatusFilter(e.target.value);
-              setQuickFilter('ALL');
+              setQuickFilter("ALL");
             }}
             className="h-10 rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             aria-label="Filter by task status"
@@ -295,7 +366,7 @@ export function TaskList({
             value={priorityFilter}
             onChange={(e) => {
               setPriorityFilter(e.target.value);
-              setQuickFilter('ALL');
+              setQuickFilter("ALL");
             }}
             className="h-10 rounded-md border border-border bg-surface px-3 py-1.5 text-xs text-text-primary focus:outline-none focus:ring-1 focus:ring-primary"
             aria-label="Filter by task priority"
@@ -331,21 +402,45 @@ export function TaskList({
             <table className="w-full text-left text-sm min-w-[700px]">
               <thead className="border-b bg-surface-secondary/50 text-xs uppercase font-semibold text-text-secondary">
                 <tr>
-                  <th scope="col" className="px-5 py-3.5">Task</th>
-                  <th scope="col" className="px-4 py-3.5">Code</th>
-                  <th scope="col" className="px-4 py-3.5">Priority</th>
-                  <th scope="col" className="px-4 py-3.5">Status</th>
-                  <th scope="col" className="px-4 py-3.5">Assignee</th>
-                  <th scope="col" className="px-4 py-3.5">Due Date</th>
-                  <th scope="col" className="px-4 py-3.5">Progress</th>
-                  <th scope="col" className="px-5 py-3.5 text-right">View</th>
+                  <th scope="col" className="px-5 py-3.5">
+                    Task
+                  </th>
+                  <th scope="col" className="px-4 py-3.5">
+                    Code
+                  </th>
+                  <th scope="col" className="px-4 py-3.5">
+                    Priority
+                  </th>
+                  <th scope="col" className="px-4 py-3.5">
+                    Status
+                  </th>
+                  <th scope="col" className="px-4 py-3.5">
+                    Assignee
+                  </th>
+                  <th scope="col" className="px-4 py-3.5">
+                    Due Date
+                  </th>
+                  <th scope="col" className="px-4 py-3.5">
+                    Progress
+                  </th>
+                  <th scope="col" className="px-5 py-3.5 text-right">
+                    View
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {filteredTasks.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-5 py-12 text-center text-text-muted text-xs">
-                      No tasks found matching your filters.
+                    <td colSpan={8} className="p-8 bg-[#F3F4F6]">
+                      <div className="mx-auto max-w-sm p-8 rounded-[28px] bg-white text-center shadow-[14px_14px_32px_rgba(15,23,42,0.1),-10px_-10px_25px_rgba(255,255,255,1),inset_0_1px_2px_rgba(255,255,255,1)] border border-white/80">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 text-primary flex items-center justify-center shadow-[inset_4px_4px_8px_rgba(0,0,0,0.06),inset_-4px_-4px_8px_rgba(255,255,255,0.9)] border border-white">
+                          <Search className="size-6" />
+                        </div>
+                        <h3 className="text-[16px] font-bold text-[#111827] mb-2">No tasks found</h3>
+                        <p className="text-[13px] text-[#6B7280]">
+                          Try adjusting your filters or search query to find what you&apos;re looking for.
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -355,20 +450,24 @@ export function TaskList({
                     const isAssignee = t.assignee?.id === currentUserId;
 
                     const highlightStyles: Record<string, string> = {
-                      YELLOW: 'border-l-4 border-l-[#F59E0B] bg-[#FFFBEB]/40',
-                      RED: 'border-l-4 border-l-[#EF4444] bg-[#FEF2F2]/40',
-                      PURPLE: 'border-l-4 border-l-[#8B5CF6] bg-[#F5F3FF]/40',
-                      BLUE: 'border-l-4 border-l-[#3B82F6] bg-[#EFF6FF]/40',
-                      GREEN: 'border-l-4 border-l-[#10B981] bg-[#F0FDF4]/40',
+                      YELLOW: "border-l-4 border-l-[#F59E0B] bg-[#FFFBEB]/40",
+                      RED: "border-l-4 border-l-[#EF4444] bg-[#FEF2F2]/40",
+                      PURPLE: "border-l-4 border-l-[#8B5CF6] bg-[#F5F3FF]/40",
+                      BLUE: "border-l-4 border-l-[#3B82F6] bg-[#EFF6FF]/40",
+                      GREEN: "border-l-4 border-l-[#10B981] bg-[#F0FDF4]/40",
                     };
-                    const rowHighlight = t.highlightColor ? highlightStyles[t.highlightColor] || '' : '';
+                    const rowHighlight = t.highlightColor
+                      ? highlightStyles[t.highlightColor] || ""
+                      : "";
                     const isPointedTask = Boolean(t.isPointed);
 
                     return (
                       <tr
                         key={t.id}
                         className={`hover:bg-surface-secondary/40 transition-colors ${rowHighlight} ${
-                          isPointedTask ? 'ring-2 ring-inset ring-[#5B5FEF]/40' : ''
+                          isPointedTask
+                            ? "ring-2 ring-inset ring-primary/40"
+                            : ""
                         }`}
                       >
                         <td className="px-5 py-3.5">
@@ -381,8 +480,9 @@ export function TaskList({
                                 {t.title}
                               </Link>
                               {isPointedTask && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-[#5B5FEF] text-white shadow-xs">
-                                  <Target className="size-3 animate-pulse" /> Focus
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-bold bg-primary text-white shadow-xs">
+                                  <Target className="size-3 animate-pulse" />{" "}
+                                  Focus
                                 </span>
                               )}
                             </div>
@@ -391,12 +491,13 @@ export function TaskList({
                                 {t.project.name}
                               </p>
                             )}
-                            {t.status === TaskStatus.BLOCKED && t.blockerReason && (
-                              <p className="text-xs text-red-600 mt-1 flex items-center gap-1 font-medium">
-                                <AlertCircle className="size-3 shrink-0" />
-                                Blocker: {t.blockerReason}
-                              </p>
-                            )}
+                            {t.status === TaskStatus.BLOCKED &&
+                              t.blockerReason && (
+                                <p className="text-xs text-red-600 mt-1 flex items-center gap-1 font-medium">
+                                  <AlertCircle className="size-3 shrink-0" />
+                                  Blocker: {t.blockerReason}
+                                </p>
+                              )}
                           </div>
                         </td>
 
@@ -406,7 +507,9 @@ export function TaskList({
                           </span>
                         </td>
 
-                        <td className="px-4 py-3.5 whitespace-nowrap">{getPriorityBadge(t.priority)}</td>
+                        <td className="px-4 py-3.5 whitespace-nowrap">
+                          {getPriorityBadge(t.priority)}
+                        </td>
 
                         <td className="px-4 py-3.5 whitespace-nowrap">
                           <TaskStatusDropdown
@@ -427,11 +530,13 @@ export function TaskList({
                               </span>
                               <span className="text-xs font-medium text-text-primary">
                                 {t.assignee.name}
-                                {isAssignee && ' (You)'}
+                                {isAssignee && " (You)"}
                               </span>
                             </div>
                           ) : (
-                            <span className="text-xs text-text-muted italic">Unassigned</span>
+                            <span className="text-xs text-text-muted italic">
+                              Unassigned
+                            </span>
                           )}
                         </td>
 
@@ -439,15 +544,20 @@ export function TaskList({
                           {t.dueDate ? (
                             <div
                               className={`text-xs flex items-center gap-1.5 ${
-                                overdue ? 'text-red-600 font-semibold' : 'text-text-secondary'
+                                overdue
+                                  ? "text-red-600 font-semibold"
+                                  : "text-text-secondary"
                               }`}
                             >
                               <Calendar className="size-3.5" />
                               <span>
-                                {new Date(t.dueDate).toLocaleDateString("en-US", {
-                                  month: 'short',
-                                  day: 'numeric',
-                                })}
+                                {new Date(t.dueDate).toLocaleDateString(
+                                  "en-US",
+                                  {
+                                    month: "short",
+                                    day: "numeric",
+                                  },
+                                )}
                               </span>
                               {overdue && (
                                 <span className="rounded bg-red-100 text-red-800 px-1 py-0.2 text-[10px]">
@@ -482,10 +592,14 @@ export function TaskList({
                               onClick={(e) => handleTogglePointer(t.id, e)}
                               className={`size-7 rounded-md border flex items-center justify-center transition-colors ${
                                 t.isPointed
-                                  ? 'bg-[#5B5FEF] text-white border-[#4C50D8] shadow-xs'
-                                  : 'border-border text-text-muted hover:text-[#5B5FEF] hover:bg-[#EEF4FF]'
+                                  ? "bg-primary text-white border-primary shadow-xs"
+                                  : "border-border text-text-muted hover:text-primary hover:bg-primary/10"
                               }`}
-                              title={t.isPointed ? 'Clear active focus pointer' : 'Set as team active focus pointer'}
+                              title={
+                                t.isPointed
+                                  ? "Clear active focus pointer"
+                                  : "Set as team active focus pointer"
+                              }
                             >
                               <Target className="size-3.5" />
                             </button>
@@ -494,33 +608,47 @@ export function TaskList({
                             <button
                               type="button"
                               onClick={(e) => {
-                                const order = [null, 'YELLOW', 'RED', 'PURPLE', 'BLUE', 'GREEN'];
-                                const nextIdx = (order.indexOf(t.highlightColor || null) + 1) % order.length;
-                                handleSetHighlight(t.id, order[nextIdx] ?? null, e);
+                                const order = [
+                                  null,
+                                  "YELLOW",
+                                  "RED",
+                                  "PURPLE",
+                                  "BLUE",
+                                  "GREEN",
+                                ];
+                                const nextIdx =
+                                  (order.indexOf(t.highlightColor || null) +
+                                    1) %
+                                  order.length;
+                                handleSetHighlight(
+                                  t.id,
+                                  order[nextIdx] ?? null,
+                                  e,
+                                );
                               }}
                               className={`size-7 rounded-md border flex items-center justify-center transition-colors ${
                                 t.highlightColor
-                                  ? 'bg-white border-[#D0D5DD] shadow-xs'
-                                  : 'border-border text-text-muted hover:text-text-primary hover:bg-surface-secondary'
+                                  ? "bg-background border-border shadow-xs"
+                                  : "border-border text-text-muted hover:text-foreground hover:bg-surface-hover"
                               }`}
                               title={
                                 t.highlightColor
                                   ? `Highlighter: ${t.highlightColor} (Click to cycle/clear)`
-                                  : 'Highlight task'
+                                  : "Highlight task"
                               }
                             >
                               {t.highlightColor ? (
                                 <span
                                   className={`size-3 rounded-full ${
-                                    t.highlightColor === 'YELLOW'
-                                      ? 'bg-[#F59E0B]'
-                                      : t.highlightColor === 'RED'
-                                      ? 'bg-[#EF4444]'
-                                      : t.highlightColor === 'PURPLE'
-                                      ? 'bg-[#8B5CF6]'
-                                      : t.highlightColor === 'BLUE'
-                                      ? 'bg-[#3B82F6]'
-                                      : 'bg-[#10B981]'
+                                    t.highlightColor === "YELLOW"
+                                      ? "bg-[#F59E0B]"
+                                      : t.highlightColor === "RED"
+                                        ? "bg-[#EF4444]"
+                                        : t.highlightColor === "PURPLE"
+                                          ? "bg-[#8B5CF6]"
+                                          : t.highlightColor === "BLUE"
+                                            ? "bg-[#3B82F6]"
+                                            : "bg-[#10B981]"
                                   }`}
                                 />
                               ) : (

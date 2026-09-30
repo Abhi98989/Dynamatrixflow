@@ -6,7 +6,8 @@ import { SystemRole, TaskStatus } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Projects | Dynamatrix Flow",
-  description: "All active, archived, and pipeline client & internal engineering projects.",
+  description:
+    "All active, archived, and pipeline client & internal engineering projects.",
 };
 
 export default async function ProjectsPage() {
@@ -14,12 +15,14 @@ export default async function ProjectsPage() {
   const isAdmin = currentUser.systemRole === SystemRole.ADMIN;
 
   const projects = await db.project.findMany({
-    where: isAdmin ? {} : {
-      OR: [
-        { projectLeadId: currentUser.id },
-        { members: { some: { userId: currentUser.id, removedAt: null } } },
-      ],
-    },
+    where: isAdmin
+      ? {}
+      : {
+          OR: [
+            { projectLeadId: currentUser.id },
+            { members: { some: { userId: currentUser.id, removedAt: null } } },
+          ],
+        },
     select: {
       id: true,
       projectCode: true,
@@ -29,10 +32,10 @@ export default async function ProjectsPage() {
       priority: true,
       deadline: true,
       projectLead: { select: { name: true } },
-      members: { 
+      members: {
         where: { removedAt: null },
         select: { user: { select: { name: true } } },
-        take: 5 
+        take: 5,
       },
       tasks: { select: { id: true, status: true } },
     },
@@ -41,7 +44,9 @@ export default async function ProjectsPage() {
 
   const enrichedProjects = projects.map((p) => {
     const total = p.tasks ? p.tasks.length : 0;
-    const completed = p.tasks ? p.tasks.filter(t => t.status === TaskStatus.COMPLETED).length : 0;
+    const completed = p.tasks
+      ? p.tasks.filter((t) => t.status === TaskStatus.COMPLETED).length
+      : 0;
     return {
       ...p,
       progress: total > 0 ? Math.round((completed / total) * 100) : 0,

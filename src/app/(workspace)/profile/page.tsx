@@ -2,12 +2,20 @@ import { Metadata } from "next";
 import { requireActiveUser } from "@/server/auth/authorization";
 import { db } from "@/server/db/client";
 import { ProfileForm } from "@/features/employees/profile-form";
-import { User, Shield, Calendar, FolderKanban, CheckSquare, Layers } from "lucide-react";
+import {
+  User,
+  Shield,
+  Calendar,
+  FolderKanban,
+  CheckSquare,
+  Layers,
+} from "lucide-react";
 import { TaskStatus } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Account Profile | Dynamatrix Flow",
-  description: "Manage your corporate staff profile details and account security credentials.",
+  description:
+    "Manage your corporate staff profile details and account security credentials.",
 };
 
 export default async function ProfilePage() {
@@ -57,21 +65,22 @@ export default async function ProfilePage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       {/* 1. Header Banner */}
-      <div className="border-b border-[#E4E7EC] pb-5">
-        <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-[#101828] flex items-center gap-2">
-          <User className="size-5 text-[#5B5FEF]" />
+      <div className="border-b border-border pb-5">
+        <h1 className="text-[22px] sm:text-[24px] font-semibold tracking-tight text-foreground flex items-center gap-2">
+          <User className="size-5 text-primary" />
           Account Profile
         </h1>
-        <p className="mt-1 text-[13px] text-[#475467]">
-          Corporate identity profile, workspace permissions, and account credentials.
+        <p className="mt-1 text-[13px] text-text-secondary">
+          Corporate identity profile, workspace permissions, and account
+          credentials.
         </p>
       </div>
 
       {/* 2. Identity Summary Card (§0: 0 shadow, 8px radius, flat 1px border) */}
-      <div className="bg-white rounded-[8px] border border-[#E4E7EC] p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div className="bg-surface rounded-[8px] border border-border p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="relative shrink-0">
-            <span className="flex size-14 items-center justify-center rounded-full bg-[#EEF2FF] text-[#5B5FEF] font-bold text-[18px] border border-[#E0E7FF]">
+            <span className="flex size-14 items-center justify-center rounded-full bg-[#EEF2FF] text-primary font-bold text-[18px] border border-[#E0E7FF]">
               {initials}
             </span>
             <span className="absolute bottom-0 right-0 size-3.5 rounded-full ring-2 ring-white bg-[#16A34A]" />
@@ -79,8 +88,10 @@ export default async function ProfilePage() {
 
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-[17px] font-bold text-[#101828]">{user.name}</h2>
-              <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-[#F2F4F7] text-[#475467] border border-[#E4E7EC]">
+              <h2 className="text-[17px] font-bold text-foreground">
+                {user.name}
+              </h2>
+              <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded bg-surface-hover text-text-secondary border border-border">
                 {user.employeeId}
               </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-[#F5F3FF] text-[#7C3AED] border border-[#DDD6FE]">
@@ -89,7 +100,7 @@ export default async function ProfilePage() {
               </span>
             </div>
 
-            <p className="text-[13px] text-[#667085] flex flex-wrap items-center gap-2">
+            <p className="text-[13px] text-text-muted flex flex-wrap items-center gap-2">
               <span>{user.position || "Corporate Staff"}</span>
               <span>•</span>
               <span>{user.email || "No email assigned"}</span>
@@ -98,43 +109,43 @@ export default async function ProfilePage() {
         </div>
 
         {/* Workload Stats */}
-        <div className="grid grid-cols-2 sm:flex sm:items-center gap-4 sm:gap-6 border-t md:border-t-0 md:border-l border-[#EEF1F5] pt-4 md:pt-0 md:pl-6 shrink-0">
+        <div className="grid grid-cols-2 sm:flex sm:items-center gap-4 sm:gap-6 border-t md:border-t-0 md:border-l border-border-subtle pt-4 md:pt-0 md:pl-6 shrink-0">
           <div>
-            <div className="flex items-center gap-1 text-[11px] text-[#667085]">
-              <FolderKanban className="size-3 text-[#5B5FEF]" />
+            <div className="flex items-center gap-1 text-[11px] text-text-muted">
+              <FolderKanban className="size-3 text-primary" />
               Projects
             </div>
-            <p className="text-[18px] font-bold text-[#101828] mt-0.5">
+            <p className="text-[18px] font-bold text-foreground mt-0.5">
               {totalProjectsCount}
             </p>
           </div>
 
           <div>
-            <div className="flex items-center gap-1 text-[11px] text-[#667085]">
+            <div className="flex items-center gap-1 text-[11px] text-text-muted">
               <CheckSquare className="size-3 text-[#16A34A]" />
               Active Tasks
             </div>
-            <p className="text-[18px] font-bold text-[#101828] mt-0.5">
+            <p className="text-[18px] font-bold text-foreground mt-0.5">
               {activeTasksCount}
             </p>
           </div>
 
           <div>
-            <div className="flex items-center gap-1 text-[11px] text-[#667085]">
-              <Layers className="size-3 text-[#5B5FEF]" />
+            <div className="flex items-center gap-1 text-[11px] text-text-muted">
+              <Layers className="size-3 text-primary" />
               Total Delivered
             </div>
-            <p className="text-[18px] font-bold text-[#101828] mt-0.5">
+            <p className="text-[18px] font-bold text-foreground mt-0.5">
               {totalHistoricTasks}
             </p>
           </div>
 
           <div>
-            <div className="flex items-center gap-1 text-[11px] text-[#667085]">
-              <Calendar className="size-3 text-[#667085]" />
+            <div className="flex items-center gap-1 text-[11px] text-text-muted">
+              <Calendar className="size-3 text-text-muted" />
               Joined
             </div>
-            <p className="text-[13px] font-medium text-[#475467] mt-1">
+            <p className="text-[13px] font-medium text-text-secondary mt-1">
               {new Date(user.createdAt).toLocaleDateString("en-US", {
                 month: "short",
                 year: "numeric",

@@ -1,15 +1,15 @@
-import { NextResponse } from 'next/server';
-import { db } from '@/server/db/client';
-import { TaskStatus, NotificationType } from '@prisma/client';
-import { addDays, startOfDay } from '@/lib/utils/date';
+import { NextResponse } from "next/server";
+import { db } from "@/server/db/client";
+import { TaskStatus, NotificationType } from "@prisma/client";
+import { addDays, startOfDay } from "@/lib/utils/date";
 
 export async function GET(request: Request) {
   // In a real application, you should verify a secret or token here to ensure
   // this endpoint is only called by a trusted cron scheduler (e.g. Vercel Cron, Google Cloud Scheduler)
-  const authHeader = request.headers.get('authorization');
+  const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
-    return new NextResponse('Unauthorized', { status: 401 });
+    return new NextResponse("Unauthorized", { status: 401 });
   }
 
   try {
@@ -26,7 +26,14 @@ export async function GET(request: Request) {
         },
         assigneeId: { not: null },
       },
-      select: { id: true, title: true, taskCode: true, projectId: true, assigneeId: true, dueDate: true }
+      select: {
+        id: true,
+        title: true,
+        taskCode: true,
+        projectId: true,
+        assigneeId: true,
+        dueDate: true,
+      },
     });
 
     // 2. Process Overdue Tasks
@@ -38,7 +45,14 @@ export async function GET(request: Request) {
         },
         assigneeId: { not: null },
       },
-      select: { id: true, title: true, taskCode: true, projectId: true, assigneeId: true, dueDate: true }
+      select: {
+        id: true,
+        title: true,
+        taskCode: true,
+        projectId: true,
+        assigneeId: true,
+        dueDate: true,
+      },
     });
 
     let notificationsCreated = 0;
@@ -47,43 +61,55 @@ export async function GET(request: Request) {
       // Check existing notifications created today for these tasks to prevent duplicate spamming
       const existingToday = await tx.notification.findMany({
         where: {
-          entityType: 'Task',
+          entityType: "Task",
           createdAt: { gte: today },
-          type: { in: [NotificationType.TASK_DUE_SOON, NotificationType.TASK_OVERDUE] },
+          type: {
+            in: [NotificationType.TASK_DUE_SOON, NotificationType.TASK_OVERDUE],
+          },
         },
         select: { entityId: true, type: true },
       });
-      const notifiedSet = new Set(existingToday.map((n) => `${n.entityId}:${n.type}`));
+      const notifiedSet = new Set(
+        existingToday.map((n) => `${n.entityId}:${n.type}`),
+      );
 
       for (const task of dueSoonTasks) {
-        if (!task.assigneeId || notifiedSet.has(`${task.id}:${NotificationType.TASK_DUE_SOON}`)) continue;
+        if (
+          !task.assigneeId ||
+          notifiedSet.has(`${task.id}:${NotificationType.TASK_DUE_SOON}`)
+        )
+          continue;
         await tx.notification.create({
           data: {
             userId: task.assigneeId,
             type: NotificationType.TASK_DUE_SOON,
-            title: 'Task Due Soon',
+            title: "Task Due Soon",
             message: `Task "${task.title}" [${task.taskCode}] is due on ${task.dueDate?.toLocaleDateString("en-US")}.`,
             projectId: task.projectId,
-            entityType: 'Task',
+            entityType: "Task",
             entityId: task.id,
-          }
+          },
         });
         notifiedSet.add(`${task.id}:${NotificationType.TASK_DUE_SOON}`);
         notificationsCreated++;
       }
 
       for (const task of overdueTasks) {
-        if (!task.assigneeId || notifiedSet.has(`${task.id}:${NotificationType.TASK_OVERDUE}`)) continue;
+        if (
+          !task.assigneeId ||
+          notifiedSet.has(`${task.id}:${NotificationType.TASK_OVERDUE}`)
+        )
+          continue;
         await tx.notification.create({
           data: {
             userId: task.assigneeId,
             type: NotificationType.TASK_OVERDUE,
-            title: 'Task Overdue',
+            title: "Task Overdue",
             message: `Task "${task.title}" [${task.taskCode}] was due on ${task.dueDate?.toLocaleDateString("en-US")} and is now overdue.`,
             projectId: task.projectId,
-            entityType: 'Task',
+            entityType: "Task",
             entityId: task.id,
-          }
+          },
         });
         notifiedSet.add(`${task.id}:${NotificationType.TASK_OVERDUE}`);
         notificationsCreated++;
@@ -92,8 +118,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ success: true, notificationsCreated });
   } catch (error: unknown) {
-    console.error('Cron job error:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    console.error("Cron job error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 500 },
+    );
   }
 }

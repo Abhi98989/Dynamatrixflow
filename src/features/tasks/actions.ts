@@ -1,27 +1,27 @@
-'use server';
+"use server";
 
-import { z } from 'zod';
-import { db } from '@/server/db/client';
+import { z } from "zod";
+import { db } from "@/server/db/client";
 import {
   requireActiveUser,
   requireProjectManage,
   canUpdateTask,
   isAllowedStatusTransition,
   canViewProject,
-} from '@/server/auth/authorization';
-import { generateNextTaskCode } from './code-generator';
+} from "@/server/auth/authorization";
+import { generateNextTaskCode } from "./code-generator";
 import {
   TaskStatus,
   Priority,
   NotificationType,
   SystemRole,
   AccountStatus,
-} from '@prisma/client';
-import { revalidatePath } from 'next/cache';
+} from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const createTaskSchema = z.object({
   projectId: z.string().min(1),
-  title: z.string().min(2, 'Task title must be at least 2 characters').trim(),
+  title: z.string().min(2, "Task title must be at least 2 characters").trim(),
   description: z.string().optional(),
   assigneeId: z.string().optional(),
   milestoneId: z.string().optional(),
@@ -41,31 +41,31 @@ export interface CreateTaskResult {
 
 export async function createTaskAction(
   _prevState: CreateTaskResult | undefined,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreateTaskResult> {
-  const projectId = formData.get('projectId') as string;
+  const projectId = formData.get("projectId") as string;
   if (!projectId) {
-    return { error: 'Project ID is required.' };
+    return { error: "Project ID is required." };
   }
 
   const actor = await requireProjectManage(projectId);
 
   const raw = {
     projectId,
-    title: formData.get('title'),
-    description: formData.get('description') || '',
-    assigneeId: formData.get('assigneeId') || '',
-    milestoneId: formData.get('milestoneId') || '',
-    priority: (formData.get('priority') as Priority) || Priority.MEDIUM,
-    status: (formData.get('status') as TaskStatus) || TaskStatus.TODO,
-    startDate: formData.get('startDate') || '',
-    dueDate: formData.get('dueDate') || '',
-    estimatedMinutes: formData.get('estimatedMinutes') || undefined,
+    title: formData.get("title"),
+    description: formData.get("description") || "",
+    assigneeId: formData.get("assigneeId") || "",
+    milestoneId: formData.get("milestoneId") || "",
+    priority: (formData.get("priority") as Priority) || Priority.MEDIUM,
+    status: (formData.get("status") as TaskStatus) || TaskStatus.TODO,
+    startDate: formData.get("startDate") || "",
+    dueDate: formData.get("dueDate") || "",
+    estimatedMinutes: formData.get("estimatedMinutes") || undefined,
   };
 
   const parsed = createTaskSchema.safeParse(raw);
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message || 'Invalid task input.' };
+    return { error: parsed.error.issues[0]?.message || "Invalid task input." };
   }
 
   const {
@@ -93,7 +93,7 @@ export async function createTaskAction(
     });
 
     if (!member) {
-      return { error: 'Assignee must be an active member of this project.' };
+      return { error: "Assignee must be an active member of this project." };
     }
   }
 
@@ -101,7 +101,7 @@ export async function createTaskAction(
   const dueParsed = dueDate ? new Date(dueDate) : null;
 
   if (startParsed && dueParsed && dueParsed < startParsed) {
-    return { error: 'Due date cannot be earlier than start date.' };
+    return { error: "Due date cannot be earlier than start date." };
   }
 
   let task = null;
@@ -128,7 +128,9 @@ export async function createTaskAction(
             createdById: actor.id,
           },
           include: {
-            project: { select: { name: true, projectCode: true, projectLeadId: true } },
+            project: {
+              select: { name: true, projectCode: true, projectLeadId: true },
+            },
           },
         });
 
@@ -139,7 +141,7 @@ export async function createTaskAction(
             userId: actor.id,
             newStatus: status,
             newProgress: 0,
-            note: 'Task created',
+            note: "Task created",
           },
         });
 
@@ -149,10 +151,10 @@ export async function createTaskAction(
             data: {
               userId: assigneeId,
               type: NotificationType.TASK_ASSIGNED,
-              title: 'New Task Assigned',
+              title: "New Task Assigned",
               message: `You were assigned "${newTask.title}" [${newTask.taskCode}] in ${newTask.project.name}.`,
               projectId,
-              entityType: 'Task',
+              entityType: "Task",
               entityId: newTask.id,
             },
           });
@@ -162,8 +164,8 @@ export async function createTaskAction(
         await tx.activityLog.create({
           data: {
             actorId: actor.id,
-            action: 'TASK_CREATED',
-            entityType: 'Task',
+            action: "TASK_CREATED",
+            entityType: "Task",
             entityId: newTask.id,
             metadata: {
               taskCode: newTask.taskCode,
@@ -177,7 +179,7 @@ export async function createTaskAction(
         return newTask;
       });
     } catch (err: unknown) {
-      if ((err as { code?: string })?.code === 'P2002' && attempts < 5) {
+      if ((err as { code?: string })?.code === "P2002" && attempts < 5) {
         await new Promise((resolve) => setTimeout(resolve, 50 * attempts));
         continue;
       }
@@ -186,12 +188,14 @@ export async function createTaskAction(
   }
 
   if (!task) {
-    return { error: 'Failed to generate a unique task code. Please try again.' };
+    return {
+      error: "Failed to generate a unique task code. Please try again.",
+    };
   }
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/projects/${projectId}/tasks`);
-  revalidatePath('/my-tasks');
+  revalidatePath("/my-tasks");
 
   return {
     success: true,
@@ -205,27 +209,38 @@ export async function updateTaskStatusAction(
   newStatus: TaskStatus,
   progress?: number,
   blockerReason?: string,
-  note?: string
+  note?: string,
 ): Promise<{ success: boolean; error?: string }> {
   const actor = await requireActiveUser();
 
   const task = await db.task.findUnique({
     where: { id: taskId },
     include: {
-      project: { select: { id: true, name: true, projectLeadId: true, projectCode: true } },
+      project: {
+        select: {
+          id: true,
+          name: true,
+          projectLeadId: true,
+          projectCode: true,
+        },
+      },
     },
   });
 
   if (!task) {
-    return { success: false, error: 'Task not found.' };
+    return { success: false, error: "Task not found." };
   }
 
   const isLeadOrAdmin =
-    actor.systemRole === SystemRole.ADMIN || task.project.projectLeadId === actor.id;
+    actor.systemRole === SystemRole.ADMIN ||
+    task.project.projectLeadId === actor.id;
   const isAssignee = task.assigneeId === actor.id;
 
   if (!isLeadOrAdmin && !isAssignee) {
-    return { success: false, error: 'You do not have permission to update this task.' };
+    return {
+      success: false,
+      error: "You do not have permission to update this task.",
+    };
   }
 
   // Check state transition rules
@@ -234,7 +249,7 @@ export async function updateTaskStatusAction(
     isLeadOrAdmin,
     isAssignee,
     task.status,
-    newStatus
+    newStatus,
   );
 
   if (!allowed) {
@@ -244,10 +259,14 @@ export async function updateTaskStatusAction(
     };
   }
 
-  if (newStatus === TaskStatus.BLOCKED && !blockerReason?.trim() && !task.blockerReason) {
+  if (
+    newStatus === TaskStatus.BLOCKED &&
+    !blockerReason?.trim() &&
+    !task.blockerReason
+  ) {
     return {
       success: false,
-      error: 'A reason must be provided when marking a task as BLOCKED.',
+      error: "A reason must be provided when marking a task as BLOCKED.",
     };
   }
 
@@ -269,7 +288,10 @@ export async function updateTaskStatusAction(
     } = {
       status: newStatus,
       progress: targetProgress,
-      blockerReason: newStatus === TaskStatus.BLOCKED ? blockerReason || task.blockerReason : null,
+      blockerReason:
+        newStatus === TaskStatus.BLOCKED
+          ? blockerReason || task.blockerReason
+          : null,
     };
 
     if (newStatus === TaskStatus.IN_REVIEW) {
@@ -305,10 +327,10 @@ export async function updateTaskStatusAction(
         data: {
           userId: task.project.projectLeadId,
           type: NotificationType.TASK_REVIEW_REQUESTED,
-          title: 'Task Review Requested',
+          title: "Task Review Requested",
           message: `${actor.name} submitted "${task.title}" [${task.taskCode}] for review.`,
           projectId: task.projectId,
-          entityType: 'Task',
+          entityType: "Task",
           entityId: taskId,
         },
       });
@@ -321,22 +343,25 @@ export async function updateTaskStatusAction(
           data: {
             userId: task.assigneeId,
             type: NotificationType.TASK_REVIEWED,
-            title: 'Task Approved',
+            title: "Task Approved",
             message: `Your task "${task.title}" was approved and marked Completed.`,
             projectId: task.projectId,
-            entityType: 'Task',
+            entityType: "Task",
             entityId: taskId,
           },
         });
-      } else if (task.status === TaskStatus.IN_REVIEW && newStatus === TaskStatus.IN_PROGRESS) {
+      } else if (
+        task.status === TaskStatus.IN_REVIEW &&
+        newStatus === TaskStatus.IN_PROGRESS
+      ) {
         await tx.notification.create({
           data: {
             userId: task.assigneeId,
             type: NotificationType.TASK_REVIEWED,
-            title: 'Changes Requested',
+            title: "Changes Requested",
             message: `Changes were requested on "${task.title}".`,
             projectId: task.projectId,
-            entityType: 'Task',
+            entityType: "Task",
             entityId: taskId,
           },
         });
@@ -347,8 +372,8 @@ export async function updateTaskStatusAction(
     await tx.activityLog.create({
       data: {
         actorId: actor.id,
-        action: 'TASK_STATUS_CHANGED',
-        entityType: 'Task',
+        action: "TASK_STATUS_CHANGED",
+        entityType: "Task",
         entityId: taskId,
         metadata: {
           taskCode: task.taskCode,
@@ -363,25 +388,32 @@ export async function updateTaskStatusAction(
   revalidatePath(`/projects/${task.projectId}`);
   revalidatePath(`/projects/${task.projectId}/tasks`);
   revalidatePath(`/projects/${task.projectId}/tasks/${taskId}`);
-  revalidatePath('/my-tasks');
-  revalidatePath('/upcoming');
+  revalidatePath("/my-tasks");
+  revalidatePath("/upcoming");
 
   return { success: true };
 }
 
 export async function reassignTaskAction(
   taskId: string,
-  newAssigneeId: string
+  newAssigneeId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const task = await db.task.findUnique({
     where: { id: taskId },
     include: {
-      project: { select: { id: true, name: true, projectLeadId: true, projectCode: true } },
+      project: {
+        select: {
+          id: true,
+          name: true,
+          projectLeadId: true,
+          projectCode: true,
+        },
+      },
     },
   });
 
   if (!task) {
-    return { success: false, error: 'Task not found.' };
+    return { success: false, error: "Task not found." };
   }
 
   const actor = await requireProjectManage(task.projectId);
@@ -398,7 +430,10 @@ export async function reassignTaskAction(
   });
 
   if (!member) {
-    return { success: false, error: 'New assignee must be an active project member.' };
+    return {
+      success: false,
+      error: "New assignee must be an active project member.",
+    };
   }
 
   await db.$transaction(async (tx) => {
@@ -421,10 +456,10 @@ export async function reassignTaskAction(
         data: {
           userId: newAssigneeId,
           type: NotificationType.TASK_REASSIGNED,
-          title: 'Task Reassigned to You',
+          title: "Task Reassigned to You",
           message: `You were assigned "${task.title}" [${task.taskCode}] in ${task.project.name}.`,
           projectId: task.projectId,
-          entityType: 'Task',
+          entityType: "Task",
           entityId: taskId,
         },
       });
@@ -433,8 +468,8 @@ export async function reassignTaskAction(
     await tx.activityLog.create({
       data: {
         actorId: actor.id,
-        action: 'TASK_REASSIGNED',
-        entityType: 'Task',
+        action: "TASK_REASSIGNED",
+        entityType: "Task",
         entityId: taskId,
         metadata: {
           previousAssigneeId: task.assigneeId,
@@ -447,30 +482,30 @@ export async function reassignTaskAction(
 
   revalidatePath(`/projects/${task.projectId}/tasks`);
   revalidatePath(`/projects/${task.projectId}/tasks/${taskId}`);
-  revalidatePath('/my-tasks');
+  revalidatePath("/my-tasks");
 
   return { success: true };
 }
 
 export async function createSubtaskAction(
   taskId: string,
-  title: string
+  title: string,
 ): Promise<{ success: boolean; error?: string }> {
   const actor = await requireActiveUser();
   const trimmed = title.trim();
   if (!trimmed) {
-    return { success: false, error: 'Subtask title cannot be empty.' };
+    return { success: false, error: "Subtask title cannot be empty." };
   }
 
   const task = await db.task.findUnique({
     where: { id: taskId },
     select: { id: true, projectId: true },
   });
-  if (!task) return { success: false, error: 'Task not found.' };
+  if (!task) return { success: false, error: "Task not found." };
 
   const canEdit = await canUpdateTask(actor.id, taskId);
   if (!canEdit) {
-    return { success: false, error: 'Permission denied.' };
+    return { success: false, error: "Permission denied." };
   }
 
   await db.$transaction(async (tx) => {
@@ -491,7 +526,9 @@ export async function createSubtaskAction(
 
     if (allSubtasks.length > 0) {
       const completed = allSubtasks.filter((s) => s.isCompleted).length;
-      const progressPercent = Math.round((completed / allSubtasks.length) * 100);
+      const progressPercent = Math.round(
+        (completed / allSubtasks.length) * 100,
+      );
 
       await tx.task.update({
         where: { id: taskId },
@@ -505,7 +542,7 @@ export async function createSubtaskAction(
 }
 
 export async function toggleSubtaskAction(
-  subtaskId: string
+  subtaskId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const actor = await requireActiveUser();
 
@@ -514,11 +551,11 @@ export async function toggleSubtaskAction(
     include: { task: { select: { id: true, projectId: true } } },
   });
 
-  if (!subtask) return { success: false, error: 'Subtask not found.' };
+  if (!subtask) return { success: false, error: "Subtask not found." };
 
   const canEdit = await canUpdateTask(actor.id, subtask.taskId);
   if (!canEdit) {
-    return { success: false, error: 'Permission denied.' };
+    return { success: false, error: "Permission denied." };
   }
 
   const willBeCompleted = !subtask.isCompleted;
@@ -540,7 +577,9 @@ export async function toggleSubtaskAction(
 
     if (allSubtasks.length > 0) {
       const completed = allSubtasks.filter((s) => s.isCompleted).length;
-      const progressPercent = Math.round((completed / allSubtasks.length) * 100);
+      const progressPercent = Math.round(
+        (completed / allSubtasks.length) * 100,
+      );
 
       await tx.task.update({
         where: { id: subtask.taskId },
@@ -551,13 +590,13 @@ export async function toggleSubtaskAction(
 
   revalidatePath(`/projects/${subtask.task.projectId}/tasks/${subtask.taskId}`);
   revalidatePath(`/projects/${subtask.task.projectId}/tasks`);
-  revalidatePath('/my-tasks');
+  revalidatePath("/my-tasks");
 
   return { success: true };
 }
 
 export async function deleteSubtaskAction(
-  subtaskId: string
+  subtaskId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const actor = await requireActiveUser();
 
@@ -566,11 +605,11 @@ export async function deleteSubtaskAction(
     include: { task: { select: { id: true, projectId: true } } },
   });
 
-  if (!subtask) return { success: false, error: 'Subtask not found.' };
+  if (!subtask) return { success: false, error: "Subtask not found." };
 
   const canEdit = await canUpdateTask(actor.id, subtask.taskId);
   if (!canEdit) {
-    return { success: false, error: 'Permission denied.' };
+    return { success: false, error: "Permission denied." };
   }
 
   await db.$transaction(async (tx) => {
@@ -583,7 +622,9 @@ export async function deleteSubtaskAction(
 
     if (allSubtasks.length > 0) {
       const completed = allSubtasks.filter((s) => s.isCompleted).length;
-      const progressPercent = Math.round((completed / allSubtasks.length) * 100);
+      const progressPercent = Math.round(
+        (completed / allSubtasks.length) * 100,
+      );
 
       await tx.task.update({
         where: { id: subtask.taskId },
@@ -606,13 +647,26 @@ export async function getTaskDetailsAction(taskId: string) {
   const task = await db.task.findUnique({
     where: { id: taskId, archivedAt: null },
     include: {
-      project: { select: { id: true, name: true, projectCode: true, projectLeadId: true } },
-      assignee: { select: { id: true, name: true, employeeId: true, position: true } },
-      subtasks: { orderBy: { sortOrder: 'asc' } },
+      project: {
+        select: {
+          id: true,
+          name: true,
+          projectCode: true,
+          projectLeadId: true,
+        },
+      },
+      assignee: {
+        select: { id: true, name: true, employeeId: true, position: true },
+      },
+      subtasks: { orderBy: { sortOrder: "asc" } },
       comments: {
         where: { deletedAt: null },
-        include: { user: { select: { id: true, name: true, employeeId: true, position: true } } },
-        orderBy: { createdAt: 'asc' },
+        include: {
+          user: {
+            select: { id: true, name: true, employeeId: true, position: true },
+          },
+        },
+        orderBy: { createdAt: "asc" },
       },
     },
   });
@@ -622,7 +676,9 @@ export async function getTaskDetailsAction(taskId: string) {
   const hasAccess = await canViewProject(user.id, task.projectId);
   if (!hasAccess) return null;
 
-  const isLeadOrAdmin = user.systemRole === SystemRole.ADMIN || task.project.projectLeadId === user.id;
+  const isLeadOrAdmin =
+    user.systemRole === SystemRole.ADMIN ||
+    task.project.projectLeadId === user.id;
   const canEdit = isLeadOrAdmin || task.assigneeId === user.id;
 
   return {
@@ -641,10 +697,10 @@ export async function toggleTaskPointerAction(taskId: string) {
       select: { id: true, projectId: true, isPointed: true },
     });
 
-    if (!task) return { error: 'Task not found.' };
+    if (!task) return { error: "Task not found." };
 
     const hasAccess = await canViewProject(user.id, task.projectId);
-    if (!hasAccess) return { error: 'Unauthorized.' };
+    if (!hasAccess) return { error: "Unauthorized." };
 
     const willPoint = !task.isPointed;
 
@@ -676,14 +732,14 @@ export async function toggleTaskPointerAction(taskId: string) {
 
     return { success: true, isPointed: willPoint };
   } catch (error) {
-    console.error('toggleTaskPointerAction error:', error);
-    return { error: 'Failed to toggle pointer.' };
+    console.error("toggleTaskPointerAction error:", error);
+    return { error: "Failed to toggle pointer." };
   }
 }
 
 export async function setTaskHighlightAction(
   taskId: string,
-  highlightColor: string | null
+  highlightColor: string | null,
 ) {
   try {
     const user = await requireActiveUser();
@@ -692,12 +748,12 @@ export async function setTaskHighlightAction(
       select: { id: true, projectId: true },
     });
 
-    if (!task) return { error: 'Task not found.' };
+    if (!task) return { error: "Task not found." };
 
     const hasAccess = await canViewProject(user.id, task.projectId);
-    if (!hasAccess) return { error: 'Unauthorized.' };
+    if (!hasAccess) return { error: "Unauthorized." };
 
-    const allowed = ['YELLOW', 'RED', 'PURPLE', 'BLUE', 'GREEN', null];
+    const allowed = ["YELLOW", "RED", "PURPLE", "BLUE", "GREEN", null];
     const color = allowed.includes(highlightColor) ? highlightColor : null;
 
     await db.task.update({
@@ -712,8 +768,7 @@ export async function setTaskHighlightAction(
 
     return { success: true, highlightColor: color };
   } catch (error) {
-    console.error('setTaskHighlightAction error:', error);
-    return { error: 'Failed to update highlight color.' };
+    console.error("setTaskHighlightAction error:", error);
+    return { error: "Failed to update highlight color." };
   }
 }
-

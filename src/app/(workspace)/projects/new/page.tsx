@@ -20,7 +20,7 @@ export default async function NewProjectPage() {
   if (!canCreate) {
     return (
       <div className="w-full max-w-lg mx-auto py-16 px-4">
-        <div className="bg-white rounded-xl border border-slate-200 p-8 text-center shadow-xs">
+        <div className="bg-surface rounded-xl border border-slate-200 p-8 text-center shadow-xs">
           <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 border border-amber-200">
             <ShieldAlert className="w-6 h-6" />
           </div>
@@ -28,12 +28,13 @@ export default async function NewProjectPage() {
             Access Restricted
           </h2>
           <p className="text-sm text-slate-500 mt-2">
-            You are signed in as an employee. Only Administrators and Project Leads have permission to initialize new projects.
+            You are signed in as an employee. Only Administrators and Project
+            Leads have permission to initialize new projects.
           </p>
           <div className="mt-6">
             <Link
               href="/projects"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#5B5FEF] text-white rounded-md text-sm font-semibold hover:bg-[#4C50D8] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-md text-sm font-semibold hover:bg-primary-hover transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Return to Projects
             </Link>

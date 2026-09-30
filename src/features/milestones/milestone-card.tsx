@@ -1,17 +1,13 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { useState } from 'react';
-import Link from 'next/link';
-import { EditMilestoneDialog } from './edit-milestone-dialog';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import {
-  Calendar,
-  Settings2,
-  Clock,
-} from 'lucide-react';
-import { MilestoneStatus, TaskStatus, Priority } from '@prisma/client';
+import * as React from "react";
+import { useState } from "react";
+import Link from "next/link";
+import { EditMilestoneDialog } from "./edit-milestone-dialog";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Calendar, Settings2, Clock } from "lucide-react";
+import { MilestoneStatus, TaskStatus, Priority } from "@prisma/client";
 
 export interface MilestoneCardProps {
   milestone: {
@@ -41,16 +37,23 @@ export interface MilestoneCardProps {
   isManager: boolean;
 }
 
-export function MilestoneCard({ milestone, projectId, isManager }: MilestoneCardProps) {
+export function MilestoneCard({
+  milestone,
+  projectId,
+  isManager,
+}: MilestoneCardProps) {
   const [editOpen, setEditOpen] = useState(false);
 
   // Compute progress: completed / total tasks, or override
   const totalTasks = milestone.tasks.length;
-  const completedTasks = milestone.tasks.filter((t) => t.status === TaskStatus.COMPLETED).length;
+  const completedTasks = milestone.tasks.filter(
+    (t) => t.status === TaskStatus.COMPLETED,
+  ).length;
   const calculatedProgress =
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
   const progressPercent =
-    milestone.progressOverride !== null && milestone.progressOverride !== undefined
+    milestone.progressOverride !== null &&
+    milestone.progressOverride !== undefined
       ? milestone.progressOverride
       : calculatedProgress;
 
@@ -90,14 +93,16 @@ export function MilestoneCard({ milestone, projectId, isManager }: MilestoneCard
 
   return (
     <>
-      <Card className="p-5 border-border bg-surface shadow-xs space-y-4">
+      <Card className="p-5.5 border border-[rgba(220,227,240,0.9)] bg-surface shadow-clay space-y-4 rounded-[20px]">
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-xs font-bold px-2 py-0.5 rounded bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300">
               {milestone.milestoneCode}
             </span>
-            <h3 className="text-base font-bold text-text-primary">{milestone.name}</h3>
+            <h3 className="text-base font-bold text-text-primary">
+              {milestone.name}
+            </h3>
             {getStatusBadge(milestone.status)}
           </div>
 
@@ -127,7 +132,9 @@ export function MilestoneCard({ milestone, projectId, isManager }: MilestoneCard
           {/* Progress Column */}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-text-muted font-medium">Deliverables Delivery</span>
+              <span className="text-text-muted font-medium">
+                Deliverables Delivery
+              </span>
               <span className="font-bold text-text-primary">
                 {progressPercent}% ({completedTasks}/{totalTasks} tasks)
               </span>
@@ -135,7 +142,7 @@ export function MilestoneCard({ milestone, projectId, isManager }: MilestoneCard
             <div className="h-2 w-full bg-surface-secondary rounded-full overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all duration-300 ${
-                  progressPercent === 100 ? 'bg-emerald-600' : 'bg-primary'
+                  progressPercent === 100 ? "bg-emerald-600" : "bg-primary"
                 }`}
                 style={{ width: `${progressPercent}%` }}
               />
@@ -146,11 +153,11 @@ export function MilestoneCard({ milestone, projectId, isManager }: MilestoneCard
           <div className="flex flex-wrap items-center gap-4 text-xs text-text-muted sm:justify-end">
             {milestone.startDate && (
               <span className="flex items-center gap-1">
-                <Calendar className="size-3.5 text-text-muted" /> Start:{' '}
+                <Calendar className="size-3.5 text-text-muted" /> Start:{" "}
                 <strong className="text-text-primary font-medium">
                   {new Date(milestone.startDate).toLocaleDateString("en-US", {
-                    month: 'short',
-                    day: 'numeric',
+                    month: "short",
+                    day: "numeric",
                   })}
                 </strong>
               </span>
@@ -158,14 +165,18 @@ export function MilestoneCard({ milestone, projectId, isManager }: MilestoneCard
             {milestone.deadline && (
               <span
                 className={`flex items-center gap-1 ${
-                  isOverdue ? 'text-red-600 font-bold' : ''
+                  isOverdue ? "text-red-600 font-bold" : ""
                 }`}
               >
-                <Clock className="size-3.5" /> Due:{' '}
-                <strong className={isOverdue ? 'text-red-600' : 'text-text-primary font-medium'}>
+                <Clock className="size-3.5" /> Due:{" "}
+                <strong
+                  className={
+                    isOverdue ? "text-red-600" : "text-text-primary font-medium"
+                  }
+                >
                   {new Date(milestone.deadline).toLocaleDateString("en-US", {
-                    month: 'short',
-                    day: 'numeric',
+                    month: "short",
+                    day: "numeric",
                   })}
                 </strong>
                 {isOverdue && (
@@ -211,15 +222,15 @@ export function MilestoneCard({ milestone, projectId, isManager }: MilestoneCard
                     <span
                       className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${
                         t.status === TaskStatus.COMPLETED
-                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
                           : t.status === TaskStatus.IN_REVIEW
-                          ? 'bg-purple-100 text-purple-800'
-                          : t.status === TaskStatus.BLOCKED
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-surface-secondary text-text-secondary'
+                            ? "bg-purple-100 text-purple-800"
+                            : t.status === TaskStatus.BLOCKED
+                              ? "bg-red-100 text-red-800"
+                              : "bg-surface-secondary text-text-secondary"
                       }`}
                     >
-                      {t.status.replace('_', ' ')}
+                      {t.status.replace("_", " ")}
                     </span>
                   </div>
                 </div>

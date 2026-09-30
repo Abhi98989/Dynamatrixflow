@@ -48,7 +48,9 @@ export async function createProjectAction(
   } catch (err: unknown) {
     return {
       error:
-        err instanceof Error ? err.message : "Authentication required to create a project.",
+        err instanceof Error
+          ? err.message
+          : "Authentication required to create a project.",
     };
   }
 
@@ -57,7 +59,8 @@ export async function createProjectAction(
     user.systemRole !== SystemRole.PROJECT_LEAD
   ) {
     return {
-      error: "Only Administrators and Project Leads are authorized to create projects.",
+      error:
+        "Only Administrators and Project Leads are authorized to create projects.",
     };
   }
 
@@ -110,7 +113,8 @@ export async function createProjectAction(
   if (finalProjectCode) {
     if (!/^[A-Z0-9-]+$/.test(finalProjectCode)) {
       return {
-        error: "Project code can only contain letters, numbers, and hyphens (e.g. PROJ-001).",
+        error:
+          "Project code can only contain letters, numbers, and hyphens (e.g. PROJ-001).",
       };
     }
     const existing = await db.project.findUnique({

@@ -1,11 +1,17 @@
 import { db } from "@/server/db/client";
-import { requireActiveUser, canViewProject, canManageProject } from "@/server/auth/authorization";
+import {
+  requireActiveUser,
+  canViewProject,
+  canManageProject,
+} from "@/server/auth/authorization";
 import { notFound } from "next/navigation";
 import { TaskList } from "@/features/tasks/task-list";
 import { CreateTaskDialog } from "@/features/tasks/create-task-dialog";
 import { SystemRole } from "@prisma/client";
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>;
+}
 
 export default async function TasksPage({ params }: Props) {
   const currentUser = await requireActiveUser();
@@ -19,10 +25,17 @@ export default async function TasksPage({ params }: Props) {
   const project = await db.project.findUnique({
     where: { id: projectId },
     select: {
-      id: true, name: true, projectCode: true, projectLeadId: true,
+      id: true,
+      name: true,
+      projectCode: true,
+      projectLeadId: true,
       members: {
         where: { removedAt: null },
-        include: { user: { select: { id: true, name: true, employeeId: true, position: true } } },
+        include: {
+          user: {
+            select: { id: true, name: true, employeeId: true, position: true },
+          },
+        },
       },
       milestones: {
         where: { archivedAt: null },
@@ -42,20 +55,35 @@ export default async function TasksPage({ params }: Props) {
     orderBy: { createdAt: "desc" },
   });
 
-  const isLeadOrAdmin = currentUser.systemRole === SystemRole.ADMIN || project.projectLeadId === currentUser.id;
+  const isLeadOrAdmin =
+    currentUser.systemRole === SystemRole.ADMIN ||
+    project.projectLeadId === currentUser.id;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-[16px] font-semibold text-[#101828]">Project Tasks</h1>
-          <p className="text-[12px] text-[#667085] mt-0.5">{tasks.length} deliverables across all milestones</p>
+          <h1 className="text-[16px] font-semibold text-foreground">
+            Project Tasks
+          </h1>
+          <p className="text-[12px] text-text-muted mt-0.5">
+            {tasks.length} deliverables across all milestones
+          </p>
         </div>
         {isManager && (
-          <CreateTaskDialog projectId={project.id} members={project.members} milestones={project.milestones} />
+          <CreateTaskDialog
+            projectId={project.id}
+            members={project.members}
+            milestones={project.milestones}
+          />
         )}
       </div>
-      <TaskList tasks={tasks} currentUserId={currentUser.id} isLeadOrAdmin={isLeadOrAdmin} basePath={`/projects/${project.id}/tasks`} />
+      <TaskList
+        tasks={tasks}
+        currentUserId={currentUser.id}
+        isLeadOrAdmin={isLeadOrAdmin}
+        basePath={`/projects/${project.id}/tasks`}
+      />
     </div>
   );
 }

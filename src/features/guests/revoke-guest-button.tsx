@@ -16,7 +16,11 @@ export function RevokeGuestButton({
   const [isPending, startTransition] = useTransition();
 
   const handleRevoke = () => {
-    if (!confirm(`Are you sure you want to revoke guest access for ${guestName}? They will no longer be able to monitor this project.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to revoke guest access for ${guestName}? They will no longer be able to monitor this project.`,
+      )
+    ) {
       return;
     }
 
