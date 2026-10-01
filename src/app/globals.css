@@ -13,8 +13,8 @@
   --charcoal: #222834;
 
   --white: #ffffff;
-  --off-white: #f7f8fc;
-  --soft-white: #f1f4fa;
+  --off-white: #eef2f6;
+  --soft-white: #f8faff;
 
   --text-primary: #0b1220;
   --text-secondary: #475467;
@@ -110,14 +110,30 @@
     0 8px 16px -4px rgba(15, 23, 42, 0.08),
     0 4px 6px -2px rgba(15, 23, 42, 0.03);
   --shadow-dialog:
-    0 12px 28px -4px rgba(15, 23, 42, 0.12),
-    0 4px 10px -2px rgba(15, 23, 42, 0.06);
+    0 16px 36px -4px rgba(15, 23, 42, 0.14),
+    0 6px 14px -2px rgba(15, 23, 42, 0.08);
   --shadow-clay:
-    4px 4px 10px rgba(15, 23, 42, 0.05),
-    -3px -3px 8px rgba(255, 255, 255, 0.9);
+    10px 10px 24px rgba(15, 23, 42, 0.08),
+    -8px -8px 18px rgba(255, 255, 255, 1),
+    inset 1px 1px 2px rgba(255, 255, 255, 1),
+    inset -1px -1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-clay-subtle:
+    6px 6px 16px rgba(15, 23, 42, 0.06),
+    -6px -6px 14px rgba(255, 255, 255, 1),
+    inset 1px 1px 1.5px rgba(255, 255, 255, 0.95),
+    inset -1px -1px 1.5px rgba(15, 23, 42, 0.03);
+  --shadow-clay-hover:
+    14px 14px 30px rgba(15, 23, 42, 0.11),
+    -10px -10px 22px rgba(255, 255, 255, 1),
+    inset 1px 1px 2px rgba(255, 255, 255, 1),
+    inset -1px -1px 2px rgba(15, 23, 42, 0.04);
   --shadow-clay-inset:
-    inset 2px 2px 5px rgba(15, 23, 42, 0.04),
-    inset -2px -2px 5px rgba(255, 255, 255, 0.9);
+    inset 4px 4px 10px rgba(15, 23, 42, 0.07),
+    inset -4px -4px 10px rgba(255, 255, 255, 1);
+  --shadow-clay-button:
+    0 4px 12px rgba(30, 58, 138, 0.35),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.4),
+    inset -1px -1px 2px rgba(0, 0, 0, 0.25);
 }
 
 @theme inline {
@@ -182,7 +198,10 @@
   --shadow-dropdown: var(--shadow-dropdown);
   --shadow-dialog: var(--shadow-dialog);
   --shadow-clay: var(--shadow-clay);
+  --shadow-clay-subtle: var(--shadow-clay-subtle);
+  --shadow-clay-hover: var(--shadow-clay-hover);
   --shadow-clay-inset: var(--shadow-clay-inset);
+  --shadow-clay-button: var(--shadow-clay-button);
 }
 
 @layer utilities {

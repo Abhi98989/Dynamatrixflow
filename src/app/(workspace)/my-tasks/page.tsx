@@ -82,9 +82,9 @@ export default async function MyTasksPage() {
         </div>
       </div>
 
-      {/* Metrics Row — Minimal Clay */}
+      {/* Metrics Row — Authentic Clay */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             Total Assigned
           </span>
@@ -94,7 +94,7 @@ export default async function MyTasksPage() {
           <span className="text-[10px] text-text-muted mt-0.5 block">all workspaces</span>
         </div>
 
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             In Progress
           </span>
@@ -104,7 +104,7 @@ export default async function MyTasksPage() {
           <span className="text-[10px] text-text-muted mt-0.5 block">active work</span>
         </div>
 
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             Completed
           </span>
@@ -114,7 +114,7 @@ export default async function MyTasksPage() {
           <span className="text-[10px] text-text-muted mt-0.5 block">delivered</span>
         </div>
 
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             Overdue
           </span>

@@ -162,19 +162,19 @@ export function GuestMonitorView({
       </div>
 
       {/* ─── Compact KPI Row ─── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-0.5">
-            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Progress</span>
-            <TrendingUp className="w-3 h-3 text-primary" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Progress</span>
+            <TrendingUp className="w-3.5 h-3.5 text-primary" />
           </div>
           <div className="flex items-baseline justify-between gap-1">
-            <span className="text-lg sm:text-xl font-bold text-foreground tabular-nums leading-tight">
+            <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums leading-none">
               {progressPercentage}%
             </span>
-            <span className="text-[9px] text-text-muted">{completedTasks.length}/{totalTasks} tasks</span>
+            <span className="text-[10px] text-text-muted">{completedTasks.length}/{totalTasks} tasks</span>
           </div>
-          <div className="w-full h-1 rounded-full overflow-hidden mt-1 bg-[#F1F4FA] shadow-clay-inset">
+          <div className="w-full h-1.5 rounded-full overflow-hidden mt-2 bg-[#F8FAFF] shadow-clay-inset border border-border-subtle">
             <div
               className={`h-full rounded-full transition-all duration-500 ${progressPercentage === 100 ? "bg-[#16A34A]" : "bg-primary"}`}
               style={{ width: `${progressPercentage}%` }}
@@ -182,58 +182,58 @@ export function GuestMonitorView({
           </div>
         </div>
 
-        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-0.5">
-            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Active</span>
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Active</span>
             <span className="flex h-1.5 w-1.5 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-60" />
               <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
             </span>
           </div>
           <div className="flex items-baseline justify-between gap-1">
-            <span className="text-lg sm:text-xl font-bold text-primary tabular-nums leading-tight">
+            <span className="text-xl sm:text-2xl font-bold text-primary tabular-nums leading-none">
               {inProgressTasks.length}
             </span>
-            <span className="text-[9px] text-text-muted">in execution</span>
+            <span className="text-[10px] text-text-muted">in execution</span>
           </div>
           {blockedTasks.length > 0 ? (
-            <span className="text-[8px] font-bold text-red-600 mt-0.5 block">{blockedTasks.length} blocked</span>
+            <span className="text-[9px] font-bold text-red-600 mt-1 block">{blockedTasks.length} blocked</span>
           ) : (
-            <span className="text-[8px] text-text-muted mt-0.5 block">0 blocked</span>
+            <span className="text-[9px] text-text-muted mt-1 block">0 blocked</span>
           )}
         </div>
 
-        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-0.5">
-            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Pipeline</span>
-            <Layers className="w-3 h-3 text-[#D97706]" />
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Pipeline</span>
+            <Layers className="w-3.5 h-3.5 text-[#D97706]" />
           </div>
           <div className="flex items-baseline justify-between gap-1">
-            <span className="text-lg sm:text-xl font-bold text-[#D97706] tabular-nums leading-tight">
+            <span className="text-xl sm:text-2xl font-bold text-[#D97706] tabular-nums leading-none">
               {upcomingTasks.length}
             </span>
-            <span className="text-[9px] text-text-muted">queued tasks</span>
+            <span className="text-[10px] text-text-muted">queued tasks</span>
           </div>
-          <span className="text-[8px] text-text-muted mt-0.5 block">upcoming deliverables</span>
+          <span className="text-[9px] text-text-muted mt-1 block">upcoming deliverables</span>
         </div>
 
-        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-0.5">
-            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Milestones</span>
-            <CheckCircle2 className="w-3 h-3 text-[#15803D]" />
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Milestones</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#15803D]" />
           </div>
           <div className="flex items-baseline justify-between gap-1">
-            <span className="text-lg sm:text-xl font-bold text-[#15803D] tabular-nums leading-tight">
+            <span className="text-xl sm:text-2xl font-bold text-[#15803D] tabular-nums leading-none">
               {currentProject.milestones.filter((m) => m.status === "COMPLETED").length}/{currentProject.milestones.length}
             </span>
-            <span className="text-[9px] text-[#15803D]">delivered</span>
+            <span className="text-[10px] text-[#15803D]">delivered</span>
           </div>
-          <span className="text-[8px] text-text-muted mt-0.5 block">project roadmap</span>
+          <span className="text-[9px] text-text-muted mt-1 block">project roadmap</span>
         </div>
       </div>
 
       {/* ─── Project Info + Tabs ─── */}
-      <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-xs">
+      <div className="bg-surface rounded-2xl border border-[rgba(220,227,240,0.9)] overflow-hidden shadow-clay">
         {/* Project header */}
         <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 border-b border-border bg-[#FAFBFE]">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
@@ -265,22 +265,26 @@ export function GuestMonitorView({
         </div>
 
         {/* Tabs */}
-        <div className="px-2.5 bg-surface border-b border-border">
-          <div className="flex items-center gap-0.5 overflow-x-auto hide-scrollbar">
+        <div className="px-3 py-2 bg-[#F8FAFF] border-b border-border-subtle">
+          <div className="flex items-center gap-1.5 overflow-x-auto hide-scrollbar">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`px-2 py-1 text-[11px] font-medium border-b-2 transition-colors flex items-center gap-1 whitespace-nowrap cursor-pointer ${
+                className={`px-3 py-1 text-xs font-semibold rounded-xl transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                   activeTab === tab.key
-                    ? "text-primary border-primary font-semibold"
-                    : "text-text-muted border-transparent hover:text-foreground"
+                    ? "bg-surface text-primary shadow-clay font-bold border border-[rgba(220,227,240,0.9)]"
+                    : "text-text-muted hover:text-foreground hover:bg-surface/50"
                 }`}
               >
                 {tab.label}
-                <span className={`px-1 py-0.2 rounded text-[9px] font-bold ${
-                  activeTab === tab.key ? "bg-primary/10 text-primary" : "bg-background text-text-muted"
-                }`}>
+                <span
+                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                    activeTab === tab.key
+                      ? "bg-primary text-white"
+                      : "bg-[#EEF2F6] text-text-muted"
+                  }`}
+                >
                   {tab.count}
                 </span>
               </button>
@@ -301,7 +305,10 @@ export function GuestMonitorView({
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   {inProgressTasks.map((task) => (
-                    <div key={task.id} className="p-3 rounded-lg border border-border hover:border-primary/30 transition-colors bg-[#FAFBFE]">
+                    <div
+                      key={task.id}
+                      className="p-3 rounded-2xl border border-[rgba(220,227,240,0.85)] hover:border-primary/40 transition-all bg-surface shadow-clay-subtle hover:shadow-clay"
+                    >
                       <div className="flex items-center justify-between gap-2 mb-1.5">
                         <span className="font-mono text-[9px] font-bold text-text-muted">{task.taskCode}</span>
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border ${priorityColor[task.priority] || priorityColor.MEDIUM}`}>
@@ -313,7 +320,7 @@ export function GuestMonitorView({
                         <p className="text-[11px] text-text-muted mt-1 line-clamp-2">{task.description}</p>
                       )}
                       {task.progress > 0 && (
-                        <div className="w-full h-1 rounded-full overflow-hidden mt-2 bg-[#F1F4FA] shadow-clay-inset">
+                        <div className="w-full h-1.5 rounded-full overflow-hidden mt-2 bg-[#F8FAFF] shadow-clay-inset border border-border-subtle">
                           <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${task.progress}%` }} />
                         </div>
                       )}
@@ -347,9 +354,9 @@ export function GuestMonitorView({
                   <p className="text-xs text-text-muted">No upcoming tasks</p>
                 </div>
               ) : (
-                <div className="divide-y divide-border-subtle border border-border rounded-md overflow-hidden">
+                <div className="divide-y divide-border-subtle border border-[rgba(220,227,240,0.85)] rounded-2xl overflow-hidden bg-surface shadow-clay-subtle">
                   {upcomingTasks.map((task) => (
-                    <div key={task.id} className="px-2.5 py-2 hover:bg-background transition-colors flex items-center justify-between gap-2.5 bg-surface">
+                    <div key={task.id} className="px-3 py-2.5 hover:bg-background transition-colors flex items-center justify-between gap-2.5 bg-surface">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <span className="font-mono text-[9px] text-text-muted">{task.taskCode}</span>
@@ -363,7 +370,7 @@ export function GuestMonitorView({
                           {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                         </span>
                       ) : (
-                        <span className="text-[9px] text-text-muted bg-background px-1.5 py-0.5 rounded shrink-0">Queued</span>
+                        <span className="text-[9px] text-text-muted bg-[#F8FAFF] px-2 py-0.5 rounded-full border border-border-subtle shrink-0">Queued</span>
                       )}
                     </div>
                   ))}
@@ -381,9 +388,9 @@ export function GuestMonitorView({
                   <p className="text-xs text-text-muted">No completed tasks yet</p>
                 </div>
               ) : (
-                <div className="divide-y divide-border-subtle border border-border rounded-md overflow-hidden">
+                <div className="divide-y divide-border-subtle border border-[rgba(220,227,240,0.85)] rounded-2xl overflow-hidden bg-surface shadow-clay-subtle">
                   {completedTasks.map((task) => (
-                    <div key={task.id} className="px-2.5 py-2 hover:bg-background transition-colors flex items-center justify-between gap-2.5 bg-surface">
+                    <div key={task.id} className="px-3 py-2.5 hover:bg-background transition-colors flex items-center justify-between gap-2.5 bg-surface">
                       <div className="min-w-0 flex-1 flex items-center gap-2">
                         <CheckCircle2 className="w-3.5 h-3.5 text-[#15803D] shrink-0" />
                         <div className="min-w-0">
@@ -391,7 +398,7 @@ export function GuestMonitorView({
                           <h4 className="text-xs font-semibold text-foreground truncate">{task.title}</h4>
                         </div>
                       </div>
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold shrink-0">DONE</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold shrink-0">DONE</span>
                     </div>
                   ))}
                 </div>
@@ -401,7 +408,7 @@ export function GuestMonitorView({
 
           {/* ROADMAP */}
           {activeTab === "milestones" && (
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               {currentProject.milestones.length === 0 ? (
                 <div className="py-5 text-center">
                   <Target className="w-5 h-5 text-text-muted mx-auto mb-1.5 opacity-40" />
@@ -414,33 +421,33 @@ export function GuestMonitorView({
                   return (
                     <div
                       key={milestone.id}
-                      className={`p-2.5 rounded-md border transition-colors ${
+                      className={`p-3 rounded-2xl border transition-all shadow-clay-subtle ${
                         isDone ? "bg-surface border-emerald-200"
-                          : isCurrent ? "bg-primary/3 border-primary/25" : "bg-surface border-border"
+                          : isCurrent ? "bg-primary/5 border-primary/30" : "bg-surface border-[rgba(220,227,240,0.85)]"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2.5">
-                        <div className="flex items-start gap-2">
-                          <div className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold shrink-0 ${
-                            isDone ? "bg-emerald-600 text-white" : isCurrent ? "bg-primary text-white" : "bg-background text-text-muted border border-border"
+                        <div className="flex items-start gap-2.5">
+                          <div className={`w-6 h-6 rounded-xl flex items-center justify-center text-[10px] font-bold shrink-0 shadow-xs ${
+                            isDone ? "bg-emerald-600 text-white" : isCurrent ? "bg-primary text-white" : "bg-[#F8FAFF] text-text-muted border border-border"
                           }`}>
-                            {isDone ? <CheckCircle2 className="w-3 h-3" /> : idx + 1}
+                            {isDone ? <CheckCircle2 className="w-3.5 h-3.5" /> : idx + 1}
                           </div>
                           <div>
                             <h4 className="text-xs font-bold text-foreground">{milestone.name}</h4>
-                            {milestone.description && <p className="text-[10px] text-text-muted mt-0.5">{milestone.description}</p>}
+                            {milestone.description && <p className="text-[11px] text-text-muted mt-0.5">{milestone.description}</p>}
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <span className={`inline-block px-1.5 py-0.2 rounded text-[9px] font-bold ${
+                          <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-bold ${
                             isDone ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
-                              : isCurrent ? "bg-primary/10 text-primary border border-primary/20" : "bg-background text-text-muted border border-border"
+                              : isCurrent ? "bg-primary/10 text-primary border border-primary/20" : "bg-[#F8FAFF] text-text-muted border border-border"
                           }`}>
                             {formatEnum(milestone.status)}
                           </span>
                           {milestone.deadline && (
-                            <p className="text-[9px] text-text-muted mt-0.5 flex items-center gap-0.5 justify-end">
-                              <Calendar className="w-2.5 h-2.5" />
+                            <p className="text-[10px] text-text-muted mt-1 flex items-center gap-1 justify-end">
+                              <Calendar className="w-3 h-3" />
                               {new Date(milestone.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                             </p>
                           )}
@@ -462,7 +469,7 @@ export function GuestMonitorView({
                   <p className="text-xs text-text-muted">No shared files yet</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {currentProject.resources.map((res) => {
                     const isFile = res.url.startsWith("/api/upload") || res.url.match(/\.(pdf|doc|docx|png|jpg|jpeg|svg|zip)$/i);
                     return (
@@ -471,7 +478,7 @@ export function GuestMonitorView({
                         href={res.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-2.5 rounded-md border border-border hover:border-primary/30 transition-colors flex items-center justify-between gap-2 group"
+                        className="p-3 rounded-2xl border border-[rgba(220,227,240,0.85)] bg-surface shadow-clay-subtle hover:shadow-clay hover:border-primary/40 transition-all flex items-center justify-between gap-2.5 group"
                       >
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="w-7 h-7 rounded bg-primary/8 text-primary flex items-center justify-center shrink-0">

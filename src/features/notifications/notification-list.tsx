@@ -354,7 +354,7 @@ export function NotificationList({
       </div>
 
       {/* 2. Search & Filter Bar */}
-      <div className="bg-surface border border-border rounded-[8px] p-3 sm:p-3.5 space-y-3">
+      <div className="bg-surface border border-[rgba(220,227,240,0.9)] rounded-2xl p-3 sm:p-3.5 space-y-3 shadow-clay">
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           {/* Search Box */}
           <div className="relative flex-1 min-w-[240px]">
@@ -364,7 +364,7 @@ export function NotificationList({
               placeholder="Search notifications..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full h-9 pl-9 pr-8 rounded-[6px] border border-border-subtle bg-surface text-[13px] text-foreground placeholder-[#98A2B3] focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+              className="w-full h-9 pl-9 pr-8 rounded-xl border border-[rgba(220,227,240,0.8)] bg-[#F8FAFF] text-[13px] text-foreground placeholder-[#98A2B3] shadow-clay-inset focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
             />
             {search && (
               <button
@@ -384,7 +384,7 @@ export function NotificationList({
                 type="button"
                 onClick={handleMarkAllRead}
                 disabled={isPending}
-                className="h-9 px-3 rounded-[6px] border border-border-subtle bg-surface text-[12px] font-semibold text-text-secondary hover:bg-surface-hover transition-colors flex items-center gap-1.5"
+                className="h-8 px-3 rounded-xl border border-[rgba(220,227,240,0.9)] bg-surface text-[12px] font-semibold text-text-secondary hover:bg-surface-hover shadow-[2px_2px_6px_rgba(15,23,42,0.04),-2px_-2px_6px_rgba(255,255,255,0.95)] transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <CheckCheck className="size-3.5 text-primary" />
                 Mark all read
@@ -396,7 +396,7 @@ export function NotificationList({
                 type="button"
                 onClick={handleClearAllRead}
                 disabled={isPending}
-                className="h-9 px-3 rounded-[6px] border border-border-subtle bg-surface text-[12px] font-semibold text-[#DC2626] hover:bg-red-50 hover:border-[#FECACA] transition-colors flex items-center gap-1.5"
+                className="h-8 px-3 rounded-xl border border-border-subtle bg-surface text-[12px] font-semibold text-[#DC2626] hover:bg-red-50 hover:border-[#FECACA] shadow-[2px_2px_6px_rgba(15,23,42,0.04),-2px_-2px_6px_rgba(255,255,255,0.95)] transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <Trash2 className="size-3.5" />
                 Clear read
@@ -418,10 +418,10 @@ export function NotificationList({
               key={tab.id}
               type="button"
               onClick={() => setActiveTab(tab.id as NotificationFilterTab)}
-              className={`h-7 px-2.5 rounded-[4px] text-[11px] font-semibold whitespace-nowrap transition-colors ${
+              className={`h-7 px-3 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer ${
                 activeTab === tab.id
-                  ? "bg-[#101828] text-white"
-                  : "text-text-secondary hover:bg-surface-hover"
+                  ? "bg-primary text-white shadow-clay-button"
+                  : "text-text-secondary hover:bg-[#EEF2F6]"
               }`}
             >
               {tab.label}
@@ -431,7 +431,7 @@ export function NotificationList({
       </div>
 
       {/* 3. Notifications List */}
-      <div className="bg-surface border border-border rounded-[8px] overflow-hidden">
+      <div className="bg-surface border border-[rgba(220,227,240,0.9)] rounded-2xl overflow-hidden shadow-clay">
         {filteredNotifications.length === 0 ? (
           <div className="py-16 px-6 text-center">
             <div className="w-12 h-12 rounded-full bg-surface-hover text-text-muted mx-auto flex items-center justify-center mb-3">

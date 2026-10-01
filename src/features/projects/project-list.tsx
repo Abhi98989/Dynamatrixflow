@@ -134,14 +134,14 @@ export function ProjectList({
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <button className="inline-flex items-center gap-1.5 px-3 h-8 border border-border rounded-md text-[13px] font-medium text-text-secondary hover:bg-surface-hover transition-colors">
+          <button className="inline-flex items-center gap-1.5 px-3 h-8 border border-[rgba(220,227,240,0.9)] rounded-xl text-[13px] font-medium text-text-secondary hover:text-foreground hover:bg-[#F8FAFF] transition-all shadow-[3px_3px_8px_rgba(15,23,42,0.05),-3px_-3px_8px_rgba(255,255,255,0.95)] hover:-translate-y-0.5 active:translate-y-0 cursor-pointer">
             <Download className="w-3.5 h-3.5" /> Export
           </button>
           {canCreate && (
             <Link
               href="/projects/new"
               role="button"
-              className="inline-flex items-center gap-1.5 px-3 h-8 bg-primary rounded-md text-[13px] font-semibold text-white hover:bg-primary-hover transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 h-8 bg-primary rounded-xl text-[13px] font-semibold text-white hover:bg-primary-hover transition-all shadow-clay-button hover:-translate-y-0.5 active:translate-y-0 cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" /> New Project
             </Link>
@@ -149,8 +149,8 @@ export function ProjectList({
         </div>
       </div>
 
-      {/* Stat row — compact, single line each */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Stat row — authentic clay cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         {[
           {
             label: "Active",
@@ -179,7 +179,7 @@ export function ProjectList({
         ].map((s) => (
           <div
             key={s.label}
-            className="bg-surface rounded-lg border border-border p-2.5 sm:p-3 shadow-clay flex flex-col justify-between"
+            className="bg-surface rounded-2xl border border-[rgba(220,227,240,0.9)] p-2.5 sm:p-3 shadow-clay hover:shadow-clay-hover transition-all flex flex-col justify-between"
           >
             <span className="text-[10px] font-semibold text-text-muted tracking-wider uppercase">
               {s.label}
@@ -339,7 +339,7 @@ export function ProjectList({
 
       {/* Table view */}
       {filteredProjects.length > 0 && view === "table" && (
-        <div className="bg-surface rounded-lg border border-border overflow-hidden">
+        <div className="bg-surface rounded-2xl border border-[rgba(220,227,240,0.9)] overflow-hidden shadow-clay">
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[720px]">
               <thead className="bg-background border-b border-border">
@@ -501,7 +501,7 @@ export function ProjectList({
             <Link
               key={p.id}
               href={`/projects/${p.id}`}
-              className="block bg-surface rounded-lg border border-border hover:border-primary/30 transition-colors p-4"
+              className="block bg-surface rounded-2xl border border-[rgba(220,227,240,0.9)] hover:border-primary/40 shadow-clay-subtle hover:shadow-clay hover:-translate-y-0.5 transition-all p-4"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2.5 min-w-0">

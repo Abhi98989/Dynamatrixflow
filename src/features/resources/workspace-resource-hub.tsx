@@ -419,15 +419,15 @@ export function WorkspaceResourceHub({
       </div>
 
       {/* 2. Attention Metrics Strip */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         {/* Total Assets */}
         <button
           type="button"
           onClick={() => setSelectedCategory("ALL")}
-          className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-2.5 sm:p-3 rounded-2xl border text-left transition-all shadow-clay hover:shadow-clay-hover cursor-pointer ${
             selectedCategory === "ALL" && !hasActiveFilters
               ? "ring-2 ring-primary border-primary bg-surface"
-              : "bg-surface border-border hover:border-primary/40"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
@@ -448,10 +448,10 @@ export function WorkspaceResourceHub({
         <button
           type="button"
           onClick={() => setSelectedCategory("DOCUMENTATION")}
-          className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-2.5 sm:p-3 rounded-2xl border text-left transition-all shadow-clay hover:shadow-clay-hover cursor-pointer ${
             selectedCategory === "DOCUMENTATION"
               ? "ring-2 ring-[#15803D] border-[#15803D] bg-surface"
-              : "bg-surface border-border hover:border-[#15803D]/40"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-[#15803D]/40"
           }`}
         >
           <div className="flex items-center justify-between">
@@ -473,10 +473,10 @@ export function WorkspaceResourceHub({
         <button
           type="button"
           onClick={() => setSelectedCategory("API")}
-          className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-2.5 sm:p-3 rounded-2xl border text-left transition-all shadow-clay hover:shadow-clay-hover cursor-pointer ${
             selectedCategory === "API" || selectedCategory === "DEVELOPMENT"
               ? "ring-2 ring-primary border-primary bg-surface"
-              : "bg-surface border-border hover:border-primary/40"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
@@ -497,10 +497,10 @@ export function WorkspaceResourceHub({
         <button
           type="button"
           onClick={() => setSelectedCategory("DESIGN")}
-          className={`p-2.5 sm:p-3 rounded-lg border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-2.5 sm:p-3 rounded-2xl border text-left transition-all shadow-clay hover:shadow-clay-hover cursor-pointer ${
             selectedCategory === "DESIGN" || selectedCategory === "RESEARCH"
               ? "ring-2 ring-primary border-primary bg-surface"
-              : "bg-surface border-border hover:border-primary/40"
+              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
@@ -700,7 +700,7 @@ export function WorkspaceResourceHub({
         </div>
       ) : viewMode === "LIST" ? (
         /* Compact List View (§13: Prefer a compact list over cards whenever a list scans faster) */
-        <div className="bg-surface border border-border rounded-[8px] overflow-hidden">
+        <div className="bg-surface border border-[rgba(220,227,240,0.9)] rounded-2xl overflow-hidden shadow-clay">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm border-collapse">
               <thead className="border-b border-border bg-background text-[11px] uppercase tracking-wider font-semibold text-text-secondary">
@@ -895,7 +895,7 @@ export function WorkspaceResourceHub({
             return (
               <div
                 key={res.id}
-                className="bg-surface border border-border rounded-[8px] p-4 flex flex-col justify-between hover:border-border-subtle transition-all"
+                className="bg-surface border border-[rgba(220,227,240,0.9)] rounded-2xl p-4 flex flex-col justify-between shadow-clay-subtle hover:shadow-clay hover:border-primary/40 hover:-translate-y-0.5 transition-all"
               >
                 <div className="space-y-2.5">
                   <div className="flex items-start justify-between gap-2">

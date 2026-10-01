@@ -209,14 +209,14 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-border rounded-lg text-xs font-medium text-text-secondary hover:text-foreground transition-colors shadow-sm">
+          <button className="flex items-center gap-1.5 px-3 py-1.5 bg-surface border border-[rgba(220,227,240,0.9)] rounded-xl text-xs font-medium text-text-secondary hover:text-foreground transition-all shadow-[3px_3px_8px_rgba(15,23,42,0.05),-3px_-3px_8px_rgba(255,255,255,0.95)] hover:-translate-y-0.5 active:translate-y-0">
             <Download className="w-3.5 h-3.5" />
             Export
           </button>
           {(isAdmin || isLead) && (
             <Link
               href="/projects/new"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary rounded-lg text-xs font-semibold text-white hover:bg-primary-hover transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary rounded-xl text-xs font-semibold text-white hover:bg-primary-hover transition-all shadow-clay-button hover:-translate-y-0.5 active:translate-y-0"
             >
               <Plus className="w-3.5 h-3.5" />
               New Project
@@ -226,8 +226,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 mb-3">
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 mb-3">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
               {isDev ? "Open Tasks" : "Projects"}
@@ -242,7 +242,7 @@ export default async function DashboardPage() {
           </span>
         </div>
 
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Overdue</span>
             {overdueCount > 0 ? <AlertTriangle className="w-3.5 h-3.5 text-red-600" /> : <CheckSquare className="w-3.5 h-3.5 text-[#15803D]" />}
@@ -255,7 +255,7 @@ export default async function DashboardPage() {
           </span>
         </div>
 
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Blocked</span>
             <Clock className={`w-3.5 h-3.5 ${blockedCount > 0 ? "text-[#D97706]" : "text-text-muted"}`} />
@@ -268,7 +268,7 @@ export default async function DashboardPage() {
           </span>
         </div>
 
-        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+        <div className="bg-surface rounded-2xl p-2.5 sm:p-3 border border-[rgba(220,227,240,0.9)] shadow-clay hover:shadow-clay-hover transition-all">
           <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
               {isDev ? "This Week" : "Review"}
@@ -285,7 +285,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Health Bar */}
-      <div className="bg-surface rounded-lg p-3 border border-border shadow-clay mb-3">
+      <div className="bg-surface rounded-2xl p-3 border border-[rgba(220,227,240,0.9)] shadow-clay mb-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
           <div className="flex items-center gap-1.5">
             <Activity className="size-3.5 text-primary" />
@@ -300,7 +300,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="h-2.5 w-full rounded-full flex overflow-hidden p-0.5 gap-0.5 bg-[#F1F4FA] shadow-clay-inset border border-border-subtle">
+        <div className="h-2.5 w-full rounded-full flex overflow-hidden p-0.5 gap-0.5 bg-[#F8FAFF] shadow-clay-inset border border-border-subtle">
           {onTrackPct > 0 && (
             <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${onTrackPct}%` }} title={`On Track: ${onTrackPct}%`} />
           )}
@@ -335,9 +335,9 @@ export default async function DashboardPage() {
           <Link
             key={item.href}
             href={item.href}
-            className="p-2 bg-surface border border-border rounded-lg transition-colors flex items-center gap-2 group hover:border-primary/30"
+            className="p-2.5 bg-surface border border-[rgba(220,227,240,0.9)] rounded-2xl transition-all flex items-center gap-2.5 group hover:border-primary/40 shadow-clay-subtle hover:shadow-clay hover:-translate-y-0.5"
           >
-            <div className={`size-7 rounded-md flex items-center justify-center shrink-0 ${item.iconColor || "text-primary bg-primary/10"}`}>
+            <div className={`size-7 rounded-xl flex items-center justify-center shrink-0 shadow-xs ${item.iconColor || "text-primary bg-primary/10"}`}>
               {item.icon}
             </div>
             <div className="min-w-0">
@@ -352,7 +352,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Workstreams Table */}
         <div className="lg:col-span-2">
-          <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-xs">
+          <div className="bg-surface rounded-2xl border border-[rgba(220,227,240,0.9)] overflow-hidden shadow-clay">
             <div className="px-3 py-2 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <h2 className="font-bold text-foreground text-xs">{isDev ? "My Projects" : "Active Workstreams"}</h2>
@@ -420,7 +420,7 @@ export default async function DashboardPage() {
 
         {/* Deadlines */}
         <div>
-          <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-xs h-full">
+          <div className="bg-surface rounded-2xl border border-[rgba(220,227,240,0.9)] overflow-hidden shadow-clay h-full">
             <div className="px-3 py-2 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Calendar className="size-3.5 text-primary" />
