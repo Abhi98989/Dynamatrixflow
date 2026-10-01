@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { db } from "@/server/db/client";
 import { requireActiveUser } from "@/server/auth/authorization";
 import { TaskList } from "@/features/tasks/task-list";
-import { Card } from "@/components/ui/card";
 import { TaskStatus, SystemRole } from "@prisma/client";
 
 export const metadata: Metadata = {
@@ -65,57 +64,71 @@ export default async function MyTasksPage() {
   const isLeadOrAdmin = currentUser.systemRole === SystemRole.ADMIN;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight text-text-primary">
+            <h1 className="text-lg font-bold text-foreground tracking-tight">
               My Tasks
             </h1>
-            <span className="rounded-full bg-review-bg px-2.5 py-0.5 text-xs font-semibold text-primary">
+            <span className="text-[10px] font-bold text-primary bg-[#EFF6FF] border border-[#BFDBFE] px-2 py-0.5 rounded-full">
               {tasks.length} Assigned
             </span>
           </div>
-          <p className="mt-1 text-sm text-text-secondary">
+          <p className="text-xs text-text-muted mt-0.5">
             Deliverables assigned to you across all project workspaces.
           </p>
         </div>
       </div>
 
-      {/* Metrics Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <p className="text-xs text-text-muted">Total Assigned</p>
-          <p className="text-2xl font-bold text-text-primary mt-1">
+      {/* Metrics Row — Minimal Clay */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+          <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
+            Total Assigned
+          </span>
+          <span className="text-2xl font-extrabold text-foreground tabular-nums leading-none mt-2 block">
             {tasks.length}
-          </p>
-        </Card>
+          </span>
+          <span className="text-[10px] text-text-muted mt-1 block">all workspaces</span>
+        </div>
 
-        <Card className="p-4">
-          <p className="text-xs text-text-muted">In Progress / Review</p>
-          <p className="text-2xl font-bold text-text-primary mt-1">
+        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+          <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
+            In Progress
+          </span>
+          <span className="text-2xl font-extrabold text-primary tabular-nums leading-none mt-2 block">
             {inProgressCount}
-          </p>
-        </Card>
+          </span>
+          <span className="text-[10px] text-text-muted mt-1 block">active work</span>
+        </div>
 
-        <Card className="p-4">
-          <p className="text-xs text-text-muted">Completed Work</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">
+        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+          <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
+            Completed
+          </span>
+          <span className="text-2xl font-extrabold text-[#15803D] tabular-nums leading-none mt-2 block">
             {completedCount}
-          </p>
-        </Card>
+          </span>
+          <span className="text-[10px] text-text-muted mt-1 block">delivered</span>
+        </div>
 
-        <Card className="p-4">
-          <p className="text-xs text-text-muted">Overdue</p>
-          <p
-            className={`text-2xl font-bold mt-1 ${
-              overdueCount > 0 ? "text-red-600" : "text-text-primary"
+        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+          <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
+            Overdue
+          </span>
+          <span
+            className={`text-2xl font-extrabold tabular-nums leading-none mt-2 block ${
+              overdueCount > 0 ? "text-red-600" : "text-foreground"
             }`}
           >
             {overdueCount}
-          </p>
-        </Card>
+          </span>
+          <span className="text-[10px] text-text-muted mt-1 block">
+            {overdueCount > 0 ? "needs attention" : "on schedule"}
+          </span>
+        </div>
       </div>
 
       {/* Tasks List */}

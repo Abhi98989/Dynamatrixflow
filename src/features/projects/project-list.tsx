@@ -179,9 +179,9 @@ export function ProjectList({
         ].map((s) => (
           <div
             key={s.label}
-            className="bg-surface rounded-2xl border border-[rgba(220,227,240,0.9)] p-4 shadow-clay flex flex-col justify-between"
+            className="bg-surface rounded-xl border border-border p-3.5 shadow-clay flex flex-col justify-between"
           >
-            <span className="text-[11px] font-bold text-text-secondary tracking-wider uppercase">
+            <span className="text-[10px] font-semibold text-text-muted tracking-wider uppercase">
               {s.label}
             </span>
             <div className="flex items-baseline gap-2 mt-2">

@@ -424,23 +424,23 @@ export function WorkspaceResourceHub({
         <button
           type="button"
           onClick={() => setSelectedCategory("ALL")}
-          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-3.5 rounded-xl border text-left transition-all shadow-clay cursor-pointer ${
             selectedCategory === "ALL" && !hasActiveFilters
               ? "ring-2 ring-primary border-primary bg-surface"
-              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
+              : "bg-surface border-border hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+            <span className="text-[10px] font-semibold text-text-muted flex items-center gap-1.5 uppercase tracking-wider">
               <Layers className="size-3.5 text-primary" />
               Total Assets
             </span>
           </div>
-          <div className="mt-2.5 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold tracking-tight text-foreground tabular-nums leading-none">
               {metrics.total}
             </span>
-            <span className="text-[11px] text-text-muted font-medium">cataloged</span>
+            <span className="text-[10px] text-text-muted">cataloged</span>
           </div>
         </button>
 
@@ -448,24 +448,24 @@ export function WorkspaceResourceHub({
         <button
           type="button"
           onClick={() => setSelectedCategory("DOCUMENTATION")}
-          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-3.5 rounded-xl border text-left transition-all shadow-clay cursor-pointer ${
             selectedCategory === "DOCUMENTATION"
               ? "ring-2 ring-[#15803D] border-[#15803D] bg-surface"
-              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-[#15803D]/40"
+              : "bg-surface border-border hover:border-[#15803D]/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+            <span className="text-[10px] font-semibold text-text-muted flex items-center gap-1.5 uppercase tracking-wider">
               <FileText className="size-3.5 text-[#15803D]" />
               Docs & Guides
             </span>
             <span className="w-2 h-2 rounded-full bg-[#15803D]" />
           </div>
-          <div className="mt-2.5 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#15803D]">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold tracking-tight text-[#15803D] tabular-nums leading-none">
               {metrics.docs}
             </span>
-            <span className="text-[11px] text-text-muted font-medium">specs</span>
+            <span className="text-[10px] text-text-muted">specs</span>
           </div>
         </button>
 
@@ -473,23 +473,23 @@ export function WorkspaceResourceHub({
         <button
           type="button"
           onClick={() => setSelectedCategory("API")}
-          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-3.5 rounded-xl border text-left transition-all shadow-clay cursor-pointer ${
             selectedCategory === "API" || selectedCategory === "DEVELOPMENT"
               ? "ring-2 ring-primary border-primary bg-surface"
-              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
+              : "bg-surface border-border hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+            <span className="text-[10px] font-semibold text-text-muted flex items-center gap-1.5 uppercase tracking-wider">
               <Server className="size-3.5 text-primary" />
               Dev & APIs
             </span>
           </div>
-          <div className="mt-2.5 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold tracking-tight text-foreground tabular-nums leading-none">
               {metrics.devApi}
             </span>
-            <span className="text-[11px] text-text-muted font-medium">endpoints</span>
+            <span className="text-[10px] text-text-muted">endpoints</span>
           </div>
         </button>
 
@@ -497,23 +497,23 @@ export function WorkspaceResourceHub({
         <button
           type="button"
           onClick={() => setSelectedCategory("DESIGN")}
-          className={`p-4 sm:p-5 rounded-2xl border text-left transition-all shadow-clay cursor-pointer ${
+          className={`p-3.5 rounded-xl border text-left transition-all shadow-clay cursor-pointer ${
             selectedCategory === "DESIGN" || selectedCategory === "RESEARCH"
               ? "ring-2 ring-primary border-primary bg-surface"
-              : "bg-surface border-[rgba(220,227,240,0.9)] hover:border-primary/40"
+              : "bg-surface border-border hover:border-primary/40"
           }`}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[12px] font-bold text-text-secondary flex items-center gap-1.5 uppercase tracking-wider">
+            <span className="text-[10px] font-semibold text-text-muted flex items-center gap-1.5 uppercase tracking-wider">
               <PenTool className="size-3.5 text-primary" />
               Design & Research
             </span>
           </div>
-          <div className="mt-2.5 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
+          <div className="mt-2 flex items-baseline gap-2">
+            <span className="text-2xl font-extrabold tracking-tight text-foreground tabular-nums leading-none">
               {metrics.designResearch}
             </span>
-            <span className="text-[11px] text-text-muted font-medium">insights</span>
+            <span className="text-[10px] text-text-muted">insights</span>
           </div>
         </button>
       </div>
@@ -676,9 +676,9 @@ export function WorkspaceResourceHub({
 
       {/* 5. Resources Display (List / Grid) */}
       {filteredResources.length === 0 ? (
-        <div className="bg-surface border border-[rgba(220,227,240,0.9)] shadow-clay rounded-[24px] py-16 px-6 text-center max-w-lg mx-auto my-8">
-          <div className="size-16 rounded-2xl bg-[#F8FAFF] border border-[rgba(220,227,240,0.8)] shadow-clay-inset mx-auto flex items-center justify-center mb-4 text-primary">
-            <BookOpen className="size-7 text-primary" />
+        <div className="bg-surface border border-border shadow-clay rounded-xl py-10 px-6 text-center max-w-md mx-auto my-6">
+          <div className="size-12 rounded-xl bg-[#F8FAFF] border border-border shadow-clay-inset mx-auto flex items-center justify-center mb-3 text-primary">
+            <BookOpen className="size-5 text-primary" />
           </div>
           <h3 className="text-lg font-bold text-foreground mb-1">
             No resources found
