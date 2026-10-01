@@ -46,7 +46,7 @@ export default async function WorkspaceLayout({
         <main
           id="main-content"
           tabIndex={-1}
-          className="w-full outline-none bg-[#F6F7FB] min-h-[calc(100dvh-72px)] p-2.5 sm:p-4 lg:p-8"
+          className="w-full outline-none bg-[#F6F7FB] min-h-[calc(100dvh-64px)] p-2 sm:p-3 lg:p-4"
         >
           {children}
         </main>

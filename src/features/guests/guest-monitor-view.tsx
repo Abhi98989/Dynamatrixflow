@@ -126,22 +126,22 @@ export function GuestMonitorView({
   ];
 
   return (
-    <div className="max-w-6xl mx-auto space-y-4">
+    <div className="max-w-6xl mx-auto space-y-2.5">
       {/* ─── Compact Header ─── */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
         <div>
-          <div className="flex items-center gap-2 mb-0.5">
-            <h1 className="text-lg font-bold text-foreground tracking-tight">
+          <div className="flex items-center gap-2">
+            <h1 className="text-base font-bold text-foreground tracking-tight">
               Welcome, {guestName}
             </h1>
-            <span className="text-[10px] font-bold text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.2 rounded">
               Observer
             </span>
             <span className="font-mono text-[10px] text-text-muted">
               {guestId}
             </span>
           </div>
-          <p className="text-xs text-text-muted">
+          <p className="text-[11px] text-text-muted mt-0.5">
             Track progress, milestones, and deliverables in real time.
           </p>
         </div>
@@ -150,7 +150,7 @@ export function GuestMonitorView({
           <select
             value={selectedProjectId}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="bg-surface border border-border rounded-lg px-3 py-1.5 text-xs text-foreground focus:outline-none focus:border-primary min-w-[200px]"
+            className="bg-surface border border-border rounded-md px-2.5 py-1 text-xs text-foreground focus:outline-none focus:border-primary min-w-[180px]"
           >
             {projects.map((p) => (
               <option key={p.id} value={p.id}>
@@ -161,87 +161,100 @@ export function GuestMonitorView({
         )}
       </div>
 
-      {/* ─── KPI Row ─── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Progress</span>
-            <TrendingUp className="w-3.5 h-3.5 text-primary" />
+      {/* ─── Compact KPI Row ─── */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-0.5">
+            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Progress</span>
+            <TrendingUp className="w-3 h-3 text-primary" />
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl font-extrabold text-foreground tabular-nums leading-none">{progressPercentage}</span>
-            <span className="text-sm font-bold text-text-muted">%</span>
+          <div className="flex items-baseline justify-between gap-1">
+            <span className="text-lg sm:text-xl font-bold text-foreground tabular-nums leading-tight">
+              {progressPercentage}%
+            </span>
+            <span className="text-[9px] text-text-muted">{completedTasks.length}/{totalTasks} tasks</span>
           </div>
-          <div className="w-full h-1.5 rounded-full overflow-hidden mt-2 bg-[#F1F4FA] shadow-clay-inset">
+          <div className="w-full h-1 rounded-full overflow-hidden mt-1 bg-[#F1F4FA] shadow-clay-inset">
             <div
               className={`h-full rounded-full transition-all duration-500 ${progressPercentage === 100 ? "bg-[#16A34A]" : "bg-primary"}`}
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
-          <span className="text-[10px] text-text-muted mt-1 block">{completedTasks.length}/{totalTasks} tasks</span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Active</span>
-            <span className="flex h-2 w-2 relative">
+        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-0.5">
+            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Active</span>
+            <span className="flex h-1.5 w-1.5 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
+              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-primary" />
             </span>
           </div>
-          <span className="text-2xl font-extrabold text-primary tabular-nums leading-none">{inProgressTasks.length}</span>
-          <p className="text-[10px] text-text-muted mt-1">in execution</p>
-          {blockedTasks.length > 0 && (
-            <span className="inline-flex text-[9px] font-bold text-red-600 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded mt-1">
-              {blockedTasks.length} blocked
+          <div className="flex items-baseline justify-between gap-1">
+            <span className="text-lg sm:text-xl font-bold text-primary tabular-nums leading-tight">
+              {inProgressTasks.length}
             </span>
+            <span className="text-[9px] text-text-muted">in execution</span>
+          </div>
+          {blockedTasks.length > 0 ? (
+            <span className="text-[8px] font-bold text-red-600 mt-0.5 block">{blockedTasks.length} blocked</span>
+          ) : (
+            <span className="text-[8px] text-text-muted mt-0.5 block">0 blocked</span>
           )}
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Pipeline</span>
-            <Layers className="w-3.5 h-3.5 text-[#D97706]" />
+        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-0.5">
+            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Pipeline</span>
+            <Layers className="w-3 h-3 text-[#D97706]" />
           </div>
-          <span className="text-2xl font-extrabold text-[#D97706] tabular-nums leading-none">{upcomingTasks.length}</span>
-          <p className="text-[10px] text-text-muted mt-1">queued</p>
+          <div className="flex items-baseline justify-between gap-1">
+            <span className="text-lg sm:text-xl font-bold text-[#D97706] tabular-nums leading-tight">
+              {upcomingTasks.length}
+            </span>
+            <span className="text-[9px] text-text-muted">queued tasks</span>
+          </div>
+          <span className="text-[8px] text-text-muted mt-0.5 block">upcoming deliverables</span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Milestones</span>
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#15803D]" />
+        <div className="bg-surface rounded-lg p-2 sm:p-2.5 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-0.5">
+            <span className="text-[9px] font-semibold text-text-muted uppercase tracking-wider">Milestones</span>
+            <CheckCircle2 className="w-3 h-3 text-[#15803D]" />
           </div>
-          <div className="flex items-baseline gap-0.5">
-            <span className="text-2xl font-extrabold text-[#15803D] tabular-nums leading-none">
-              {currentProject.milestones.filter((m) => m.status === "COMPLETED").length}
+          <div className="flex items-baseline justify-between gap-1">
+            <span className="text-lg sm:text-xl font-bold text-[#15803D] tabular-nums leading-tight">
+              {currentProject.milestones.filter((m) => m.status === "COMPLETED").length}/{currentProject.milestones.length}
             </span>
-            <span className="text-sm font-bold text-text-muted">/{currentProject.milestones.length}</span>
+            <span className="text-[9px] text-[#15803D]">delivered</span>
           </div>
-          <p className="text-[10px] text-[#15803D] mt-1">delivered</p>
+          <span className="text-[8px] text-text-muted mt-0.5 block">project roadmap</span>
         </div>
       </div>
 
       {/* ─── Project Info + Tabs ─── */}
-      <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-sm">
+      <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-xs">
         {/* Project header */}
-        <div className="px-4 py-3 border-b border-border">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] font-bold text-primary bg-primary/8 px-2 py-0.5 rounded border border-primary/15">
+        <div className="px-2.5 py-1.5 sm:px-3 sm:py-2 border-b border-border bg-[#FAFBFE]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="font-mono text-[9px] font-bold text-primary bg-primary/8 px-1.5 py-0.2 rounded border border-primary/15 shrink-0">
                 {currentProject.projectCode}
               </span>
-              <h2 className="text-sm font-bold text-foreground">{currentProject.name}</h2>
+              <h2 className="text-xs sm:text-[13px] font-bold text-foreground truncate">{currentProject.name}</h2>
+              {currentProject.description && (
+                <span className="text-[10px] text-text-muted hidden md:inline truncate max-w-sm">· {currentProject.description}</span>
+              )}
             </div>
-            <div className="flex items-center gap-2 text-[11px] text-text-muted">
+            <div className="flex items-center gap-1 text-[10px] text-text-muted shrink-0">
               {currentProject.projectLead && (
-                <span className="bg-background px-2 py-1 rounded border border-border-subtle">
+                <span className="bg-surface px-1.5 py-0.2 rounded border border-border-subtle">
                   Lead: <strong className="text-foreground">{currentProject.projectLead.name}</strong>
                 </span>
               )}
               {currentProject.deadline && (
-                <span className="bg-background px-2 py-1 rounded border border-border-subtle flex items-center gap-1">
-                  <Calendar className="w-3 h-3 text-primary" />
+                <span className="bg-surface px-1.5 py-0.2 rounded border border-border-subtle flex items-center gap-1">
+                  <Calendar className="w-2.5 h-2.5 text-primary" />
                   <strong className="text-foreground">
                     {new Date(currentProject.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </strong>
@@ -249,26 +262,23 @@ export function GuestMonitorView({
               )}
             </div>
           </div>
-          {currentProject.description && (
-            <p className="text-[11px] text-text-muted mt-1.5 max-w-3xl leading-relaxed">{currentProject.description}</p>
-          )}
         </div>
 
         {/* Tabs */}
-        <div className="px-4 bg-surface border-b border-border">
+        <div className="px-2.5 bg-surface border-b border-border">
           <div className="flex items-center gap-0.5 overflow-x-auto hide-scrollbar">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`px-3 py-2.5 text-[12px] font-semibold border-b-2 transition-colors flex items-center gap-1.5 whitespace-nowrap ${
+                className={`px-2 py-1 text-[11px] font-medium border-b-2 transition-colors flex items-center gap-1 whitespace-nowrap cursor-pointer ${
                   activeTab === tab.key
-                    ? "text-primary border-primary"
+                    ? "text-primary border-primary font-semibold"
                     : "text-text-muted border-transparent hover:text-foreground"
                 }`}
               >
                 {tab.label}
-                <span className={`px-1 py-0.5 rounded text-[9px] font-bold ${
+                <span className={`px-1 py-0.2 rounded text-[9px] font-bold ${
                   activeTab === tab.key ? "bg-primary/10 text-primary" : "bg-background text-text-muted"
                 }`}>
                   {tab.count}
@@ -279,14 +289,14 @@ export function GuestMonitorView({
         </div>
 
         {/* Tab Content */}
-        <div className="p-4">
+        <div className="p-2 sm:p-2.5">
           {/* ACTIVE */}
           {activeTab === "in_progress" && (
             <div>
               {inProgressTasks.length === 0 ? (
-                <div className="py-10 text-center">
-                  <CheckCircle2 className="w-6 h-6 text-[#16A34A] mx-auto mb-2 opacity-60" />
-                  <p className="text-xs text-text-muted">No tasks in progress</p>
+                <div className="py-4 text-center">
+                  <CheckCircle2 className="w-4 h-4 text-[#16A34A] mx-auto mb-1 opacity-60" />
+                  <p className="text-[11px] text-text-muted">No tasks in progress</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -332,20 +342,20 @@ export function GuestMonitorView({
           {activeTab === "upcoming" && (
             <div>
               {upcomingTasks.length === 0 ? (
-                <div className="py-10 text-center">
-                  <Clock className="w-6 h-6 text-[#D97706] mx-auto mb-2 opacity-60" />
+                <div className="py-5 text-center">
+                  <Clock className="w-5 h-5 text-[#D97706] mx-auto mb-1.5 opacity-60" />
                   <p className="text-xs text-text-muted">No upcoming tasks</p>
                 </div>
               ) : (
-                <div className="divide-y divide-border-subtle border border-border rounded-lg overflow-hidden">
+                <div className="divide-y divide-border-subtle border border-border rounded-md overflow-hidden">
                   {upcomingTasks.map((task) => (
-                    <div key={task.id} className="px-3 py-2.5 hover:bg-background transition-colors flex items-center justify-between gap-3 bg-surface">
+                    <div key={task.id} className="px-2.5 py-2 hover:bg-background transition-colors flex items-center justify-between gap-2.5 bg-surface">
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5 mb-0.5">
                           <span className="font-mono text-[9px] text-text-muted">{task.taskCode}</span>
-                          <span className={`text-[8px] font-bold px-1 py-0.5 rounded border ${priorityColor[task.priority]}`}>{task.priority}</span>
+                          <span className={`text-[8px] font-bold px-1 py-0.2 rounded border ${priorityColor[task.priority]}`}>{task.priority}</span>
                         </div>
-                        <h4 className="text-[13px] font-semibold text-foreground truncate">{task.title}</h4>
+                        <h4 className="text-xs font-semibold text-foreground truncate">{task.title}</h4>
                       </div>
                       {task.dueDate ? (
                         <span className="text-[10px] text-text-muted flex items-center gap-1 shrink-0">
@@ -353,7 +363,7 @@ export function GuestMonitorView({
                           {new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                         </span>
                       ) : (
-                        <span className="text-[10px] text-text-muted bg-background px-1.5 py-0.5 rounded shrink-0">Queued</span>
+                        <span className="text-[9px] text-text-muted bg-background px-1.5 py-0.5 rounded shrink-0">Queued</span>
                       )}
                     </div>
                   ))}
@@ -366,22 +376,22 @@ export function GuestMonitorView({
           {activeTab === "completed" && (
             <div>
               {completedTasks.length === 0 ? (
-                <div className="py-10 text-center">
-                  <CheckCircle2 className="w-6 h-6 text-text-muted mx-auto mb-2 opacity-40" />
+                <div className="py-5 text-center">
+                  <CheckCircle2 className="w-5 h-5 text-text-muted mx-auto mb-1.5 opacity-40" />
                   <p className="text-xs text-text-muted">No completed tasks yet</p>
                 </div>
               ) : (
-                <div className="divide-y divide-border-subtle border border-border rounded-lg overflow-hidden">
+                <div className="divide-y divide-border-subtle border border-border rounded-md overflow-hidden">
                   {completedTasks.map((task) => (
-                    <div key={task.id} className="px-3 py-2.5 hover:bg-background transition-colors flex items-center justify-between gap-3 bg-surface">
+                    <div key={task.id} className="px-2.5 py-2 hover:bg-background transition-colors flex items-center justify-between gap-2.5 bg-surface">
                       <div className="min-w-0 flex-1 flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-[#15803D] shrink-0" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#15803D] shrink-0" />
                         <div className="min-w-0">
                           <span className="font-mono text-[9px] text-text-muted block">{task.taskCode}</span>
-                          <h4 className="text-[13px] font-semibold text-foreground truncate">{task.title}</h4>
+                          <h4 className="text-xs font-semibold text-foreground truncate">{task.title}</h4>
                         </div>
                       </div>
-                      <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold shrink-0">DONE</span>
+                      <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-bold shrink-0">DONE</span>
                     </div>
                   ))}
                 </div>
@@ -391,10 +401,10 @@ export function GuestMonitorView({
 
           {/* ROADMAP */}
           {activeTab === "milestones" && (
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               {currentProject.milestones.length === 0 ? (
-                <div className="py-10 text-center">
-                  <Target className="w-6 h-6 text-text-muted mx-auto mb-2 opacity-40" />
+                <div className="py-5 text-center">
+                  <Target className="w-5 h-5 text-text-muted mx-auto mb-1.5 opacity-40" />
                   <p className="text-xs text-text-muted">No milestones yet</p>
                 </div>
               ) : (
@@ -404,32 +414,32 @@ export function GuestMonitorView({
                   return (
                     <div
                       key={milestone.id}
-                      className={`p-3 rounded-lg border transition-colors ${
+                      className={`p-2.5 rounded-md border transition-colors ${
                         isDone ? "bg-surface border-emerald-200"
                           : isCurrent ? "bg-primary/3 border-primary/25" : "bg-surface border-border"
                       }`}
                     >
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start justify-between gap-2.5">
                         <div className="flex items-start gap-2">
-                          <div className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                          <div className={`w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold shrink-0 ${
                             isDone ? "bg-emerald-600 text-white" : isCurrent ? "bg-primary text-white" : "bg-background text-text-muted border border-border"
                           }`}>
-                            {isDone ? <CheckCircle2 className="w-3.5 h-3.5" /> : idx + 1}
+                            {isDone ? <CheckCircle2 className="w-3 h-3" /> : idx + 1}
                           </div>
                           <div>
-                            <h4 className="text-[13px] font-bold text-foreground">{milestone.name}</h4>
-                            {milestone.description && <p className="text-[11px] text-text-muted mt-0.5">{milestone.description}</p>}
+                            <h4 className="text-xs font-bold text-foreground">{milestone.name}</h4>
+                            {milestone.description && <p className="text-[10px] text-text-muted mt-0.5">{milestone.description}</p>}
                           </div>
                         </div>
                         <div className="text-right shrink-0">
-                          <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${
+                          <span className={`inline-block px-1.5 py-0.2 rounded text-[9px] font-bold ${
                             isDone ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : isCurrent ? "bg-primary/10 text-primary border border-primary/20" : "bg-background text-text-muted border border-border"
                           }`}>
                             {formatEnum(milestone.status)}
                           </span>
                           {milestone.deadline && (
-                            <p className="text-[10px] text-text-muted mt-1 flex items-center gap-0.5 justify-end">
+                            <p className="text-[9px] text-text-muted mt-0.5 flex items-center gap-0.5 justify-end">
                               <Calendar className="w-2.5 h-2.5" />
                               {new Date(milestone.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                             </p>
@@ -447,12 +457,12 @@ export function GuestMonitorView({
           {activeTab === "resources" && (
             <div>
               {currentProject.resources.length === 0 ? (
-                <div className="py-10 text-center">
-                  <FolderOpen className="w-6 h-6 text-text-muted mx-auto mb-2 opacity-40" />
+                <div className="py-5 text-center">
+                  <FolderOpen className="w-5 h-5 text-text-muted mx-auto mb-1.5 opacity-40" />
                   <p className="text-xs text-text-muted">No shared files yet</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {currentProject.resources.map((res) => {
                     const isFile = res.url.startsWith("/api/upload") || res.url.match(/\.(pdf|doc|docx|png|jpg|jpeg|svg|zip)$/i);
                     return (
@@ -461,19 +471,19 @@ export function GuestMonitorView({
                         href={res.url}
                         target="_blank"
                         rel="noreferrer"
-                        className="p-3 rounded-lg border border-border hover:border-primary/30 transition-colors flex items-center justify-between gap-2 group"
+                        className="p-2.5 rounded-md border border-border hover:border-primary/30 transition-colors flex items-center justify-between gap-2 group"
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-8 h-8 rounded-lg bg-primary/8 text-primary flex items-center justify-center shrink-0">
-                            {isFile ? <FileText className="w-4 h-4" /> : <ExternalLink className="w-4 h-4" />}
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="w-7 h-7 rounded bg-primary/8 text-primary flex items-center justify-center shrink-0">
+                            {isFile ? <FileText className="w-3.5 h-3.5" /> : <ExternalLink className="w-3.5 h-3.5" />}
                           </div>
                           <div className="min-w-0">
-                            <h4 className="text-[12px] font-semibold text-foreground group-hover:text-primary truncate">{res.title}</h4>
+                            <h4 className="text-[11px] font-semibold text-foreground group-hover:text-primary truncate">{res.title}</h4>
                             <span className="text-[9px] text-text-muted uppercase tracking-wider">{res.category}</span>
                           </div>
                         </div>
                         <div className="text-text-muted group-hover:text-primary shrink-0">
-                          {isFile ? <Download className="w-3.5 h-3.5" /> : <ArrowUpRight className="w-3.5 h-3.5" />}
+                          {isFile ? <Download className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
                         </div>
                       </a>
                     );

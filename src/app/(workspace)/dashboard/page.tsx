@@ -226,81 +226,81 @@ export default async function DashboardPage() {
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5 mb-3">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
               {isDev ? "Open Tasks" : "Projects"}
             </span>
             {isDev ? <Code2 className="w-3.5 h-3.5 text-primary" /> : <FolderPlus className="w-3.5 h-3.5 text-primary" />}
           </div>
-          <div className="text-2xl font-extrabold text-foreground tabular-nums leading-none">
+          <div className="text-xl sm:text-2xl font-bold text-foreground tabular-nums leading-none">
             {isDev ? myTotalTasks - myCompletedTasks : activeProjectsCount}
           </div>
-          <span className="text-[10px] text-[#15803D] font-semibold mt-1 block">
+          <span className="text-[10px] text-[#15803D] font-semibold mt-0.5 block">
             {isDev ? `${myCompletionRate}% done` : "Active"}
           </span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Overdue</span>
             {overdueCount > 0 ? <AlertTriangle className="w-3.5 h-3.5 text-red-600" /> : <CheckSquare className="w-3.5 h-3.5 text-[#15803D]" />}
           </div>
-          <div className={`text-2xl font-extrabold tabular-nums leading-none ${overdueCount > 0 ? "text-red-600" : "text-foreground"}`}>
+          <div className={`text-xl sm:text-2xl font-bold tabular-nums leading-none ${overdueCount > 0 ? "text-red-600" : "text-foreground"}`}>
             {overdueCount}
           </div>
-          <span className={`text-[10px] font-semibold mt-1 block ${overdueCount > 0 ? "text-red-600" : "text-[#15803D]"}`}>
+          <span className={`text-[10px] font-semibold mt-0.5 block ${overdueCount > 0 ? "text-red-600" : "text-[#15803D]"}`}>
             {overdueCount > 0 ? "Needs attention" : "On schedule"}
           </span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">Blocked</span>
             <Clock className={`w-3.5 h-3.5 ${blockedCount > 0 ? "text-[#D97706]" : "text-text-muted"}`} />
           </div>
-          <div className={`text-2xl font-extrabold tabular-nums leading-none ${blockedCount > 0 ? "text-[#D97706]" : "text-foreground"}`}>
+          <div className={`text-xl sm:text-2xl font-bold tabular-nums leading-none ${blockedCount > 0 ? "text-[#D97706]" : "text-foreground"}`}>
             {blockedCount}
           </div>
-          <span className={`text-[10px] font-semibold mt-1 block ${blockedCount > 0 ? "text-[#D97706]" : "text-text-muted"}`}>
+          <span className={`text-[10px] font-semibold mt-0.5 block ${blockedCount > 0 ? "text-[#D97706]" : "text-text-muted"}`}>
             {blockedCount > 0 ? "Stalled" : "Clear"}
           </span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
-          <div className="flex items-center justify-between mb-2">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
+          <div className="flex items-center justify-between mb-1">
             <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
               {isDev ? "This Week" : "Review"}
             </span>
             {isDev ? <Zap className="w-3.5 h-3.5 text-primary" /> : <Sparkles className="w-3.5 h-3.5 text-primary" />}
           </div>
-          <div className="text-2xl font-extrabold text-foreground tabular-nums leading-none">
+          <div className="text-xl sm:text-2xl font-bold text-foreground tabular-nums leading-none">
             {isDev ? completedThisWeekCount : needsReviewCount}
           </div>
-          <span className="text-[10px] text-primary font-semibold mt-1 block">
+          <span className="text-[10px] text-primary font-semibold mt-0.5 block">
             {isDev ? "Delivered" : "Queued"}
           </span>
         </div>
       </div>
 
       {/* Health Bar */}
-      <div className="bg-surface rounded-xl p-4 border border-border shadow-clay mb-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+      <div className="bg-surface rounded-lg p-3 border border-border shadow-clay mb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-2">
           <div className="flex items-center gap-1.5">
             <Activity className="size-3.5 text-primary" />
-            <h2 className="text-[13px] font-bold text-foreground">
+            <h2 className="text-xs font-bold text-foreground">
               {isDev ? "Delivery Momentum" : "Portfolio Health"}
             </h2>
             <span className="text-[10px] text-text-muted">· {allProjectsForHealth.length} projects</span>
           </div>
-          <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0] px-2 py-0.5 rounded">
+          <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[#15803D] bg-[#F0FDF4] border border-[#BBF7D0] px-1.5 py-0.2 rounded">
             <TrendingUp className="size-3" />
             {completedThisWeekCount} this week
           </div>
         </div>
 
-        <div className="h-3 w-full rounded-full flex overflow-hidden p-0.5 gap-0.5 bg-[#F1F4FA] shadow-clay-inset border border-border-subtle">
+        <div className="h-2.5 w-full rounded-full flex overflow-hidden p-0.5 gap-0.5 bg-[#F1F4FA] shadow-clay-inset border border-border-subtle">
           {onTrackPct > 0 && (
             <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${onTrackPct}%` }} title={`On Track: ${onTrackPct}%`} />
           )}
@@ -312,51 +312,51 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-2 text-[11px]">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-primary" /><span className="text-text-muted">Track:</span><strong>{onTrackProjectsCount}</strong></span>
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-red-500" /><span className="text-text-muted">Risk:</span><strong className="text-red-600">{atRiskProjectsCount}</strong></span>
-            <span className="flex items-center gap-1"><span className="size-2 rounded-full bg-[#16A34A]" /><span className="text-text-muted">Done:</span><strong className="text-[#15803D]">{completedProjectsCount}</strong></span>
+        <div className="flex items-center justify-between mt-1.5 text-[10px]">
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-primary" /><span className="text-text-muted">Track:</span><strong>{onTrackProjectsCount}</strong></span>
+            <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-red-500" /><span className="text-text-muted">Risk:</span><strong className="text-red-600">{atRiskProjectsCount}</strong></span>
+            <span className="flex items-center gap-1"><span className="size-1.5 rounded-full bg-[#16A34A]" /><span className="text-text-muted">Done:</span><strong className="text-[#15803D]">{completedProjectsCount}</strong></span>
           </div>
-          <Link href="/projects" className="text-[11px] font-semibold text-primary hover:text-primary-hover flex items-center gap-0.5">
+          <Link href="/projects" className="text-[10px] font-semibold text-primary hover:text-primary-hover flex items-center gap-0.5">
             All projects <ArrowRight className="size-3" />
           </Link>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
         {[
-          { href: isAdmin || isLead ? "/projects/new" : "/projects", icon: <FolderPlus className="size-4" />, label: isAdmin || isLead ? "New Project" : "Projects", sub: isAdmin || isLead ? "Create" : "Browse" },
-          { href: "/my-tasks", icon: <CheckSquare className="size-4" />, label: "My Tasks", sub: isDev ? "Focus" : "Track" },
-          { href: "/team", icon: <Users className="size-4" />, label: "Team", sub: "Directory", iconColor: "text-purple-600 bg-purple-500/10" },
-          { href: "/notifications", icon: <Sparkles className="size-4" />, label: "Alerts", sub: "Updates", iconColor: "text-[#15803D] bg-[#F0FDF4]" },
+          { href: isAdmin || isLead ? "/projects/new" : "/projects", icon: <FolderPlus className="size-3.5" />, label: isAdmin || isLead ? "New Project" : "Projects", sub: isAdmin || isLead ? "Create" : "Browse" },
+          { href: "/my-tasks", icon: <CheckSquare className="size-3.5" />, label: "My Tasks", sub: isDev ? "Focus" : "Track" },
+          { href: "/team", icon: <Users className="size-3.5" />, label: "Team", sub: "Directory", iconColor: "text-purple-600 bg-purple-500/10" },
+          { href: "/notifications", icon: <Sparkles className="size-3.5" />, label: "Alerts", sub: "Updates", iconColor: "text-[#15803D] bg-[#F0FDF4]" },
         ].map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="p-2.5 bg-surface border border-border rounded-lg transition-colors flex items-center gap-2.5 group hover:border-primary/30"
+            className="p-2 bg-surface border border-border rounded-lg transition-colors flex items-center gap-2 group hover:border-primary/30"
           >
-            <div className={`size-8 rounded-lg flex items-center justify-center shrink-0 ${item.iconColor || "text-primary bg-primary/10"}`}>
+            <div className={`size-7 rounded-md flex items-center justify-center shrink-0 ${item.iconColor || "text-primary bg-primary/10"}`}>
               {item.icon}
             </div>
             <div className="min-w-0">
               <p className="text-[11px] font-bold text-foreground group-hover:text-primary truncate">{item.label}</p>
-              <p className="text-[10px] text-text-muted truncate">{item.sub}</p>
+              <p className="text-[9px] text-text-muted truncate">{item.sub}</p>
             </div>
           </Link>
         ))}
       </div>
 
       {/* Two Column */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Workstreams Table */}
         <div className="lg:col-span-2">
-          <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-sm">
-            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-xs">
+            <div className="px-3 py-2 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-1.5">
-                <h2 className="font-bold text-foreground text-[13px]">{isDev ? "My Projects" : "Active Workstreams"}</h2>
-                <span className="text-[9px] font-bold text-text-muted bg-background px-1.5 py-0.5 rounded border border-border-subtle">{projectList.length}</span>
+                <h2 className="font-bold text-foreground text-xs">{isDev ? "My Projects" : "Active Workstreams"}</h2>
+                <span className="text-[9px] font-bold text-text-muted bg-background px-1.5 py-0.2 rounded border border-border-subtle">{projectList.length}</span>
               </div>
               <Link href="/projects" className="text-[11px] font-semibold text-primary hover:text-primary-hover flex items-center gap-0.5">
                 View all <ArrowRight className="size-3" />
@@ -420,19 +420,19 @@ export default async function DashboardPage() {
 
         {/* Deadlines */}
         <div>
-          <div className="bg-surface rounded-xl border border-border overflow-hidden shadow-sm h-full">
-            <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+          <div className="bg-surface rounded-lg border border-border overflow-hidden shadow-xs h-full">
+            <div className="px-3 py-2 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-1.5">
                 <Calendar className="size-3.5 text-primary" />
-                <h2 className="font-bold text-foreground text-[13px]">Deadlines</h2>
+                <h2 className="font-bold text-foreground text-xs">Deadlines</h2>
               </div>
-              <Link href="/upcoming" className="text-[11px] font-semibold text-primary hover:text-primary-hover flex items-center gap-0.5">
+              <Link href="/upcoming" className="text-[10px] font-semibold text-primary hover:text-primary-hover flex items-center gap-0.5">
                 All <ArrowRight className="size-3" />
               </Link>
             </div>
             {upcomingDeadlines.length === 0 ? (
-              <div className="p-6 text-center">
-                <Calendar className="w-5 h-5 text-text-muted mx-auto mb-1.5 opacity-50" />
+              <div className="p-4 text-center">
+                <Calendar className="w-5 h-5 text-text-muted mx-auto mb-1 opacity-50" />
                 <p className="text-xs text-text-muted">No upcoming deadlines</p>
               </div>
             ) : (
@@ -440,11 +440,11 @@ export default async function DashboardPage() {
                 const daysUntil = task.dueDate ? Math.ceil((new Date(task.dueDate).getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : null;
                 const isUrgent = daysUntil !== null && daysUntil <= 2;
                 return (
-                  <div key={task.id} className={`px-4 py-3 ${i !== upcomingDeadlines.length - 1 ? "border-b border-border-subtle" : ""} hover:bg-background transition-colors`}>
-                    <p className="font-semibold text-foreground text-[13px] leading-tight mb-1">{task.title}</p>
+                  <div key={task.id} className={`px-3 py-2 sm:py-2.5 ${i !== upcomingDeadlines.length - 1 ? "border-b border-border-subtle" : ""} hover:bg-background transition-colors`}>
+                    <p className="font-semibold text-foreground text-xs leading-tight mb-1">{task.title}</p>
                     <div className="flex items-center justify-between">
-                      <p className="text-[11px] text-text-muted">{task.project.name}</p>
-                      <span className={`text-[10px] font-bold flex items-center gap-0.5 px-1.5 py-0.5 rounded ${isUrgent ? "text-red-600 bg-red-50 border border-red-200" : "text-primary bg-primary/5 border border-primary/15"}`}>
+                      <p className="text-[10px] text-text-muted truncate max-w-[140px]">{task.project.name}</p>
+                      <span className={`text-[9px] font-bold flex items-center gap-0.5 px-1.5 py-0.2 rounded ${isUrgent ? "text-red-600 bg-red-50 border border-red-200" : "text-primary bg-primary/5 border border-primary/15"}`}>
                         <Clock className="w-2.5 h-2.5" />
                         {task.dueDate ? new Date(task.dueDate).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : ""}
                       </span>

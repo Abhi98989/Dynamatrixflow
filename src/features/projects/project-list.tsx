@@ -179,14 +179,14 @@ export function ProjectList({
         ].map((s) => (
           <div
             key={s.label}
-            className="bg-surface rounded-xl border border-border p-3.5 shadow-clay flex flex-col justify-between"
+            className="bg-surface rounded-lg border border-border p-2.5 sm:p-3 shadow-clay flex flex-col justify-between"
           >
             <span className="text-[10px] font-semibold text-text-muted tracking-wider uppercase">
               {s.label}
             </span>
-            <div className="flex items-baseline gap-2 mt-2">
-              <span className={`text-2xl font-extrabold tracking-tight ${s.accent}`}>{s.value}</span>
-              <span className="text-[11px] text-text-muted font-medium">{s.sub}</span>
+            <div className="flex items-baseline gap-1.5 mt-1">
+              <span className={`text-xl sm:text-2xl font-bold tracking-tight ${s.accent}`}>{s.value}</span>
+              <span className="text-[10px] text-text-muted">{s.sub}</span>
             </div>
           </div>
         ))}

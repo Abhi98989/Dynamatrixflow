@@ -64,68 +64,68 @@ export default async function MyTasksPage() {
   const isLeadOrAdmin = currentUser.systemRole === SystemRole.ADMIN;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2.5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-bold text-foreground tracking-tight">
+            <h1 className="text-base font-bold text-foreground tracking-tight">
               My Tasks
             </h1>
-            <span className="text-[10px] font-bold text-primary bg-[#EFF6FF] border border-[#BFDBFE] px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-primary bg-[#EFF6FF] border border-[#BFDBFE] px-1.5 py-0.2 rounded-full">
               {tasks.length} Assigned
             </span>
           </div>
-          <p className="text-xs text-text-muted mt-0.5">
+          <p className="text-[11px] text-text-muted mt-0.5">
             Deliverables assigned to you across all project workspaces.
           </p>
         </div>
       </div>
 
       {/* Metrics Row — Minimal Clay */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             Total Assigned
           </span>
-          <span className="text-2xl font-extrabold text-foreground tabular-nums leading-none mt-2 block">
+          <span className="text-xl sm:text-2xl font-bold text-foreground tabular-nums leading-none mt-1 block">
             {tasks.length}
           </span>
-          <span className="text-[10px] text-text-muted mt-1 block">all workspaces</span>
+          <span className="text-[10px] text-text-muted mt-0.5 block">all workspaces</span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             In Progress
           </span>
-          <span className="text-2xl font-extrabold text-primary tabular-nums leading-none mt-2 block">
+          <span className="text-xl sm:text-2xl font-bold text-primary tabular-nums leading-none mt-1 block">
             {inProgressCount}
           </span>
-          <span className="text-[10px] text-text-muted mt-1 block">active work</span>
+          <span className="text-[10px] text-text-muted mt-0.5 block">active work</span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             Completed
           </span>
-          <span className="text-2xl font-extrabold text-[#15803D] tabular-nums leading-none mt-2 block">
+          <span className="text-xl sm:text-2xl font-bold text-[#15803D] tabular-nums leading-none mt-1 block">
             {completedCount}
           </span>
-          <span className="text-[10px] text-text-muted mt-1 block">delivered</span>
+          <span className="text-[10px] text-text-muted mt-0.5 block">delivered</span>
         </div>
 
-        <div className="bg-surface rounded-xl p-3.5 border border-border shadow-clay">
+        <div className="bg-surface rounded-lg p-2.5 sm:p-3 border border-border shadow-clay">
           <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider block">
             Overdue
           </span>
           <span
-            className={`text-2xl font-extrabold tabular-nums leading-none mt-2 block ${
+            className={`text-xl sm:text-2xl font-bold tabular-nums leading-none mt-1 block ${
               overdueCount > 0 ? "text-red-600" : "text-foreground"
             }`}
           >
             {overdueCount}
           </span>
-          <span className="text-[10px] text-text-muted mt-1 block">
+          <span className="text-[10px] text-text-muted mt-0.5 block">
             {overdueCount > 0 ? "needs attention" : "on schedule"}
           </span>
         </div>

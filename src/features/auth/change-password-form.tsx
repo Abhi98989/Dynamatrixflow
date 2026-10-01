@@ -32,36 +32,36 @@ export function ChangePasswordForm() {
 
   return (
     <>
-      {/* Floating Claymorphic Toast Notification */}
+      {/* Floating Compact Toast / Snackbar Notification */}
       {toast && (
         <div
           role="status"
           aria-live="polite"
-          className="fixed top-5 right-5 sm:top-6 sm:right-6 z-50 flex items-start gap-3 rounded-[20px] bg-white/95 backdrop-blur-md border border-white p-3.5 sm:p-4 shadow-[16px_20px_45px_rgba(15,23,42,0.18),-8px_-8px_24px_rgba(255,255,255,1),inset_0_2px_3px_rgba(255,255,255,0.95)] max-w-[380px] w-[calc(100vw-40px)] animate-in slide-in-from-top-4 fade-in duration-300 transition-all"
+          className="fixed top-4 right-4 z-50 flex items-start gap-2.5 rounded-lg bg-surface border border-border p-2.5 sm:p-3 shadow-md max-w-[340px] w-[calc(100vw-32px)] animate-in slide-in-from-top-2 fade-in duration-200 transition-all"
         >
           <div className="shrink-0 mt-0.5">
             {toast.type === "error" && (
-              <div className="size-8 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
-                <AlertCircle className="size-4.5" />
+              <div className="size-6 rounded-full bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600">
+                <AlertCircle className="size-3.5" />
               </div>
             )}
             {toast.type === "success" && (
-              <div className="size-8 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
-                <CheckCircle2 className="size-4.5" />
+              <div className="size-6 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                <CheckCircle2 className="size-3.5" />
               </div>
             )}
             {toast.type === "info" && (
-              <div className="size-8 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0724D0] shadow-[inset_1px_1px_2px_rgba(0,0,0,0.06)]">
-                <Sparkles className="size-4" />
+              <div className="size-6 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center text-primary">
+                <Sparkles className="size-3.5" />
               </div>
             )}
           </div>
 
           <div className="flex-1 min-w-0 pr-1">
-            <h4 className="text-[12.5px] font-bold text-[#0B1220] leading-tight">
+            <h4 className="text-xs font-semibold text-foreground leading-tight">
               {toast.title}
             </h4>
-            <p className="text-[11.5px] text-[#475569] mt-0.5 leading-snug">
+            <p className="text-[11px] text-text-muted mt-0.5 leading-snug">
               {toast.message}
             </p>
           </div>
@@ -69,10 +69,10 @@ export function ChangePasswordForm() {
           <button
             type="button"
             onClick={() => setToast(null)}
-            className="size-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="size-5 rounded flex items-center justify-center text-text-muted hover:text-foreground hover:bg-surface-hover transition-colors cursor-pointer"
             aria-label="Dismiss notification"
           >
-            <X className="size-3.5" />
+            <X className="size-3" />
           </button>
         </div>
       )}

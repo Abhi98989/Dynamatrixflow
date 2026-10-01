@@ -6,7 +6,7 @@ export function Card({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "rounded-2xl border border-border-strong bg-surface text-card-foreground shadow-card",
+        "rounded-xl border border-border bg-surface text-card-foreground shadow-xs",
         className,
       )}
       {...props}
@@ -19,7 +19,7 @@ export function ClayCard({ className, ...props }: ComponentProps<"div">) {
     <div
       data-slot="clay-card"
       className={cn(
-        "rounded-[20px] border border-[rgba(220,227,240,0.9)] bg-surface text-card-foreground shadow-clay",
+        "rounded-xl border border-border bg-surface text-card-foreground shadow-clay",
         className,
       )}
       {...props}
@@ -31,7 +31,7 @@ export function CardHeader({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
       data-slot="card-header"
-      className={cn("flex flex-col gap-1.5 p-6", className)}
+      className={cn("flex flex-col gap-1 p-3.5 sm:p-4", className)}
       {...props}
     />
   );
