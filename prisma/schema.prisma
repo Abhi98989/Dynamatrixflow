@@ -67,6 +67,7 @@ enum ResourceCategory {
 
 enum ProjectMemberRole {
   PROJECT_LEAD
+  ACTING_LEAD
   DEVELOPER
   DESIGNER
   QA

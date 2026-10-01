@@ -9,7 +9,9 @@ import { AddMemberForm } from "@/features/projects/add-member-form";
 import { RemoveMemberButton } from "@/features/projects/remove-member-button";
 import { GenerateGuestDialog } from "@/features/guests/generate-guest-dialog";
 import { RevokeGuestButton } from "@/features/guests/revoke-guest-button";
-import { ShieldCheck } from "lucide-react";
+import { ChangeMemberRoleDialog } from "@/features/projects/change-member-role-dialog";
+import { EditPositionDialog } from "@/features/employees/edit-position-dialog";
+import { ShieldCheck, Pencil } from "lucide-react";
 import { SystemRole } from "@prisma/client";
 
 interface Props {
@@ -183,6 +185,7 @@ export default async function TeamPage({ params }: Props) {
               <tbody className="divide-y divide-[#F2F4F7]">
                 {teamMembers.map((m) => {
                   const isLead = m.user.id === project.projectLeadId;
+                  const isActingLead = m.projectRole === "ACTING_LEAD";
                   return (
                     <tr
                       key={m.id}
@@ -194,13 +197,18 @@ export default async function TeamPage({ params }: Props) {
                             {getInitials(m.user.name)}
                           </div>
                           <div>
-                            <div className="flex items-center gap-1.5">
+                            <div className="flex items-center gap-1.5 flex-wrap">
                               <span className="text-[13px] font-semibold text-foreground">
                                 {m.user.name}
                               </span>
                               {isLead && (
                                 <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-bold">
                                   LEAD
+                                </span>
+                              )}
+                              {isActingLead && (
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 border border-amber-300/80 text-[9px] font-bold">
+                                  ACTING LEAD
                                 </span>
                               )}
                             </div>
@@ -211,10 +219,49 @@ export default async function TeamPage({ params }: Props) {
                         </div>
                       </td>
                       <td className="py-2 px-4 text-[13px] text-text-secondary">
-                        {m.user.position || "—"}
+                        <div className="flex items-center gap-1.5">
+                          <span>{m.user.position || "—"}</span>
+                          {isManager && (
+                            <EditPositionDialog
+                              employee={m.user}
+                              isAdmin={
+                                currentUser.systemRole === SystemRole.ADMIN
+                              }
+                              trigger={
+                                <button
+                                  type="button"
+                                  title="Upgrade employee position (e.g. Fullstack, System Designer)"
+                                  className="w-5 h-5 rounded hover:bg-surface-hover text-text-muted hover:text-foreground inline-flex items-center justify-center transition-colors"
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </button>
+                              }
+                            />
+                          )}
+                        </div>
                       </td>
                       <td className="py-2 px-4 text-[12px] text-text-secondary">
-                        {formatEnum(m.projectRole)}
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={
+                              isActingLead
+                                ? "font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200"
+                                : ""
+                            }
+                          >
+                            {isActingLead
+                              ? "Acting Project Lead"
+                              : formatEnum(m.projectRole)}
+                          </span>
+                          {isManager && !isLead && (
+                            <ChangeMemberRoleDialog
+                              projectId={projectId}
+                              memberId={m.id}
+                              memberName={m.user.name}
+                              currentRole={m.projectRole}
+                            />
+                          )}
+                        </div>
                       </td>
                       <td className="py-2 px-4 text-center">
                         <span className="text-[12px] font-semibold text-text-muted tabular-nums">

@@ -18,6 +18,7 @@ import {
 import { SystemRole, AccountStatus } from "@prisma/client";
 import { ResetPasswordDialog } from "./reset-password-dialog";
 import { StatusDialog } from "./status-dialog";
+import { EditPositionDialog } from "./edit-position-dialog";
 
 export interface EmployeeItem {
   id: string;
@@ -654,6 +655,27 @@ export function EmployeeList({ employees, isAdmin }: EmployeeListProps) {
                       {isAdmin && (
                         <td className="px-4 py-3 text-right whitespace-nowrap">
                           <div className="flex items-center justify-end gap-1.5">
+                            {/* Upgrade Position / Role Button */}
+                            <EditPositionDialog
+                              employee={{
+                                id: emp.id,
+                                employeeId: emp.employeeId,
+                                name: emp.name,
+                                position: emp.position,
+                                systemRole: emp.systemRole,
+                              }}
+                              isAdmin={isAdmin}
+                              trigger={
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center justify-center size-7 rounded-[4px] border border-border-subtle bg-surface text-text-secondary hover:text-[#101828] hover:bg-[#F1F5F9] hover:border-[#94A3B8] transition-colors"
+                                  title="Upgrade employee position / designation"
+                                >
+                                  <Briefcase className="size-3.5" />
+                                </button>
+                              }
+                            />
+
                             {/* Reset Password Button */}
                             <ResetPasswordDialog
                               employee={{

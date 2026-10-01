@@ -114,6 +114,7 @@ export async function sendProjectMessageAction({
 
     revalidatePath(`/projects/${projectId}/chat`);
     revalidatePath(`/projects/${projectId}`);
+    revalidatePath("/chat");
     return { success: true, message };
   } catch (error) {
     console.error("sendProjectMessageAction error:", error);
@@ -191,6 +192,7 @@ export async function deleteProjectMessageAction(
     });
 
     revalidatePath(`/projects/${projectId}/chat`);
+    revalidatePath("/chat");
     return { success: true };
   } catch (error) {
     console.error("deleteProjectMessageAction error:", error);
@@ -223,6 +225,7 @@ export async function togglePinProjectMessageAction(
     });
 
     revalidatePath(`/projects/${projectId}/chat`);
+    revalidatePath("/chat");
     return { success: true, isPinned: updated.isPinned };
   } catch (error) {
     console.error("togglePinProjectMessageAction error:", error);

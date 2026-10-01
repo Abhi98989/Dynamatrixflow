@@ -33,7 +33,7 @@ const tabs = [
   { key: "/team", label: "Team", icon: Users, countKey: "members" },
   {
     key: "/chat",
-    label: "Discussion",
+    label: "Chat",
     icon: MessageSquare,
     countKey: "messages",
   },

@@ -13,6 +13,7 @@ import {
   Library,
   Settings,
   UserCircle,
+  MessageSquare,
   type LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +32,7 @@ const defaultNavGroups: { label: string; items: NavItem[] }[] = [
     label: "WORK",
     items: [
       { label: "Projects", href: "/projects", icon: FolderKanban },
+      { label: "Chat", href: "/chat", icon: MessageSquare },
       { label: "My Tasks", href: "/my-tasks", icon: CheckSquare },
       { label: "Review Queue", href: "/review", icon: ClipboardCheck },
       { label: "Upcoming", href: "/upcoming", icon: CalendarClock },
@@ -67,6 +69,7 @@ const guestNavGroups: { label: string; items: NavItem[] }[] = [
     label: "WORKSPACE",
     items: [
       { label: "Projects", href: "/projects", icon: FolderKanban },
+      { label: "Chat", href: "/chat", icon: MessageSquare },
       { label: "Resources & Files", href: "/resources", icon: Library },
     ],
   },

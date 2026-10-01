@@ -310,3 +310,77 @@ export async function changeOwnPasswordAction(
   revalidatePath("/profile");
   return { success: true };
 }
+
+export async function updateEmployeePositionAction(
+  targetUserId: string,
+  newPosition: string,
+  newSystemRole?: SystemRole,
+): Promise<{ success: boolean; error?: string }> {
+  const currentUser = await requireActiveUser();
+  const isAdmin = (currentUser.systemRole as string) === "ADMIN";
+  const isLead = (currentUser.systemRole as string) === "PROJECT_LEAD";
+
+  if (!isAdmin && !isLead) {
+    return {
+      success: false,
+      error: "Only admins and project leads can update employee positions.",
+    };
+  }
+
+  const trimmed = newPosition.trim();
+  if (!trimmed || trimmed.length < 2) {
+    return { success: false, error: "Position must be at least 2 characters." };
+  }
+
+  const target = await db.user.findUnique({
+    where: { id: targetUserId },
+    select: {
+      id: true,
+      employeeId: true,
+      name: true,
+      position: true,
+      systemRole: true,
+    },
+  });
+
+  if (!target) {
+    return { success: false, error: "Employee not found." };
+  }
+
+  // Only admins can change system roles (e.g. promote to PROJECT_LEAD or ADMIN)
+  const roleToSet =
+    isAdmin && newSystemRole ? newSystemRole : target.systemRole;
+
+  await db.$transaction(async (tx) => {
+    await tx.user.update({
+      where: { id: target.id },
+      data: {
+        position: trimmed,
+        systemRole: roleToSet,
+      },
+    });
+
+    await tx.activityLog.create({
+      data: {
+        actorId: currentUser.id,
+        action: "EMPLOYEE_POSITION_UPDATED",
+        entityType: "User",
+        entityId: target.id,
+        metadata: {
+          employeeId: target.employeeId,
+          name: target.name,
+          previousPosition: target.position,
+          newPosition: trimmed,
+          previousRole: target.systemRole,
+          newRole: roleToSet,
+        },
+      },
+    });
+  });
+
+  revalidatePath(`/team/${target.employeeId}`);
+  revalidatePath("/team");
+  revalidatePath("/projects");
+  revalidatePath("/chat");
+  return { success: true };
+}
