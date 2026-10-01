@@ -185,7 +185,8 @@ export default async function TeamPage({ params }: Props) {
               <tbody className="divide-y divide-[#F2F4F7]">
                 {teamMembers.map((m) => {
                   const isLead = m.user.id === project.projectLeadId;
-                  const isActingLead = m.projectRole === "ACTING_LEAD";
+                  const isActingLead =
+                    (m.projectRole as string) === "ACTING_LEAD";
                   return (
                     <tr
                       key={m.id}

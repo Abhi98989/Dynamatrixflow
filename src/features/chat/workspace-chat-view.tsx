@@ -727,7 +727,8 @@ export function WorkspaceChatView({
                   {/* Panel Member List */}
                   <div className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-[#F1F4FA]">
                     {drawerMembers.map((member) => {
-                      const isActingLead = member.projectRole === "ACTING_LEAD";
+                      const isActingLead =
+                        (member.projectRole as string) === "ACTING_LEAD";
                       const isLead = member.isLead;
 
                       return (
