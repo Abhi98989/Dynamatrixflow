@@ -14,14 +14,12 @@ import {
   AtSign,
   Trash2,
   Pin,
-  Smile,
   ExternalLink,
-  ChevronRight,
-  ShieldAlert,
-  ArrowRight,
+  ChevronDown,
+  Hash,
+  ShieldCheck,
+  Crown,
   Sparkles,
-  Layers,
-  Check,
 } from "lucide-react";
 import {
   sendProjectMessageAction,
@@ -107,7 +105,10 @@ export function WorkspaceChatView({
   const [showMentionMenu, setShowMentionMenu] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
   const [highlightedMentionIndex, setHighlightedMentionIndex] = useState(0);
-  const [showMembersDrawer, setShowMembersDrawer] = useState(false);
+
+  // Team member sheet / drawer state (only show member names when clicked)
+  const [showMembersPanel, setShowMembersPanel] = useState(false);
+  const [memberFilterQuery, setMemberFilterQuery] = useState("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -129,10 +130,13 @@ export function WorkspaceChatView({
     setMessages(initialMessages);
     setReplyingTo(null);
     setInputText("");
+    setShowMembersPanel(false);
   }, [initialActiveProjectId, initialMessages]);
 
   const activeProject = useMemo(() => {
-    return projects.find((p) => p.id === activeProjectId) || projects[0] || null;
+    return (
+      projects.find((p) => p.id === activeProjectId) || projects[0] || null
+    );
   }, [projects, activeProjectId]);
 
   const isLeadOrAdmin = useMemo(() => {
@@ -148,14 +152,13 @@ export function WorkspaceChatView({
     scrollToBottom("auto");
   }, [activeProjectId, scrollToBottom]);
 
-  // Filter project groups in left sidebar
+  // Filter project groups in left sidebar by project name
   const filteredProjects = useMemo(() => {
     if (!searchQuery.trim()) return projects;
     const q = searchQuery.toLowerCase().trim();
     return projects.filter(
       (p) =>
         p.name.toLowerCase().includes(q) ||
-        p.projectCode.toLowerCase().includes(q) ||
         p.members.some((m) => m.name.toLowerCase().includes(q)),
     );
   }, [projects, searchQuery]);
@@ -178,6 +181,20 @@ export function WorkspaceChatView({
         (m.position && m.position.toLowerCase().includes(q)),
     );
   }, [activeProject, showMentionMenu, mentionQuery]);
+
+  // Members inside drawer filtering
+  const drawerMembers = useMemo(() => {
+    if (!activeProject) return [];
+    if (!memberFilterQuery.trim()) return activeProject.members;
+    const q = memberFilterQuery.toLowerCase().trim();
+    return activeProject.members.filter(
+      (m) =>
+        m.name.toLowerCase().includes(q) ||
+        m.employeeId.toLowerCase().includes(q) ||
+        (m.position && m.position.toLowerCase().includes(q)) ||
+        m.projectRole.toLowerCase().includes(q),
+    );
+  }, [activeProject, memberFilterQuery]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
@@ -226,7 +243,7 @@ export function WorkspaceChatView({
         }
       }, 10);
     } else {
-      const newText = `${inputText} @${member.name} `;
+      const newText = `${inputText}${inputText.endsWith(" ") || inputText.length === 0 ? "" : " "}@${member.name} `;
       setInputText(newText);
       textareaRef.current.focus();
     }
@@ -320,7 +337,9 @@ export function WorkspaceChatView({
         setMessages((prev) => prev.filter((m) => m.id !== tempId));
       } else if (res.message) {
         setMessages((prev) =>
-          prev.map((m) => (m.id === tempId ? (res.message as unknown as ChatMessage) : m)),
+          prev.map((m) =>
+            m.id === tempId ? (res.message as unknown as ChatMessage) : m,
+          ),
         );
       }
     } catch {
@@ -361,63 +380,43 @@ export function WorkspaceChatView({
   // If user has zero projects
   if (projects.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-border p-8 text-center shadow-clay space-y-4 max-w-lg mx-auto mt-12">
+      <div className="bg-white rounded-3xl border border-[#DCE3F0] p-8 text-center shadow-clay space-y-4 max-w-md mx-auto mt-12">
         <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto shadow-clay-button">
           <MessageSquare className="w-6 h-6" />
         </div>
         <div className="space-y-1">
-          <h2 className="text-[17px] font-bold text-foreground">
-            No Project Groups Yet
+          <h2 className="text-[17px] font-bold text-[#0B1220]">
+            No Project Channels
           </h2>
           <p className="text-[13px] text-text-muted">
-            Project chat groups are automatically created for every project you
-            are assigned to. Once you create or join a project, you and your
-            team will be added here automatically.
+            Project chat groups are automatically created for each project you
+            join.
           </p>
         </div>
         <Link
           href="/projects"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#101828] text-white text-[13px] font-semibold rounded-xl hover:bg-black transition-colors shadow-clay-button"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-white text-[13px] font-semibold rounded-xl hover:bg-primary-hover transition-colors shadow-clay-button"
         >
           View Projects
-          <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {/* Top Bar Info */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-[18px] font-bold text-foreground tracking-tight">
-              Team Chat & Project Channels
-            </h1>
-            <span className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-              Auto-Synced Groups
-            </span>
-          </div>
-          <p className="text-[12px] text-text-muted">
-            Every project has a dedicated group with all assigned team members
-            automatically included.
-          </p>
-        </div>
-      </div>
-
-      {/* Main Split Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 h-[calc(100vh-175px)] min-h-[580px]">
+    <div className="h-[calc(100vh-140px)] min-h-[580px] flex flex-col gap-2">
+      {/* Main Clay Container Shell */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 h-full overflow-hidden">
         {/* Left Column: Project Channel / Group List */}
-        <div className="lg:col-span-4 xl:col-span-3 bg-white rounded-2xl border border-border shadow-clay flex flex-col overflow-hidden">
-          {/* Header & Search */}
-          <div className="p-3 border-b border-border bg-[#F8FAFC]/70 space-y-2">
+        <div className="lg:col-span-4 xl:col-span-3.5 bg-white rounded-2xl border border-[#DCE3F0] shadow-clay flex flex-col overflow-hidden">
+          {/* Channel Header & Search */}
+          <div className="p-3 border-b border-[#E9EEF6] bg-gradient-to-b from-[#F8FAFF] to-white space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[11px] font-bold uppercase tracking-wider text-text-muted">
-                Project Channels ({filteredProjects.length})
+                Project Channels
               </span>
-              <span className="text-[10px] font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded-md">
-                Live
+              <span className="text-[11px] font-semibold text-primary bg-[#E8EEFF] px-2 py-0.5 rounded-full">
+                {projects.length}
               </span>
             </div>
             <div className="relative">
@@ -426,14 +425,14 @@ export function WorkspaceChatView({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search channel or member..."
-                className="w-full h-8 pl-8 pr-2.5 text-[12px] bg-[#EEF2F6] border border-transparent rounded-xl focus:bg-white focus:border-primary/40 focus:outline-none shadow-clay-inset transition-all"
+                placeholder="Search channel..."
+                className="w-full h-8 pl-8 pr-2.5 text-[12px] bg-[#F8FAFF] border border-[#DCE3F0]/80 rounded-xl focus:bg-white focus:border-primary focus:outline-none shadow-clay-inset transition-all"
               />
             </div>
           </div>
 
           {/* Channels Scroll Area */}
-          <div className="flex-1 overflow-y-auto divide-y divide-border/50">
+          <div className="flex-1 overflow-y-auto divide-y divide-[#F1F4FA] p-1.5 space-y-1">
             {filteredProjects.map((project) => {
               const isSelected = project.id === activeProjectId;
               const hasMembers = project.members.length;
@@ -442,51 +441,54 @@ export function WorkspaceChatView({
                 <div
                   key={project.id}
                   onClick={() => selectChannel(project.id)}
-                  className={`p-3 cursor-pointer transition-all ${
+                  className={`px-3 py-2.5 rounded-xl cursor-pointer transition-all flex items-center gap-3 ${
                     isSelected
-                      ? "bg-[#EFF6FF] border-l-4 border-l-primary shadow-clay-card"
-                      : "hover:bg-[#F8FAFC]"
+                      ? "bg-[#EFF4FF] border border-[#BFDBFE] shadow-clay-subtle"
+                      : "hover:bg-[#F8FAFC] border border-transparent"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-mono font-bold text-primary px-1.5 py-0.5 bg-primary/10 rounded">
-                          #{project.projectCode}
-                        </span>
-                        <h3 className="text-[13px] font-bold text-foreground truncate">
-                          {project.name}
-                        </h3>
-                      </div>
+                  {/* Clean Hashtag Icon */}
+                  <div
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-[13px] shrink-0 transition-colors ${
+                      isSelected
+                        ? "bg-[#1E3A8A] text-white shadow-clay-button"
+                        : "bg-[#F1F4FA] text-[#475467] group-hover:bg-[#E8EEFF] group-hover:text-primary"
+                    }`}
+                  >
+                    <Hash className="w-4 h-4 stroke-[2.5]" />
+                  </div>
 
-                      {/* Last message snippet or member summary */}
-                      <p className="text-[11px] text-text-muted truncate mt-1">
-                        {project.lastMessage ? (
-                          <>
-                            <span className="font-semibold text-foreground/80">
-                              {project.lastMessage.senderName}:{" "}
-                            </span>
-                            {project.lastMessage.content}
-                          </>
-                        ) : (
-                          <span className="italic text-text-muted">
-                            Channel active • {hasMembers} members
-                          </span>
-                        )}
-                      </p>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className="text-[10px] text-text-muted flex items-center gap-1">
-                        <Users className="w-3 h-3 text-text-muted" />
-                        {hasMembers}
-                      </span>
+                  {/* Clean Project Name (NO ID prefix clutter) */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <h3
+                        className={`text-[13px] truncate ${
+                          isSelected
+                            ? "font-bold text-[#0B1220]"
+                            : "font-medium text-[#344054]"
+                        }`}
+                      >
+                        {project.name}
+                      </h3>
                       {project.status && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-surface-hover text-text-secondary border border-border uppercase">
-                          {project.status.slice(0, 7)}
+                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-[#F1F4FA] text-[#667085] uppercase shrink-0">
+                          {project.status}
                         </span>
                       )}
                     </div>
+
+                    <p className="text-[11px] text-text-muted truncate mt-0.5">
+                      {project.lastMessage ? (
+                        <>
+                          <span className="font-medium text-[#475467]">
+                            {project.lastMessage.senderName}:{" "}
+                          </span>
+                          {project.lastMessage.content}
+                        </>
+                      ) : (
+                        <span>{hasMembers} team members</span>
+                      )}
+                    </p>
                   </div>
                 </div>
               );
@@ -494,7 +496,7 @@ export function WorkspaceChatView({
 
             {filteredProjects.length === 0 && (
               <div className="p-6 text-center text-text-muted text-[12px]">
-                No matching project channels found.
+                No matching project channels.
               </div>
             )}
           </div>
@@ -502,108 +504,58 @@ export function WorkspaceChatView({
 
         {/* Right Column: Active Channel Group Chat */}
         {activeProject ? (
-          <div className="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl border border-border shadow-clay flex flex-col overflow-hidden">
+          <div className="lg:col-span-8 xl:col-span-8.5 bg-white rounded-2xl border border-[#DCE3F0] shadow-clay flex flex-col overflow-hidden relative">
             {/* Channel Top Header */}
-            <div className="px-4 py-3 border-b border-border bg-[#F8FAFC]/90 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#101828] text-white flex items-center justify-center font-bold text-[13px] shadow-clay-button shrink-0">
-                  #{activeProject.projectCode.slice(-3)}
+            <div className="px-4 py-2.5 border-b border-[#E9EEF6] bg-gradient-to-b from-[#F8FAFF] to-white flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-xl bg-[#1E3A8A] text-white flex items-center justify-center font-bold text-[13px] shadow-clay-button shrink-0">
+                  <Hash className="w-4 h-4 stroke-[2.5]" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h2 className="text-[15px] font-bold text-foreground">
-                      {activeProject.name}
-                    </h2>
-                    <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary font-bold">
-                      {activeProject.projectCode}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowMembersDrawer((prev) => !prev)}
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-text-secondary bg-surface hover:bg-surface-hover border border-border px-2 py-0.5 rounded-lg transition-colors"
-                      title="Toggle members drawer"
-                    >
-                      <Users className="w-3 h-3 text-primary" />
-                      {activeProject.members.length} Members
-                      <ChevronRight
-                        className={`w-3 h-3 transition-transform ${showMembersDrawer ? "rotate-90" : ""}`}
-                      />
-                    </button>
-                  </div>
-                  <p className="text-[11px] text-text-muted mt-0.5">
-                    Auto-created project group • Click any member pill to mention
+                <div className="min-w-0">
+                  {/* Clean Project Name as Chat Group Name */}
+                  <h2 className="text-[15px] font-bold text-[#0B1220] truncate">
+                    {activeProject.name}
+                  </h2>
+                  <p className="text-[11px] text-text-muted truncate">
+                    Auto-created project channel • Click members to mention
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* Action buttons: Member Pill (click to show names) and Overview */}
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Team Members Button -> Only shows member names on click */}
+                <button
+                  type="button"
+                  onClick={() => setShowMembersPanel((prev) => !prev)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[12px] font-semibold transition-all ${
+                    showMembersPanel
+                      ? "bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-clay-button"
+                      : "bg-[#F8FAFF] text-[#344054] border-[#DCE3F0] hover:bg-[#EEF2F6] hover:border-[#CBD5E1]"
+                  }`}
+                  title="View project team members"
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>{activeProject.members.length} Members</span>
+                  <ChevronDown
+                    className={`w-3 h-3 transition-transform ${showMembersPanel ? "rotate-180" : ""}`}
+                  />
+                </button>
+
                 <Link
                   href={`/projects/${activeProject.id}`}
-                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-primary hover:text-primary-hover bg-primary/10 hover:bg-primary/15 px-3 py-1.5 rounded-xl transition-colors"
+                  className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#1E3A8A] hover:text-[#1A3278] bg-[#E8EEFF] hover:bg-[#DCE7FE] px-2.5 py-1.5 rounded-xl transition-colors"
+                  title="Open Project"
                 >
-                  <span>Project Overview</span>
+                  <span>Project</span>
                   <ExternalLink className="w-3 h-3" />
                 </Link>
               </div>
             </div>
 
-            {/* Quick Members Strip / Collapsible Drawer */}
-            <div
-              className={`bg-[#FAFCFE] border-b border-border transition-all overflow-hidden ${
-                showMembersDrawer ? "max-h-56 p-3" : "max-h-12 px-3 py-1.5"
-              }`}
-            >
-              <div className="flex items-center gap-2 overflow-x-auto touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-text-muted shrink-0 mr-1">
-                  Team Members:
-                </span>
-                {activeProject.members.map((member) => {
-                  const isActingLead = member.projectRole === "ACTING_LEAD";
-                  const isLead = member.isLead;
-
-                  return (
-                    <button
-                      key={member.id}
-                      type="button"
-                      onClick={() => insertMention(member)}
-                      title={`Click to @mention ${member.name} (${member.position || member.projectRole})`}
-                      className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-xl text-[11px] font-medium border shrink-0 transition-all ${
-                        isLead
-                          ? "bg-[#EEF2FF] border-[#C7D2FE] text-[#312E81] hover:bg-[#E0E7FF]"
-                          : isActingLead
-                            ? "bg-[#FFFBEB] border-[#FDE68A] text-[#92400E] hover:bg-[#FEF3C7]"
-                            : "bg-white border-[#E2E8F0] text-[#334155] hover:bg-[#F1F5F9]"
-                      }`}
-                    >
-                      <span className="w-4 h-4 rounded-full bg-[#101828] text-white flex items-center justify-center text-[8px] font-bold">
-                        {getInitials(member.name)}
-                      </span>
-                      <span className="font-semibold">{member.name}</span>
-
-                      {isLead && (
-                        <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-primary text-white">
-                          LEAD
-                        </span>
-                      )}
-                      {isActingLead && (
-                        <span className="text-[9px] font-bold px-1 py-0.2 rounded bg-amber-500 text-white">
-                          ACTING LEAD
-                        </span>
-                      )}
-                      {!isLead && !isActingLead && member.position && (
-                        <span className="text-[10px] text-text-muted">
-                          • {member.position}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Pinned Note Banner (if any) */}
             {pinnedMessages.length > 0 && (
-              <div className="bg-[#FFFBEB] border-b border-[#FDE68A] px-4 py-2 flex items-center justify-between text-[12px] text-[#92400E]">
+              <div className="bg-[#FFFBEB] border-b border-[#FDE68A] px-4 py-1.5 flex items-center justify-between text-[12px] text-[#92400E] shrink-0">
                 <div className="flex items-center gap-2 truncate">
                   <Pin className="w-3.5 h-3.5 text-amber-600 fill-amber-600 shrink-0" />
                   <span className="font-bold shrink-0">Pinned Note:</span>
@@ -617,130 +569,228 @@ export function WorkspaceChatView({
               </div>
             )}
 
-            {/* Messages Scroll Area */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-[#F8FAFC]/40">
-              {messages.length === 0 ? (
-                <div className="py-20 text-center space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mx-auto">
-                    <MessageSquare className="w-5 h-5" />
+            {/* Chat Body: Messages area with optional side panel for members */}
+            <div className="flex-1 flex overflow-hidden relative bg-[#F8FAFC]/50">
+              {/* Messages Scroll Area */}
+              <div className="flex-1 p-4 overflow-y-auto space-y-3">
+                {messages.length === 0 ? (
+                  <div className="py-20 text-center space-y-2">
+                    <div className="w-11 h-11 rounded-2xl bg-[#E8EEFF] text-[#1E3A8A] flex items-center justify-center mx-auto shadow-clay-button">
+                      <MessageSquare className="w-5 h-5" />
+                    </div>
+                    <h4 className="text-[14px] font-bold text-[#0B1220]">
+                      Welcome to #{activeProject.name}
+                    </h4>
+                    <p className="text-[12px] text-text-muted max-w-sm mx-auto">
+                      All {activeProject.members.length} project collaborators
+                      are included. Use @ to mention anyone or discuss deliverables.
+                    </p>
                   </div>
-                  <h4 className="text-[14px] font-bold text-foreground">
-                    Welcome to the {activeProject.name} Channel
-                  </h4>
-                  <p className="text-[12px] text-text-muted max-w-sm mx-auto">
-                    This group is automatically synced with all{" "}
-                    {activeProject.members.length} team members. Use @ to
-                    mention team members, discuss blockers, or share sprint
-                    deliverables.
-                  </p>
-                </div>
-              ) : (
-                messages.map((m) => {
-                  const isAuthor = m.user.id === currentUserId;
-                  const canDelete = isAuthor || isLeadOrAdmin;
+                ) : (
+                  messages.map((m) => {
+                    const isAuthor = m.user.id === currentUserId;
+                    const canDelete = isAuthor || isLeadOrAdmin;
 
-                  return (
-                    <div
-                      key={m.id}
-                      ref={(el) => {
-                        messageRefs.current[m.id] = el;
-                      }}
-                      className={`group flex items-start gap-3 p-2.5 rounded-xl transition-all ${
-                        m.isPinned
-                          ? "bg-amber-50/70 border border-amber-200/80"
-                          : "hover:bg-white hover:shadow-clay-card"
-                      }`}
-                    >
-                      {/* Avatar */}
-                      <div className="w-8 h-8 rounded-full bg-[#101828] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
-                        {getInitials(m.user.name)}
-                      </div>
-
-                      {/* Content */}
-                      <div className="flex-1 min-w-0">
-                        {/* Header info */}
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-[13px] font-bold text-foreground">
-                            {m.user.name}
-                          </span>
-                          {m.user.position && (
-                            <span className="text-[10px] font-medium text-text-muted">
-                              {m.user.position}
-                            </span>
-                          )}
-                          <span className="text-[10px] text-text-muted">
-                            {new Date(m.createdAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
-                          {m.isPinned && (
-                            <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded">
-                              <Pin className="w-2.5 h-2.5 fill-amber-700" />
-                              Pinned
-                            </span>
-                          )}
+                    return (
+                      <div
+                        key={m.id}
+                        ref={(el) => {
+                          messageRefs.current[m.id] = el;
+                        }}
+                        className={`group flex items-start gap-2.5 p-2 rounded-2xl transition-all ${
+                          m.isPinned
+                            ? "bg-amber-50/80 border border-amber-200"
+                            : "hover:bg-white hover:shadow-clay-subtle"
+                        }`}
+                      >
+                        {/* Avatar */}
+                        <div className="w-8 h-8 rounded-full bg-[#101828] text-white flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">
+                          {getInitials(m.user.name)}
                         </div>
 
-                        {/* Reply reference */}
-                        {m.replyTo && (
-                          <div className="mt-1 pl-2.5 border-l-2 border-primary/50 text-[11px] text-text-muted italic bg-surface/50 py-0.5 rounded-r">
-                            <span className="font-semibold text-foreground/80">
-                              @{m.replyTo.user.name}:{" "}
+                        {/* Content */}
+                        <div className="flex-1 min-w-0">
+                          {/* Header info */}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[13px] font-bold text-[#0B1220]">
+                              {m.user.name}
                             </span>
-                            {m.replyTo.content.slice(0, 90)}
+                            {m.user.position && (
+                              <span className="text-[10px] font-medium text-text-muted">
+                                {m.user.position}
+                              </span>
+                            )}
+                            <span className="text-[10px] text-text-muted">
+                              {new Date(m.createdAt).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                            {m.isPinned && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded">
+                                <Pin className="w-2.5 h-2.5 fill-amber-700" />
+                                Pinned
+                              </span>
+                            )}
                           </div>
-                        )}
 
-                        {/* Message body */}
-                        <p className="text-[13px] text-foreground leading-relaxed mt-1 whitespace-pre-wrap break-words">
-                          {m.content}
-                        </p>
-                      </div>
+                          {/* Reply reference */}
+                          {m.replyTo && (
+                            <div className="mt-1 pl-2.5 border-l-2 border-primary/50 text-[11px] text-text-muted italic bg-surface/50 py-0.5 rounded-r">
+                              <span className="font-semibold text-foreground/80">
+                                @{m.replyTo.user.name}:{" "}
+                              </span>
+                              {m.replyTo.content.slice(0, 80)}
+                            </div>
+                          )}
 
-                      {/* Hover Action Bar */}
-                      <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 bg-white border border-border shadow-sm rounded-lg p-0.5 transition-opacity shrink-0">
-                        <button
-                          type="button"
-                          onClick={() => setReplyingTo(m)}
-                          className="p-1 rounded text-text-muted hover:text-primary hover:bg-surface transition-colors"
-                          title="Reply"
-                        >
-                          <Reply className="w-3.5 h-3.5" />
-                        </button>
-                        {isLeadOrAdmin && (
+                          {/* Message body */}
+                          <p className="text-[13px] text-[#0B1220] leading-relaxed mt-1 whitespace-pre-wrap break-words">
+                            {m.content}
+                          </p>
+                        </div>
+
+                        {/* Hover Action Bar */}
+                        <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1 bg-white border border-[#DCE3F0] shadow-sm rounded-lg p-0.5 transition-opacity shrink-0">
                           <button
                             type="button"
-                            onClick={() => handleTogglePin(m.id)}
-                            className="p-1 rounded text-text-muted hover:text-amber-600 hover:bg-surface transition-colors"
-                            title={m.isPinned ? "Unpin" : "Pin"}
+                            onClick={() => setReplyingTo(m)}
+                            className="p-1 rounded text-text-muted hover:text-primary hover:bg-[#F8FAFF] transition-colors"
+                            title="Reply"
                           >
-                            <Pin className="w-3.5 h-3.5" />
+                            <Reply className="w-3.5 h-3.5" />
                           </button>
-                        )}
-                        {canDelete && (
-                          <button
-                            type="button"
-                            onClick={() => handleDelete(m.id)}
-                            className="p-1 rounded text-text-muted hover:text-red-600 hover:bg-surface transition-colors"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        )}
+                          {isLeadOrAdmin && (
+                            <button
+                              type="button"
+                              onClick={() => handleTogglePin(m.id)}
+                              className="p-1 rounded text-text-muted hover:text-amber-600 hover:bg-[#F8FAFF] transition-colors"
+                              title={m.isPinned ? "Unpin" : "Pin"}
+                            >
+                              <Pin className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                          {canDelete && (
+                            <button
+                              type="button"
+                              onClick={() => handleDelete(m.id)}
+                              className="p-1 rounded text-text-muted hover:text-red-600 hover:bg-[#F8FAFF] transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
                       </div>
+                    );
+                  })
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+
+              {/* Slide-out Team Members Panel (Only appears when "Members" is clicked!) */}
+              {showMembersPanel && (
+                <div className="w-72 bg-white border-l border-[#DCE3F0] shadow-clay flex flex-col z-20 transition-all animate-in slide-in-from-right duration-200">
+                  {/* Panel Header */}
+                  <div className="p-3 border-b border-[#E9EEF6] bg-[#F8FAFF] flex items-center justify-between">
+                    <div>
+                      <h3 className="text-[13px] font-bold text-[#0B1220]">
+                        Project Members
+                      </h3>
+                      <p className="text-[11px] text-text-muted">
+                        {activeProject.members.length} collaborators in group
+                      </p>
                     </div>
-                  );
-                })
+                    <button
+                      type="button"
+                      onClick={() => setShowMembersPanel(false)}
+                      className="p-1 rounded-lg text-text-muted hover:text-[#0B1220] hover:bg-[#EEF2F6]"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Panel Member Search */}
+                  <div className="p-2 border-b border-[#E9EEF6]">
+                    <div className="relative">
+                      <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-text-muted" />
+                      <input
+                        type="text"
+                        value={memberFilterQuery}
+                        onChange={(e) => setMemberFilterQuery(e.target.value)}
+                        placeholder="Search member..."
+                        className="w-full h-7 pl-6 pr-2 text-[11px] bg-[#F8FAFF] border border-[#DCE3F0] rounded-lg focus:outline-none focus:border-primary shadow-clay-inset"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Panel Member List */}
+                  <div className="flex-1 overflow-y-auto p-2 space-y-1 divide-y divide-[#F1F4FA]">
+                    {drawerMembers.map((member) => {
+                      const isActingLead = member.projectRole === "ACTING_LEAD";
+                      const isLead = member.isLead;
+
+                      return (
+                        <div
+                          key={member.id}
+                          className="pt-1.5 pb-1 flex items-center justify-between gap-2 hover:bg-[#F8FAFC] px-1.5 rounded-lg transition-colors"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <div className="w-7 h-7 rounded-full bg-[#101828] text-white flex items-center justify-center text-[9px] font-bold shrink-0">
+                              {getInitials(member.name)}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[12px] font-bold text-[#0B1220] truncate">
+                                  {member.name}
+                                </span>
+                                {isLead && (
+                                  <span className="text-[8px] font-bold px-1 py-0.2 rounded bg-primary text-white">
+                                    LEAD
+                                  </span>
+                                )}
+                                {isActingLead && (
+                                  <span className="text-[8px] font-bold px-1 py-0.2 rounded bg-amber-500 text-white">
+                                    ACTING LEAD
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[10px] text-text-muted truncate">
+                                {member.position || member.projectRole}
+                              </p>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              insertMention(member);
+                              setShowMembersPanel(false);
+                            }}
+                            className="px-2 py-0.5 rounded text-[10px] font-semibold bg-[#E8EEFF] text-primary hover:bg-primary hover:text-white transition-colors shrink-0"
+                            title="Mention in chat"
+                          >
+                            @ Mention
+                          </button>
+                        </div>
+                      );
+                    })}
+
+                    {drawerMembers.length === 0 && (
+                      <div className="p-4 text-center text-text-muted text-[11px]">
+                        No members found.
+                      </div>
+                    )}
+                  </div>
+                </div>
               )}
-              <div ref={messagesEndRef} />
             </div>
 
             {/* Chat Composer */}
-            <div className="p-3 border-t border-border bg-white space-y-2">
+            <div className="p-3 border-t border-[#E9EEF6] bg-white space-y-2 shrink-0">
               {/* Replying banner */}
               {replyingTo && (
-                <div className="flex items-center justify-between px-3 py-1.5 bg-[#EFF6FF] border border-[#BFDBFE] rounded-xl text-[12px]">
+                <div className="flex items-center justify-between px-3 py-1.5 bg-[#EFF4FF] border border-[#BFDBFE] rounded-xl text-[12px]">
                   <div className="flex items-center gap-1.5 truncate text-[#1E40AF]">
                     <Reply className="w-3.5 h-3.5 shrink-0" />
                     <span>Replying to</span>
@@ -761,7 +811,7 @@ export function WorkspaceChatView({
 
               {/* Mentions popup */}
               {showMentionMenu && filteredMembers.length > 0 && (
-                <div className="p-1.5 bg-white border border-border rounded-xl shadow-clay space-y-0.5 max-h-44 overflow-y-auto">
+                <div className="p-1.5 bg-white border border-[#DCE3F0] rounded-2xl shadow-clay space-y-0.5 max-h-44 overflow-y-auto">
                   <div className="px-2 py-1 text-[10px] font-bold text-text-muted uppercase tracking-wider">
                     Mention Team Member
                   </div>
@@ -770,7 +820,7 @@ export function WorkspaceChatView({
                       key={member.id}
                       type="button"
                       onClick={() => insertMention(member)}
-                      className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between text-[12px] transition-colors ${
+                      className={`w-full text-left px-2.5 py-1.5 rounded-xl flex items-center justify-between text-[12px] transition-colors ${
                         idx === highlightedMentionIndex
                           ? "bg-primary text-white"
                           : "hover:bg-surface-hover text-foreground"
@@ -804,19 +854,19 @@ export function WorkspaceChatView({
                 </div>
               )}
 
-              {/* Textarea & Send Button */}
-              <div className="relative">
+              {/* Input Clay Container */}
+              <div className="relative bg-[#F8FAFF] rounded-2xl border border-[#DCE3F0] shadow-clay-inset p-2.5">
                 <textarea
                   ref={textareaRef}
                   value={inputText}
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
-                  placeholder={`Message #${activeProject.projectCode} channel... (type @ to mention a member)`}
+                  placeholder={`Message #${activeProject.name}... (type @ to mention a member)`}
                   rows={2}
-                  className="w-full p-2.5 pr-14 text-[13px] bg-[#F8FAFC] border border-[#CBD5E1] rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary shadow-clay-inset resize-none transition-all placeholder:text-text-muted"
+                  className="w-full pr-24 text-[13px] bg-transparent text-[#0B1220] focus:outline-none resize-none placeholder:text-text-muted"
                 />
 
-                <div className="absolute right-2 bottom-2.5 flex items-center gap-1">
+                <div className="absolute right-2.5 bottom-2.5 flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => insertMention({ name: "" })}
@@ -830,17 +880,18 @@ export function WorkspaceChatView({
                     type="button"
                     onClick={() => handleSubmit()}
                     disabled={isSubmitting || !inputText.trim()}
-                    className="p-1.5 bg-[#101828] text-white hover:bg-black disabled:opacity-40 rounded-lg shadow-clay-button transition-all"
+                    className="px-3.5 py-1.5 bg-[#1E3A8A] text-white hover:bg-[#1A3278] active:translate-y-0.5 disabled:opacity-40 rounded-xl shadow-clay-button text-[12px] font-semibold flex items-center gap-1 transition-all"
                     title="Send message (Enter)"
                   >
-                    <Send className="w-3.5 h-3.5" />
+                    <span>Send</span>
+                    <Send className="w-3 h-3" />
                   </button>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="lg:col-span-8 xl:col-span-9 bg-white rounded-2xl border border-border shadow-clay flex items-center justify-center p-8 text-center text-text-muted">
+          <div className="lg:col-span-8 xl:col-span-8.5 bg-white rounded-2xl border border-[#DCE3F0] shadow-clay flex items-center justify-center p-8 text-center text-text-muted">
             Select a project channel to start chatting.
           </div>
         )}
